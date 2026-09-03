@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="NextGenTechBD — আপনার অর্ডার ট্র্যাক করুন, অ্যাকাউন্টে লগইন করুন ও অর্ডার হিস্টোরি দেখুন" />
+<title>আমার অর্ডার — NextGenTechBD</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+<style>
+:root{--orange:#F85606;--orange-dark:#e04a04;--orange-light:#fff1ea;--red:#f5224d;--green:#06a94a;--bg:#f4f4f4;--card:#fff;--text:#222;--muted:#8a8a8a;--border:#ececec;--radius:12px;--shadow:0 2px 10px rgba(0,0,0,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hind Siliguri','Noto Sans Bengali',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14.5px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none}
+input{font-family:inherit;font-size:14px;outline:none;padding:10px 12px;border:1px solid #ddd;border-radius:9px;width:100%;background:#fff}
+label{font-size:12.5px;color:#555;font-weight:600;display:block;margin-bottom:4px}
+.field{margin-bottom:14px}
+.container{max-width:760px;margin:0 auto;padding:16px}
+.hidden{display:none !important}
+
+header{background:linear-gradient(90deg,#d63e00,var(--orange));color:#fff;padding:16px 0}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;font-size:17px;display:flex;align-items:center;gap:8px}
+.brand small{display:block;font-weight:400;font-size:11.5px;opacity:.85}
+.home-link{background:rgba(255,255,255,.2);padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:700;color:#fff}
+.home-link:hover{background:rgba(255,255,255,.32)}
+
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+.card h2{font-size:16.5px;margin-bottom:4px;color:var(--orange-dark)}
+.card .sub{color:var(--muted);font-size:12.5px;margin-bottom:16px}
+
+.btn{background:var(--orange);color:#fff;padding:11px 18px;border-radius:9px;font-weight:700;font-size:14px;width:100%}
+.btn:hover{background:var(--orange-dark)}
+.btn.gray{background:#eee;color:#333}
+.btn.gray:hover{background:#ddd}
+.btn.small{width:auto;padding:7px 14px;font-size:12.5px}
+
+.tabs2{display:flex;background:#f2f2f2;border-radius:10px;padding:3px;margin-bottom:16px}
+.tab2{flex:1;text-align:center;padding:9px;border-radius:8px;font-weight:700;font-size:13px;color:#666;cursor:pointer}
+.tab2.on{background:#fff;color:var(--orange-dark);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+.msg{padding:11px 13px;border-radius:9px;font-size:13px;margin-bottom:14px}
+.msg.ok{background:#e8f8ef;color:#0a7a3d}
+.msg.error{background:#fdeaea;color:#c22}
+
+.order-item{border:1px solid var(--border);border-radius:10px;padding:13px 14px;margin-bottom:10px}
+.order-item .oi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.order-no{font-weight:800;color:var(--orange-dark);font-size:14px}
+.order-date{color:var(--muted);font-size:12px}
+.order-total{font-weight:800;font-size:15px}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:700}
+.badge.pending{background:#fff3d6;color:#b07800}
+.badge.confirmed{background:#e3ecff;color:#2b6de8}
+.badge.shipped{background:#efe3ff;color:#7c3aed}
+.badge.delivered{background:#e0f7e9;color:#06a94a}
+.badge.cancelled{background:#fde0e6;color:#d92646}
+.oi-items{margin-top:9px;font-size:12.5px;color:#555;border-top:1px dashed var(--border);padding-top:9px}
+.oi-items div{margin-bottom:3px}
+.tl{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.tl span{font-size:11px;padding:3px 9px;border-radius:10px;background:#f4f4f4;color:#888}
+.tl span.active{background:var(--orange-light);color:var(--orange-dark);font-weight:700}
+
+.empty{text-align:center;padding:30px 10px;color:var(--muted)}
+.empty .ee{font-size:38px;margin-bottom:8px}
+.spinner{text-align:center;padding:24px;color:var(--muted)}
+.logout-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.greet{font-size:15px;font-weight:700}
+.greet small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.link{color:var(--orange-dark);font-weight:700;font-size:12.5px;cursor:pointer;text-decoration:underline;text-align:center;display:block;margin-top:12px}
+.link:hover{color:var(--orange)}
+.back-link{color:var(--muted);font-size:12.5px;cursor:pointer;text-decoration:underline;display:inline-block;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="brand">🛍️ NextGenTechBD<small>আমার অর্ডার ও অ্যাকাউন্ট</small></div>
+    <a class="home-link" href="/">🏠 হোমে ফিরুন</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===================== TRACK ORDER (সবার জন্য, লগইন ছাড়াই) ===================== -->
+  <div class="card">
+    <h2>📦 অর্ডার ট্র্যাক করুন</h2>
+    <div class="sub">অর্ডার আইডি ও মোবাইল নম্বর দিয়ে যেকোনো অর্ডারের বর্তমান অবস্থা দেখুন — লগইন করার দরকার নেই</div>
+    <div id="trackMsg"></div>
+    <div class="field">
+      <label>অর্ডার আইডি</label>
+      <input id="trackOrderNo" placeholder="যেমন SB12345678" />
+    </div>
+    <div class="field">
+      <label>মোবাইল নম্বর</label>
+      <input id="trackPhone" maxlength="11" inputmode="numeric" placeholder="01XXXXXXXXX" />
+    </div>
+    <button class="btn" onclick="trackOrder()">🔍 ট্র্যাক করুন</button>
+    <div id="trackResult" style="margin-top:14px"></div>
+  </div>
+
+  <!-- ===================== ACCOUNT (লগইন/রেজিস্টার/হিস্টোরি) ===================== -->
+  <div id="loggedOutCard" class="card">
+    <h2>👤 অ্যাকাউন্ট</h2>
+    <div class="sub">লগইন করে আপনার সব অর্ডারের সম্পূর্ণ হিস্টোরি এক জায়গায় দেখুন</div>
+    <div class="tabs2">
+      <div class="tab2 on" data-t="login" onclick="switchAuthTab('login')">লগইন</div>
+      <div class="tab2" data-t="register" onclick="switchAuthTab('register')">নতুন অ্যাকাউন্ট</div>
+    </div>
+    <div id="authMsg"></div>
+
+    <form id="loginForm" onsubmit="doCustomerLogin(event)">
+      <div class="field"><label>মোবাইল নম্বর</label><input id="li_phone" maxlength="11" inputmode="numeric" placeholder="01XXXXXXXXX" required /></div>
+      <div class="field"><label>পাসওয়ার্ড</label><input id="li_password" type="password" placeholder="আপনার পাসওয়ার্ড" required /></div>
+      <button type="submit" class="btn">লগইন করুন</button>
+      <span class="link" onclick="showForgotForm()">পাসওয়ার্ড ভুলে গেছেন?</span>
+    </form>
+
+    <form id="registerForm" class="hidden" onsubmit="doCustomerRegister(event)">
+      <div class="field"><label>পূর্ণ নাম</label><input id="rg_name" placeholder="আপনার নাম" required /></div>
+      <div class="field"><label>মোবাইল নম্বর</label><input id="rg_phone" maxlength="11" inputmode="numeric" placeholder="01XXXXXXXXX" required /></div>
+      <div class="field"><label>ইমেইল (ঐচ্ছিক)</label><input id="rg_email" type="email" placeholder="you@example.com" /></div>
+      <div class="field"><label>পাসওয়ার্ড (কমপক্ষে ৬ ক্যারেক্টার)</label><input id="rg_password" type="password" placeholder="একটি পাসওয়ার্ড দিন" required /></div>
+      <button type="submit" class="btn">অ্যাকাউন্ট তৈরি করুন</button>
+    </form>
+
+    <form id="forgotForm" class="hidden" onsubmit="doForgotPasswordStep1(event)">
+      <span class="back-link" onclick="showLoginForm()">← লগইনে ফিরুন</span>
+      <div class="sub" style="margin-top:0">আপনার অ্যাকাউন্টের মোবাইল নম্বর দিন</div>
+      <div class="field"><label>মোবাইল নম্বর</label><input id="fp_phone" maxlength="11" inputmode="numeric" placeholder="01XXXXXXXXX" required /></div>
+      <button type="submit" class="btn">পরবর্তী ধাপ →</button>
+    </form>
+
+    <form id="newPasswordForm" class="hidden" onsubmit="doSetNewPassword(event)">
+      <span class="back-link" onclick="showForgotForm()">← নম্বর পরিবর্তন করুন</span>
+      <div class="sub" style="margin-top:0">নতুন পাসওয়ার্ড দিন</div>
+      <div class="field"><label>নতুন পাসওয়ার্ড (কমপক্ষে ৬ ক্যারেক্টার)</label><input id="np_password" type="password" placeholder="নতুন পাসওয়ার্ড" required /></div>
+      <div class="field"><label>নতুন পাসওয়ার্ড আবার লিখুন</label><input id="np_password2" type="password" placeholder="পাসওয়ার্ড আবার লিখুন" required /></div>
+      <button type="submit" class="btn">পাসওয়ার্ড সেট করুন</button>
+    </form>
+  </div>
+
+  <div id="loggedInCard" class="card hidden">
+    <div class="logout-row">
+      <div class="greet" id="greetBox">শুভেচ্ছা!</div>
+      <button class="btn gray small" onclick="doCustomerLogout()">লগআউট</button>
+    </div>
+    <div id="historyMsg"></div>
+    <div id="orderHistory"><div class="spinner">লোড হচ্ছে…</div></div>
+  </div>
+
+</div>
+
+<script>
+const API = '/api';
+let SESSION_TOKEN = localStorage.getItem('ngtbd_session_token') || '';
+const STATUS_L = {pending:'🕐 অপেক্ষমান', confirmed:'✔ নিশ্চিত', shipped:'🚚 পাঠানো হয়েছে', delivered:'✅ ডেলিভার্ড', cancelled:'✖ বাতিল'};
+const STATUS_ORDER = ['pending','confirmed','shipped','delivered'];
+
+function $(id){ return document.getElementById(id); }
+function qs(name){ return new URL(location.href).searchParams.get(name); }
+
+/* ============ AUTH TABS ============ */
+let FORGOT_PHONE = '';
+function switchAuthTab(t){
+  document.querySelectorAll('.tab2').forEach(el=>el.classList.toggle('on', el.dataset.t===t));
+  $('loginForm').classList.toggle('hidden', t!=='login');
+  $('registerForm').classList.toggle('hidden', t!=='register');
+  $('forgotForm').classList.add('hidden');
+  $('newPasswordForm').classList.add('hidden');
+  $('authMsg').innerHTML='';
+}
+function showForgotForm(){
+  document.querySelectorAll('.tab2').forEach(el=>el.classList.remove('on'));
+  $('loginForm').classList.add('hidden');
+  $('registerForm').classList.add('hidden');
+  $('newPasswordForm').classList.add('hidden');
+  $('forgotForm').classList.remove('hidden');
+  $('fp_phone').value='';
+  $('authMsg').innerHTML='';
+}
+function showLoginForm(){
+  switchAuthTab('login');
+}
+function showAuthMsg(text,type){ $('authMsg').innerHTML = '<div class="msg '+type+'">'+text+'</div>'; }
+function showTrackMsg(text,type){ $('trackMsg').innerHTML = text ? '<div class="msg '+type+'">'+text+'</div>' : ''; }
+
+/* ============ CUSTOMER API HELPER ============ */
+async function customerApi(path, method='GET', body){
+  const headers = {'Content-Type':'application/json'};
+  if(SESSION_TOKEN) headers['X-Session-Token'] = SESSION_TOKEN;
+  const r = await fetch(API+path, {method, headers, body: body!==undefined ? JSON.stringify(body) : undefined});
+  const j = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error || 'একটি সমস্যা হয়েছে');
+  return j;
+}
+
+/* ============ REGISTER / LOGIN / LOGOUT ============ */
+async function doCustomerRegister(ev){
+  ev.preventDefault();
+  const body = { name:$('rg_name').value.trim(), phone:$('rg_phone').value.trim(), email:$('rg_email').value.trim(), password:$('rg_password').value };
+  try{
+    const j = await customerApi('/customer/register','POST',body);
+    SESSION_TOKEN = j.token;
+    localStorage.setItem('ngtbd_session_token', j.token);
+    showApp();
+  }catch(e){ showAuthMsg('❌ '+e.message,'error'); }
+}
+async function doCustomerLogin(ev){
+  ev.preventDefault();
+  const body = { phone:$('li_phone').value.trim(), password:$('li_password').value };
+  try{
+    const j = await customerApi('/customer/login','POST',body);
+    SESSION_TOKEN = j.token;
+    localStorage.setItem('ngtbd_session_token', j.token);
+    showApp();
+  }catch(e){ showAuthMsg('❌ '+e.message,'error'); }
+}
+async function doCustomerLogout(){
+  try{ await customerApi('/customer/logout','POST',{}); }catch(e){}
+  localStorage.removeItem('ngtbd_session_token');
+  SESSION_TOKEN='';
+  $('loggedInCard').classList.add('hidden');
+  $('loggedOutCard').classList.remove('hidden');
+}
+
+/* ============ FORGOT / RESET PASSWORD (দুই ধাপ: নম্বর যাচাই → নতুন পাসওয়ার্ড সেট) ============ */
+async function doForgotPasswordStep1(ev){
+  ev.preventDefault();
+  const phone = $('fp_phone').value.trim();
+  if(!/^01[3-9]\d{8}$/.test(phone)){ showAuthMsg('❌ সঠিক মোবাইল নম্বর দিন','error'); return; }
+  try{
+    await customerApi('/customer/forgot-password','POST',{phone});
+    FORGOT_PHONE = phone;
+    $('forgotForm').classList.add('hidden');
+    $('newPasswordForm').classList.remove('hidden');
+    $('np_password').value='';
+    $('np_password2').value='';
+    $('authMsg').innerHTML='';
+  }catch(e){ showAuthMsg('❌ '+e.message,'error'); }
+}
+async function doSetNewPassword(ev){
+  ev.preventDefault();
+  const p1 = $('np_password').value, p2 = $('np_password2').value;
+  $('authMsg').innerHTML='';
+  if(p1.length<6){ showAuthMsg('পাসওয়ার্ড কমপক্ষে ৬ ক্যারেক্টার হতে হবে','error'); return; }
+  if(p1!==p2){ showAuthMsg('দুটো পাসওয়ার্ড মিলছে না','error'); return; }
+  try{
+    await customerApi('/customer/reset-password','POST',{phone:FORGOT_PHONE, password:p1});
+    switchAuthTab('login');
+    $('li_phone').value = FORGOT_PHONE;
+    showAuthMsg('✅ পাসওয়ার্ড বদলানো হয়েছে — এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন','ok');
+  }catch(e){ showAuthMsg('❌ '+e.message,'error'); }
+}
+
+/* ============ APP STATE ============ */
+async function showApp(){
+  try{
+    const {customer} = await customerApi('/customer/me');
+    $('loggedOutCard').classList.add('hidden');
+    $('loggedInCard').classList.remove('hidden');
+    $('greetBox').innerHTML = '👋 শুভেচ্ছা, '+customer.name+'!<small>'+customer.phone+'</small>';
+    loadHistory();
+  }catch(e){
+    localStorage.removeItem('ngtbd_session_token');
+    SESSION_TOKEN='';
+    $('loggedInCard').classList.add('hidden');
+    $('loggedOutCard').classList.remove('hidden');
+  }
+}
+
+function orderCardHtml(o, withTimeline){
+  let items = o.items;
+  if(typeof items==='string'){ try{ items = JSON.parse(items); }catch(e){ items=[]; } }
+  const itemLines = Array.isArray(items) ? items.map(i => typeof i==='string' ? '<div>'+i+'</div>' : '').join('') : '';
+  const dt = (o.created_at||'').slice(0,16).replace('T',' ');
+  const tl = withTimeline ? '<div class="tl">'+STATUS_ORDER.map(s=>'<span class="'+(s===o.status||STATUS_ORDER.indexOf(s)<=STATUS_ORDER.indexOf(o.status)?'active':'')+'">'+STATUS_L[s]+'</span>').join('')+(o.status==='cancelled'?'<span class="active" style="background:#fde0e6;color:#d92646">✖ বাতিল</span>':'')+'</div>' : '';
+  return '<div class="order-item">'+
+    '<div class="oi-top">'+
+      '<div><div class="order-no">'+o.order_no+'</div><div class="order-date">'+dt+'</div></div>'+
+      '<div style="text-align:right"><div class="order-total">৳'+o.total+'</div><span class="badge '+o.status+'">'+STATUS_L[o.status]+'</span></div>'+
+    '</div>'+
+    (itemLines ? '<div class="oi-items">'+itemLines+'</div>' : '')+
+    tl+
+  '</div>';
+}
+
+async function loadHistory(){
+  const box = $('orderHistory');
+  box.innerHTML = '<div class="spinner">লোড হচ্ছে…</div>';
+  try{
+    const {orders} = await customerApi('/customer/orders');
+    if(!orders.length){
+      box.innerHTML = '<div class="empty"><div class="ee">📦</div><div>এখনো কোনো অর্ডার নেই</div></div>';
+      return;
+    }
+    box.innerHTML = orders.map(o=>orderCardHtml(o,false)).join('');
+  }catch(e){
+    box.innerHTML = '<div class="msg error">'+e.message+'</div>';
+  }
+}
+
+/* ============ PUBLIC TRACKING ============ */
+async function trackOrder(){
+  const orderNo = $('trackOrderNo').value.trim();
+  const phone = $('trackPhone').value.trim();
+  showTrackMsg('','');
+  if(!orderNo || !/^01[3-9]\d{8}$/.test(phone)){
+    showTrackMsg('সঠিক অর্ডার আইডি ও মোবাইল নম্বর দিন','error');
+    return;
+  }
+  $('trackResult').innerHTML = '<div class="spinner">খোঁজা হচ্ছে…</div>';
+  try{
+    const r = await fetch(API+'/orders/track?orderNo='+encodeURIComponent(orderNo)+'&phone='+encodeURIComponent(phone));
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error || 'অর্ডার পাওয়া যায়নি');
+    $('trackResult').innerHTML = orderCardHtml(j.order, true);
+  }catch(e){
+    $('trackResult').innerHTML='';
+    showTrackMsg('❌ '+e.message,'error');
+  }
+}
+
+/* ============ BOOT ============ */
+(function boot(){
+  const qOrderNo = qs('orderNo'), qPhone = qs('phone');
+  if(qOrderNo) $('trackOrderNo').value = qOrderNo;
+  if(qPhone) $('trackPhone').value = qPhone;
+  if(qOrderNo && qPhone) trackOrder();
+
+  if(SESSION_TOKEN) showApp();
+})();
+</script>
+</body>
+</html>

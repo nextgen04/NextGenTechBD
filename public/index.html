@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NextGenTechBD — বাংলাদেশের অনলাইন শপিং। ইলেকট্রনিক্স, ফ্যাশন, গ্রোসারি, হোম ও লিভিংসহ সব ধরনের পণ্য ঘরে বসে অর্ডার করুন। ক্যাশ অন ডেলিভারি সুবিধা!">
+<meta name="theme-color" content="#F85606">
+<meta property="og:title" content="NextGenTechBD — সব কিছু, এক ঠিকানায়!">
+<meta property="og:description" content="সব ধরনের পণ্য ঘরে বসে অর্ডার করুন — ক্যাশ অন ডেলিভারিতে!">
+<title>NextGenTechBD — অনলাইন শপিং বাংলাদেশ</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+<style>
+:root{
+  --orange:#F85606;
+  --orange-dark:#e04a04;
+  --orange-light:#fff1ea;
+  --red:#f5224d;
+  --yellow:#ffc400;
+  --green:#06a94a;
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --text:#222222;
+  --muted:#8a8a8a;
+  --border:#ececec;
+  --shadow:0 2px 10px rgba(0,0,0,.07);
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Hind Siliguri','Noto Sans Bengali','SolaimanLipi','Kalpurush',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.55;
+}
+img{max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:14px;outline:none}
+.container{max-width:1220px;margin:0 auto;padding:0 14px}
+
+/* ============ TOP BAR ============ */
+.topbar{background:linear-gradient(90deg,#d63e00,#F85606);color:#fff;font-size:13px}
+.topbar .container{display:flex;justify-content:space-between;align-items:center;height:34px}
+.topbar-links{display:flex;gap:16px;align-items:center}
+.topbar-links span{cursor:pointer;opacity:.95}
+.topbar-links span:hover{opacity:1;text-decoration:underline}
+.topbar-right{display:flex;gap:14px;align-items:center}
+.langsw{display:flex;background:rgba(255,255,255,.18);border-radius:14px;padding:2px;gap:2px}
+.langsw span{padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:700;cursor:pointer;opacity:.85}
+.langsw span.on{background:#fff;color:var(--orange-dark);opacity:1}
+@media(max-width:640px){.topbar-promo{display:none}.topbar .container{justify-content:space-between}}
+
+/* ============ HEADER ============ */
+header{background:#fff;box-shadow:0 1px 0 var(--border);position:sticky;top:0;z-index:500}
+.header-main{display:flex;align-items:center;gap:18px;padding:14px 0}
+.logo{display:flex;align-items:center;gap:8px;font-size:28px;font-weight:800;white-space:nowrap;cursor:pointer}
+.logo .logo-icon{font-size:30px}
+.logo b{color:var(--orange)}
+.logo small{display:block;font-size:10.5px;font-weight:500;color:var(--muted);letter-spacing:.3px}
+.search-wrap{flex:1;display:flex;position:relative;max-width:640px}
+.search-wrap input{flex:1;border:2px solid var(--orange);border-right:none;border-radius:8px 0 0 8px;padding:10px 14px;font-size:14.5px;background:#fff}
+.search-wrap input:focus{box-shadow:0 0 0 3px rgba(248,86,6,.15)}
+.search-btn{background:var(--orange);color:#fff;border-radius:0 8px 8px 0;padding:0 20px;font-size:18px;transition:.2s}
+.search-btn:hover{background:var(--orange-dark)}
+.header-actions{display:flex;gap:8px;margin-left:auto}
+.hicon{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 10px;border-radius:8px;cursor:pointer;color:#555;font-size:11.5px;transition:.15s}
+.hicon .he{font-size:22px;line-height:1}
+.hicon:hover{color:var(--orange);background:var(--orange-light)}
+.badge{position:absolute;top:-2px;right:2px;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #fff;transition:.2s}
+.badge.pop{transform:scale(1.35)}
+@media(max-width:768px){
+  .header-main{flex-wrap:wrap;gap:10px}
+  .logo{font-size:23px}
+  .search-wrap{order:3;width:100%;max-width:100%}
+  .hicon .ht{display:none}
+}
+
+/* ============ NAVBAR ============ */
+.navbar{background:#fff;border-top:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.navbar .container{display:flex;gap:8px;overflow-x:auto;padding:8px 14px;scrollbar-width:none}
+.navbar .container::-webkit-scrollbar{display:none}
+.navchip{white-space:nowrap;padding:5px 14px;border-radius:20px;font-size:13.5px;color:#555;background:#f6f6f6;transition:.15s;display:flex;align-items:center;gap:5px;cursor:pointer}
+.navchip:hover{color:var(--orange);background:var(--orange-light)}
+.navchip.active{background:var(--orange);color:#fff}
+.navchip.hot{color:var(--red);font-weight:700}
+
+/* ============ HERO ============ */
+.hero-row{display:grid;grid-template-columns:1fr 300px;gap:14px;margin:16px 0}
+.carousel{position:relative;border-radius:var(--radius);overflow:hidden;height:290px;box-shadow:var(--shadow)}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;padding:20px}
+.slide.on{opacity:1}
+.slide .big{font-size:56px;margin-bottom:10px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}
+.slide h2{font-size:30px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.3);margin-bottom:6px}
+.slide p{font-size:16px;opacity:.95;margin-bottom:16px}
+.slide .cta{background:#fff;color:#c22a00;font-weight:700;padding:10px 26px;border-radius:24px;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:.2s}
+.slide .cta:hover{transform:translateY(-2px)}
+.caro-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.85);width:36px;height:36px;border-radius:50%;font-size:17px;display:flex;align-items:center;justify-content:center;z-index:5;transition:.2s}
+.caro-arrow:hover{background:#fff}
+.caro-arrow.l{left:10px}.caro-arrow.r{right:10px}
+.dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:5}
+.dot{width:9px;height:9px;border-radius:5px;background:rgba(255,255,255,.5);cursor:pointer;transition:.25s}
+.dot.on{width:26px;background:#fff}
+.side-banners{display:flex;flex-direction:column;gap:14px}
+.side-banner{flex:1;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:.2s;padding:14px}
+.side-banner:hover{transform:translateY(-2px)}
+.side-banner .be{font-size:38px;margin-bottom:4px}
+.side-banner h3{font-size:18px}
+.side-banner p{font-size:13px;opacity:.92}
+@media(max-width:860px){
+  .hero-row{grid-template-columns:1fr}
+  .side-banners{flex-direction:row}
+  .carousel{height:210px}
+  .slide .big{font-size:40px}
+  .slide h2{font-size:21px}
+}
+
+/* ============ SECTION HEADS ============ */
+.section{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.section-head h2{font-size:20px;display:flex;align-items:center;gap:8px}
+.section-head .see-all{margin-left:auto;color:var(--orange);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.section-head .see-all:hover{text-decoration:underline}
+
+/* ============ CATEGORY CIRCLES ============ */
+.cat-circles{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px}
+.cat-circle{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:10px 4px;border-radius:12px;transition:.15s;text-align:center}
+.cat-circle:hover{background:var(--orange-light);transform:translateY(-2px)}
+.cat-circle .ring{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#fff3e9,#ffe0cc);display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:inset 0 0 0 2px #fff,0 3px 8px rgba(248,86,6,.15)}
+.cat-circle span{font-size:12.5px;font-weight:600;color:#444}
+
+/* ============ FLASH SALE ============ */
+.flash{border:2px solid var(--red);overflow:hidden;padding:0}
+.flash-head{background:linear-gradient(90deg,#f5224d,#F85606);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.flash-head h2{font-size:20px;display:flex;gap:8px;align-items:center}
+.countdown{display:flex;align-items:center;gap:6px;font-size:13px}
+.cd-box{background:#fff;color:var(--red);font-weight:800;font-size:16px;padding:3px 8px;border-radius:6px;min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
+.countdown .colon{font-weight:800;font-size:16px}
+.flash-body{padding:16px}
+.flash-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.flash-scroll::-webkit-scrollbar{height:6px}
+.flash-scroll::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+.fcard{min-width:172px;max-width:172px;cursor:pointer;transition:.15s}
+.fcard:hover{transform:translateY(-3px)}
+.fcard .cimg{height:150px}
+.fcard .cemoji{font-size:56px}
+
+/* ============ PRODUCT GRID & CARD ============ */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px}
+.card{background:#fff;border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:.18s;border:1px solid transparent;display:flex;flex-direction:column}
+.card:hover{box-shadow:var(--shadow);transform:translateY(-3px);border-color:#f3e0d5}
+.cimg{height:168px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.cemoji{font-size:62px;filter:drop-shadow(0 5px 8px rgba(0,0,0,.13));transition:.2s;position:relative;z-index:1}
+.cimg::after{content:'';position:absolute;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.65);top:50%;left:50%;transform:translate(-50%,-50%)}
+.card:hover .cemoji{transform:scale(1.1)}
+.cimg.has-photo::after{display:none}
+.cimg img.cphoto{position:relative;z-index:1;width:100%;height:100%;object-fit:cover}
+.ring.has-photo{background:none;overflow:hidden;padding:0}
+.ring img.cphoto{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.ciem.has-photo{overflow:hidden;padding:0}
+.ciem img.cphoto{width:100%;height:100%;object-fit:cover}
+.off-badge{position:absolute;top:8px;left:0;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:2px 8px 2px 6px;border-radius:0 4px 4px 0;z-index:2;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+.wbtn{position:absolute;top:6px;right:6px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92);font-size:15px;color:#bbb;display:flex;align-items:center;justify-content:center;z-index:2;transition:.15s;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.wbtn:hover{color:var(--red);transform:scale(1.12)}
+.wbtn.on{color:var(--red)}
+.qadd{position:absolute;bottom:8px;right:8px;width:34px;height:34px;border-radius:50%;background:var(--orange);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:2;opacity:0;transform:translateY(6px);transition:.2s;box-shadow:0 3px 8px rgba(248,86,6,.45)}
+.card:hover .qadd{opacity:1;transform:translateY(0)}
+.qadd:hover{background:var(--orange-dark)}
+@media(hover:none){.qadd{opacity:1;transform:none}}
+.cbody{padding:10px 11px 12px;display:flex;flex-direction:column;gap:5px;flex:1}
+.cname{font-size:13.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:36px}
+.cprice{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.cprice .np{color:var(--orange);font-weight:800;font-size:16.5px}
+.cprice s{color:#aaa;font-size:12px}
+.crate{font-size:12px;color:#888;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.stars{position:relative;display:inline-block;color:#e4e4e4;font-size:12.5px;line-height:1;letter-spacing:1px}
+.stars .sf{position:absolute;left:0;top:0;white-space:nowrap;overflow:hidden;color:#ffb400}
+.ctag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px;align-self:flex-start}
+.tag-free{background:#e8f8ef;color:var(--green)}
+.tag-hot{background:#ffe9ec;color:var(--red)}
+.tag-new{background:#e8f0ff;color:#2b6de8}
+.tag-ver{background:#fff4dd;color:#b07800}
+.empty-state{text-align:center;padding:50px 20px;color:#999}
+.empty-state .ee{font-size:56px;margin-bottom:10px}
+.empty-state h3{color:#555;margin-bottom:6px}
+
+/* ============ LISTING PAGE ============ */
+.listing-top{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;margin:16px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.listing-top h1{font-size:20px}
+.listing-top .cnt{color:var(--muted);font-size:13px}
+.sort-wrap{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13.5px;color:#555}
+.sort-wrap select{padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer}
+.crumb{font-size:12.5px;color:var(--muted);margin:14px 0 0}
+.crumb b{color:var(--orange);cursor:pointer}
+.crumb b:hover{text-decoration:underline}
+
+/* ============ PRODUCT DETAIL ============ */
+.pd{display:grid;grid-template-columns:400px 1fr;gap:24px}
+.pd-visual{border-radius:var(--radius);height:380px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:var(--shadow)}
+.pd-visual .big{font-size:150px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.18));position:relative;z-index:1}
+.pd-visual::after{content:'';position:absolute;width:270px;height:270px;border-radius:50%;background:rgba(255,255,255,.65);top:50%;left:50%;transform:translate(-50%,-50%)}
+.pd-visual.has-photo::after{display:none}
+.pd-visual img.cphoto{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;border-radius:var(--radius)}
+.pd-visual .off-badge{font-size:14px;padding:5px 12px}
+.pd-info h1{font-size:22px;font-weight:700;line-height:1.4;margin-bottom:8px}
+.pd-rate{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#777;margin-bottom:12px;flex-wrap:wrap}
+.pd-rate span{display:flex;align-items:center;gap:5px}
+.pd-price-box{background:var(--orange-light);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.pd-price-box .np{color:var(--orange);font-size:30px;font-weight:800}
+.pd-price-box s{color:#b09387;font-size:16px}
+.pd-price-box .off-badge{position:static;font-size:13px;padding:3px 10px}
+.variants{margin-bottom:12px}
+.variants .lbl{font-size:13px;color:#777;margin-bottom:6px}
+.vchips{display:flex;gap:8px;flex-wrap:wrap}
+.vchip{padding:6px 16px;border:1.5px solid #ddd;border-radius:8px;font-size:13.5px;background:#fff;transition:.15s;cursor:pointer}
+.vchip:hover{border-color:var(--orange)}
+.vchip.sel{border-color:var(--orange);background:var(--orange-light);color:var(--orange);font-weight:700}
+.qty-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.qty-box{display:flex;align-items:center;border:1.5px solid #ddd;border-radius:8px;overflow:hidden}
+.qty-box button{width:36px;height:38px;font-size:18px;background:#fafafa;transition:.15s}
+.qty-box button:hover{background:var(--orange-light);color:var(--orange)}
+.qty-box .qv{width:48px;text-align:center;font-weight:700;font-size:15px}
+.pd-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.btn{padding:12px 22px;border-radius:10px;font-size:15.5px;font-weight:700;transition:.2s;display:flex;align-items:center;gap:8px;justify-content:center;cursor:pointer;border:none}
+.btn-cart{flex:1;border:2px solid var(--orange);color:var(--orange);background:#fff;min-width:180px}
+.btn-cart:hover{background:var(--orange-light)}
+.btn-buy{flex:1;background:linear-gradient(90deg,var(--orange),#ff7a3d);color:#fff;box-shadow:0 4px 14px rgba(248,86,6,.4);min-width:180px}
+.btn-buy:hover{transform:translateY(-2px);box-shadow:0 7px 18px rgba(248,86,6,.5)}
+.pd-perks{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:8px}
+.perk{display:flex;gap:10px;align-items:flex-start;background:#fafafa;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#555}
+.perk b{display:block;font-size:13px;color:#333}
+.perk .pe{font-size:22px}
+@media(max-width:860px){.pd{grid-template-columns:1fr}.pd-visual{height:280px}.pd-visual .big{font-size:105px}.pd-visual::after{width:190px;height:190px}}
+
+/* ============ CART DRAWER ============ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;opacity:0;pointer-events:none;transition:.25s}
+.overlay.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100dvh;width:400px;max-width:94vw;background:#fff;z-index:950;transform:translateX(105%);transition:.3s ease;display:flex;flex-direction:column;box-shadow:-6px 0 24px rgba(0,0,0,.15)}
+.drawer.on{transform:translateX(0)}
+.drawer-head{background:linear-gradient(90deg,var(--orange),#ff7a3d);color:#fff;padding:15px 18px;display:flex;align-items:center;gap:10px}
+.drawer-head h3{font-size:17px;flex:1}
+.drawer-head .x{font-size:20px;opacity:.9}
+.drawer-head .x:hover{opacity:1}
+.drawer-items{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.ci{display:flex;gap:12px;border:1px solid var(--border);border-radius:10px;padding:10px}
+.ci .ciem{width:64px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.ci .cinfo{flex:1;min-width:0}
+.ci .cinfo .nm{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ci .cinfo .pr{color:var(--orange);font-weight:800;font-size:14.5px;margin-top:2px}
+.ci .cinfo .rm{font-size:11.5px;color:#999;cursor:pointer;margin-top:4px}
+.ci .cinfo .rm:hover{color:var(--red)}
+.ci-qty{display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:center}
+.ci-qty button{width:26px;height:26px;border:1px solid #ddd;border-radius:6px;font-size:15px;line-height:1}
+.ci-qty button:hover{border-color:var(--orange);color:var(--orange)}
+.ci-qty .q{font-weight:700;font-size:14px}
+.drawer-foot{border-top:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.free-ship-note{font-size:12px;background:#e8f8ef;color:#0a7a3a;padding:7px 10px;border-radius:8px;text-align:center}
+.free-ship-note.warn{background:#fff4dd;color:#9c6d00}
+.totals{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.totals .row{display:flex;justify-content:space-between}
+.totals .row.grand{font-size:17px;font-weight:800;color:var(--orange)}
+.btn-block{width:100%;background:linear-gradient(90deg,var(--orange),#ff7a3d);color:#fff;padding:13px;border-radius:10px;font-size:16px;font-weight:700;box-shadow:0 4px 12px rgba(248,86,6,.35);cursor:pointer;border:none;transition:.2s}
+.btn-block:hover{filter:brightness(1.06)}
+.btn-block:disabled{background:#ccc;box-shadow:none;cursor:not-allowed}
+
+/* ============ MODALS ============ */
+.modal-wrap{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px}
+.modal-wrap.on{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;animation:mIn .25s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+.modal-head{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;position:sticky;top:0;background:#fff;z-index:2;border-radius:14px 14px 0 0}
+.modal-head h3{font-size:17px;flex:1}
+.modal-head .x{font-size:20px;color:#888;cursor:pointer}
+.modal-head .x:hover{color:#333}
+.modal-body{padding:18px 20px 22px}
+.fgroup{margin-bottom:13px}
+.fgroup label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:5px}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;transition:.15s}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,86,6,.12)}
+.fgroup textarea{resize:vertical;min-height:64px}
+.ferr{color:var(--red);font-size:12.5px;margin-top:4px;display:none}
+.payopts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.payopt{border:1.5px solid var(--border);border-radius:10px;padding:11px;display:flex;align-items:center;gap:9px;font-size:13.5px;cursor:pointer;transition:.15s}
+.payopt:hover{border-color:var(--orange)}
+.payopt.sel{border-color:var(--orange);background:var(--orange-light);font-weight:700}
+.payopt .pe{font-size:20px}
+.ck-items{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:14px;max-height:180px;overflow-y:auto;font-size:13px}
+.ck-items .cki{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed #f0f0f0}
+.ck-items .cki:last-child{border:none}
+.success-pane{text-align:center;padding:14px 6px 6px}
+.success-pane .se{font-size:64px;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+.success-pane h2{color:var(--green);margin:8px 0 4px}
+.success-pane p{color:#666;font-size:14px}
+.success-pane .ono{background:#f6f6f6;border-radius:8px;padding:8px 14px;display:inline-block;margin:10px 0;font-weight:700;color:#333}
+
+/* order tracking */
+.track-item{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.track-item .ti-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.track-item .ti-no{font-weight:800;font-size:14px}
+.track-item .ti-items{font-size:12.5px;color:#777;line-height:1.6}
+.stchip{font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:14px;white-space:nowrap}
+
+/* ============ TOAST ============ */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(16px);background:#2e2e2e;color:#fff;padding:11px 22px;border-radius:26px;font-size:14px;z-index:1200;opacity:0;pointer-events:none;transition:.28s;box-shadow:0 6px 20px rgba(0,0,0,.35);max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ============ FOOTER ============ */
+footer{background:#fff;margin-top:26px;border-top:3px solid var(--orange)}
+.foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:26px;padding:28px 0}
+.foot-col h4{font-size:15px;margin-bottom:12px;color:#333}
+.foot-col a{display:block;font-size:13px;color:#777;margin-bottom:8px;cursor:pointer}
+.foot-col a:hover{color:var(--orange)}
+.pay-badges{display:flex;gap:8px;flex-wrap:wrap}
+.pay-badge{font-size:12px;font-weight:700;padding:5px 11px;border:1.5px solid #e5e5e5;border-radius:7px;color:#555}
+.socials{display:flex;gap:10px;font-size:22px;margin-top:6px}
+.socials span,.socials a{cursor:pointer;transition:.15s;color:inherit}
+.socials span:hover,.socials a:hover{transform:translateY(-2px)}
+.foot-note{border-top:1px solid var(--border);padding:14px 0;text-align:center;font-size:12.5px;color:#999}
+.foot-note b{color:#666}
+.sell-cta{margin-top:14px;background:linear-gradient(90deg,#1f2937,#374151);color:#fff;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sell-cta .se{font-size:30px}
+.sell-cta h3{font-size:16px}
+.sell-cta p{font-size:12.5px;opacity:.85}
+.sell-cta button{margin-left:auto;background:var(--yellow);color:#422006;font-weight:800;padding:9px 18px;border-radius:8px;font-size:13.5px;cursor:pointer;border:none}
+.sell-cta button:hover{filter:brightness(1.05)}
+
+/* ============ BOTTOM NAV (mobile) ============ */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -3px 12px rgba(0,0,0,.09);z-index:800;padding:5px 0 max(5px,env(safe-area-inset-bottom))}
+.bottom-nav .container{display:flex;justify-content:space-around}
+.bnav{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:#888;padding:4px 12px;cursor:pointer;position:relative}
+.bnav .be{font-size:20px}
+.bnav.on{color:var(--orange)}
+@media(max-width:768px){.bottom-nav{display:flex}body{padding-bottom:64px}.toast{bottom:78px}}
+@media(max-width:560px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .payopts{grid-template-columns:1fr}
+  .pd-btns{flex-direction:column}
+}
+
+/* animations */
+.fade{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.load-more{display:block;margin:18px auto 4px;border:2px solid var(--orange);color:var(--orange);font-weight:700;padding:10px 34px;border-radius:26px;font-size:14.5px;transition:.2s;cursor:pointer;background:none}
+.load-more:hover{background:var(--orange-light)}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-links topbar-promo">
+      <span onclick="location.href='/orders/'" data-i18n="track_order">📦 অর্ডার ট্র্যাক</span>
+      <span onclick="openWhatsApp()" data-i18n="whatsapp_contact">💬 হোয়াটসঅ্যাপে যোগাযোগ</span>
+    </div>
+    <div class="topbar-right">
+      <span onclick="location.href='/orders/'" id="topUserSpan" data-i18n="login_signup">👤 লগইন / সাইন আপ</span>
+      <div class="langsw" id="langSwitch">
+        <span data-lang="bn" onclick="setLang('bn')">বাংলা</span>
+        <span data-lang="en" onclick="setLang('en')">English</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="container header-main">
+    <div class="logo" onclick="goHome()">
+      <span class="logo-icon">🛍️</span>
+      <div>NextGenTech<b>BD</b><small data-i18n="tagline">সব কিছু, এক ঠিকানায়!</small></div>
+    </div>
+    <form class="search-wrap" onsubmit="event.preventDefault();doSearch(document.getElementById('searchInput').value.trim())">
+      <input id="searchInput" type="text" placeholder="পণ্য খুঁজুন… যেমন: হেডফোন, পাঞ্জাবি, চাল" data-i18n-placeholder="search_placeholder">
+      <button class="search-btn" type="submit">🔍</button>
+    </form>
+    <div class="header-actions">
+      <div class="hicon" onclick="goWish()">
+        <span class="he">❤️</span><span class="ht" data-i18n="wishlist">উইশলিস্ট</span>
+        <span class="badge" id="wishBadge" style="display:none">0</span>
+      </div>
+      <div class="hicon" onclick="openCart()">
+        <span class="he">🛒</span><span class="ht" data-i18n="cart">কার্ট</span>
+        <span class="badge" id="cartBadge" style="display:none">0</span>
+      </div>
+    </div>
+  </div>
+  <nav class="navbar">
+    <div class="container" id="navbar"></div>
+  </nav>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main id="app">
+  <div class="container"><div class="section"><div class="empty-state"><div class="ee">⏳</div><h3 data-i18n="loading_products">পণ্য লোড হচ্ছে…</h3></div></div></div>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="sell-cta">
+      <span class="se">💬</span>
+      <div>
+        <h3 data-i18n="contact_direct">অর্ডার বা যেকোনো প্রশ্নে সরাসরি যোগাযোগ করুন</h3>
+        <p id="footContactLine">📞 ০১৭১৭৮৭৭৯৫৫ — হোয়াটসঅ্যাপ ও টেলিগ্রামে মেসেজ দিন</p>
+      </div>
+      <button onclick="openWhatsApp()" data-i18n="whatsapp_msg_btn">💬 হোয়াটসঅ্যাপে মেসেজ দিন</button>
+    </div>
+    <div class="foot-grid">
+      <div class="foot-col">
+        <h4 data-i18n="customer_service">গ্রাহক সেবা</h4>
+        <a onclick="location.href='/orders/'" data-i18n="order_tracking">📦 অর্ডার ট্র্যাকিং</a>
+        <a onclick="openWhatsApp()" data-i18n="return_refund">রিটার্ন ও রিফান্ড</a>
+        <a onclick="openWhatsApp()" data-i18n="delivery_info">ডেলিভারি তথ্য</a>
+        <a onclick="openWhatsApp()" data-i18n="contact_us">যোগাযোগ করুন</a>
+      </div>
+      <div class="foot-col">
+        <h4>NextGenTechBD <span data-i18n="about_suffix">সম্পর্কে</span></h4>
+        <a data-i18n="about_us">আমাদের সম্পর্কে</a>
+        <a data-i18n="terms_policy">শর্তাবলী ও নীতি</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="payment_methods">পেমেন্ট মেথড</h4>
+        <div class="pay-badges" id="payBadges">
+          <span class="pay-badge">💵 ক্যাশ অন ডেলিভারি</span>
+          <span class="pay-badge">📱 বিকাশ</span>
+          <span class="pay-badge">📱 নগদ</span>
+          <span class="pay-badge">📱 রকেট</span>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="contact_follow">যোগাযোগ / ফলো করুন</h4>
+        <div class="sold-line socials" id="footSocials">
+          <a title="WhatsApp" id="waIcon" target="_blank" rel="noopener">💬</a>
+          <a title="Telegram" id="tgIcon" target="_blank" rel="noopener">✈️</a>
+          <a title="Facebook" id="fbIcon" target="_blank" rel="noopener">📘</a>
+          <a title="Gmail" id="gmIcon" target="_blank" rel="noopener">📧</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-note">
+      <b data-i18n="copyright">© ২০২৬ NextGenTechBD — সর্বস্বত্ব সংরক্ষিত</b><br>
+      <span data-i18n="made_with_love">ভালোবাসা দিয়ে তৈরি 🧡 বাংলাদেশে</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ BOTTOM NAV (mobile) ============ -->
+<div class="bottom-nav">
+  <div class="container">
+    <div class="bnav on" onclick="goHome()"><span class="be">🏠</span><span data-i18n="home">হোম</span></div>
+    <div class="bnav" onclick="goCat('all')"><span class="be">🗂️</span><span data-i18n="category">ক্যাটাগরি</span></div>
+    <div class="bnav" onclick="openCart()"><span class="be">🛒</span><span data-i18n="cart">কার্ট</span></div>
+    <div class="bnav" onclick="location.href='/orders/'"><span class="be">👤</span><span data-i18n="account">অ্যাকাউন্ট</span></div>
+  </div>
+</div>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+<aside class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h3>🛒 <span data-i18n="my_cart">আমার কার্ট</span> (<span id="drawerCount">0</span>)</h3>
+    <button class="x" onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
+</aside>
+
+<!-- ============ CHECKOUT MODAL ============ -->
+<div class="modal-wrap" id="checkoutModal" onclick="if(event.target===this)closeCheckout()">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head"><h3>🚚 <span data-i18n="checkout">চেকআউট</span></h3><button class="x" onclick="closeCheckout()">✕</button></div>
+    <div class="modal-body" id="checkoutBody"></div>
+  </div>
+</div>
+
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STORAGE (sandbox-safe) ================= */
+const storage=(()=>{try{const t='__t';localStorage.setItem(t,'1');localStorage.removeItem(t);return localStorage}
+catch(e){const m={};return{getItem:k=>(k in m?m[k]:null),setItem:(k,v)=>{m[k]=String(v)},removeItem:k=>{delete m[k]}}}})();
+const load=(k,d)=>{try{const v=storage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const save=(k,v)=>{try{storage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+/* ================= LANGUAGE (বাংলা / English) ================= */
+let LANG=load('sb_lang','bn');
+const T={
+ bn:{
+  track_order:'📦 অর্ডার ট্র্যাক', whatsapp_contact:'💬 হোয়াটসঅ্যাপে যোগাযোগ', login_signup:'👤 লগইন / সাইন আপ',
+  tagline:'সব কিছু, এক ঠিকানায়!', search_placeholder:'পণ্য খুঁজুন… যেমন: হেডফোন, পাঞ্জাবি, চাল',
+  wishlist:'উইশলিস্ট', cart:'কার্ট', loading_products:'পণ্য লোড হচ্ছে…',
+  all_products:'সব পণ্য', flash_sale_chip:'⚡ ফ্ল্যাশ সেল',
+  mega_sale_h:'মেগা সেল চলছে!', mega_sale_p:'৭০% পর্যন্ত ছাড় — সীমিত সময়ের অফার', buy_now_cta:'এখনই কিনুন',
+  flash_daily_h:'ফ্ল্যাশ সেল প্রতিদিন', flash_daily_p:'সকাল ১০টায় নতুন ডিল — আগে আসলে আগে পাবেন', flash_deals_cta:'ফ্ল্যাশ ডিল দেখুন',
+  free_delivery_h:'ফ্রি ডেলিভারি!', free_delivery_p:'৳১৯৯৯+ অর্ডারে সারাদেশে ফ্রি ডেলিভারি', start_shopping_cta:'শপিং শুরু করুন',
+  grocery_h:'গ্রোসারি বাজার', grocery_p:'চাল, তেল, মধু, খেজুর — ঘরে বসে বাজার', shop_now_cta:'বাজার করুন',
+  home_living:'হোম ও লিভিং', discount40:'৪০% পর্যন্ত ছাড়', beauty_care:'বিউটি কেয়ার', original_product:'অরিজিনাল প্রোডাক্ট',
+  categories:'🗂️ ক্যাটাগরি সমূহ', flash_sale:'⚡ ফ্ল্যাশ সেল', ends_at:'শেষ হবে:', see_all:'সব দেখুন ›',
+  just_for_you:'🎯 আপনার জন্য বাছাই করা', load_more:'আরও দেখুন ↓',
+  sold_count_suffix:'পিস বিক্রি হয়েছে', left_prefix:'মাত্র ', left_suffix:'টি বাকি!',
+  sort_label:'সাজান:', sort_pop:'জনপ্রিয়তা', sort_new:'নতুন পণ্য', sort_plow:'কম দাম → বেশি দাম', sort_phigh:'বেশি দাম → কম দাম', sort_off:'বড় ছাড়',
+  home_crumb:'হোম', products_count_suffix:'টি পণ্য', no_products_title:'কোনো পণ্য পাওয়া যায়নি', no_products_desc:'অন্য ক্যাটাগরি দেখুন',
+  search_crumb:'খুঁজে দেখা', results_suffix:'টি ফলাফল', no_results:'কোনো ফলাফল নেই', no_results_title:'দুঃখিত, কিছু পাওয়া যায়নি', no_results_desc_a:'এর জন্য কোনো পণ্য নেই। বানান পরীক্ষা করুন বা অন্য কিছু খুঁজুন।',
+  wish_crumb:'উইশলিস্ট', wish_title:'❤️ আমার উইশলিস্ট', wish_count_suffix:'টি', wish_empty_title:'উইশলিস্ট খালি', wish_empty_desc:'পছন্দের পণ্যে 🤍 চাপ দিয়ে এখানে সংরক্ষণ করুন',
+  free_delivery_tag:'ফ্রি ডেলিভারি', hot_tag:'হট', new_tag:'নতুন', verified_tag:'ভেরিফায়েড',
+  free_delivery_lbl:'🚚 ফ্রি ডেলিভারি', hot_lbl:'🔥 হট', new_lbl:'✨ নতুন', verified_lbl:'✔ ভেরিফায়েড',
+  select_color:'রং নির্বাচন করুন:', select_size:'সাইজ নির্বাচন করুন:', quantity:'পরিমাণ:',
+  add_to_cart_btn:'🛒 কার্টে যোগ করুন', buy_now_btn:'⚡ এখনই কিনুন',
+  perk1_h:'দ্রুত ডেলিভারি', perk1_p:'ঢাকায় ১–২ দিন, ঢাকার বাইরে ২–৪ দিন',
+  perk2_h:'ক্যাশ অন ডেলিভারি', perk2_p:'পণ্য হাতে পেয়ে টাকা পরিশোধ',
+  perk3_h:'৭ দিনের রিটার্ন', perk3_p:'সমস্যা হলে সহজ রিটার্ন',
+  perk4_h:'ভেরিফায়েড পণ্য', perk4_p:'১০০% অরিজিনাল গ্যারান্টি',
+  ratings_word:'মূল্যায়ন', description_h:'📋 পণ্যের বিবরণ',
+  category_label:'ক্যাটাগরি:', brand_label:'ব্র্যান্ড:', brand_value:'NextGenTechBD সিলেক্ট ✔ ভেরিফায়েড সেলার',
+  condition_label:'অবস্থা:', condition_value:'একদম নতুন, অরিজিনাল পণ্য',
+  delivery_label:'ডেলিভারি:', delivery_value:'সারাদেশে কুরিয়ার সুবিধা — ৳১৯৯৯+ অর্ডারে ফ্রি!',
+  payment_label:'পেমেন্ট:', payment_value:'ক্যাশ অন ডেলিভারি / বিকাশ / নগদ / কার্ড',
+  more_like_this:'✨ এ ধরনের আরও পণ্য',
+  wish_removed:'💔 উইশলিস্ট থেকে সরানো হয়েছে', wish_added:'❤️ উইশলিস্টে যোগ হয়েছে',
+  added_to_cart:'✅ কার্টে যোগ হয়েছে: ', search_empty_toast:'🔍 কিছু লিখে খুঁজুন!',
+  my_cart:'আমার কার্ট', cart_empty_title:'আপনার কার্ট খালি!', cart_empty_desc:'পছন্দের পণ্য যোগ করে শপিং শুরু করুন', start_shopping_btn:'🛍️ শপিং শুরু করুন',
+  remove_item:'🗑️ মুছে ফেলুন', add_more_free:'🎁 আর ', add_more_free2:' যোগ করলেই ফ্রি ডেলিভারি!', free_congrats:'🎉 অভিনন্দন! আপনি ফ্রি ডেলিভারি পাচ্ছেন',
+  total_items_lbl:'মোট পণ্য (', total_items_lbl2:'টি)', delivery_fee_lbl:'ডেলিভারি ফি', free_word:'ফ্রি 🎉', subtotal_lbl:'সাব-টোটাল',
+  checkout_btn:'🚚 চেকআউট করুন', cart_first_toast:'🛒 আগে কার্টে পণ্য যোগ করুন!',
+  name_label:'আপনার নাম *', name_ph:'মোঃ রহিম উদ্দিন', name_err:'অনুগ্রহ করে পুরো নাম লিখুন',
+  phone_label:'মোবাইল নম্বর *', phone_err:'সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন (01…)',
+  district_label:'জেলা *', address_label:'সম্পূর্ণ ঠিকানা *', address_ph:'বাসা/হোল্ডিং, রোড, এলাকা, থানা', address_err:'বিস্তারিত ঠিকানা লিখুন (কমপক্ষে ১০ অক্ষর)',
+  note_label:'অতিরিক্ত নির্দেশনা (ঐচ্ছিক)', note_ph:'যেমন: ডেলিভারির আগে কল করবেন / ল্যান্ডমার্ক ইত্যাদি',
+  payment_method_label:'পেমেন্ট মেথড', cod_full:'ক্যাশ অন ডেলিভারি', cod_desc:'পণ্য হাতে পেয়ে ডেলিভারি ম্যানকে টাকা দিবেন',
+  bkash:'বিকাশ', nagad:'নগদ', rocket:'রকেট', send_money_suffix:' নম্বরে সেন্ড মানি করুন',
+  grand_total_lbl:'সর্বমোট', confirm_order_btn:'✅ অর্ডার নিশ্চিত করুন', processing:'⏳ অর্ডার প্রসেস হচ্ছে…',
+  order_saved_h:'অর্ডার তথ্য জমা হয়েছে!', thanks_prefix:'ধন্যবাদ ', thanks_suffix:'! আপনার অর্ডারের বিবরণ হোয়াটসঅ্যাপে পাঠানো হয়েছে।',
+  order_no_lbl:'অর্ডার নং: ', paid_amount_lbl:'পরিশোধিত মূল্য: ', pay_on_delivery_note:' — পণ্য হাতে পেয়ে দিবেন',
+  wa_resend_note:'📞 হোয়াটসঅ্যাপ চ্যাটটি সেন্ড না হলে নিচের বাটনে চাপুন — আমাদের প্রতিনিধি শীঘ্রই কল করে অর্ডারটি নিশ্চিত করবেন',
+  eta_note:'প্রত্যাশিত ডেলিভারি: ', eta_note2:' এর মধ্যে', resend_wa_btn:'💬 হোয়াটসঅ্যাপে আবার পাঠান', continue_shopping_btn:'🛍️ শপিং চালিয়ে যান',
+  track_phone_hint:'📱 সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন',
+  track_contact_h:'📦 অর্ডারের অবস্থা জানতে যোগাযোগ করুন', track_contact_p:'আমাদের হোয়াটসঅ্যাপ বা টেলিগ্রামে মোবাইল নম্বরসহ মেসেজ দিন, আমরা সাথে সাথে জানিয়ে দেব',
+  account_greet:'শুভেচ্ছা, ', total_orders:'মোট অর্ডার', wishlist_word:'উইশলিস্ট', my_orders:'আমার অর্ডারসমূহ:', loading_dots:'⏳ লোড হচ্ছে…',
+  contact_support_btn:'💬 সাপোর্টে যোগাযোগ', logout_btn:'লগ আউট', logout_toast:'লগ আউট হয়েছে',
+  welcome_h:'স্বাগতম NextGenTechBD-তে!', welcome_p:'লগইন করে দ্রুত অর্ডার করুন', enter_signup_btn:'→ প্রবেশ / সাইন আপ করুন',
+  terms_note:'চালিয়ে গিয়ে আপনি আমাদের শর্তাবলীতে সম্মত হচ্ছেন (ডেমো — কোনো ডেটা বাইরে যায় না)',
+  name_err2:'নাম লিখুন (কমপক্ষে ৩ অক্ষর)', phone_err2:'সঠিক ১১ সংখ্যার নম্বর দিন', welcome_toast:'🎉 স্বাগতম, ',
+  track_status_link:'হোয়াটসঅ্যাপে যোগাযোগ করুন', track_status_prefix:'অর্ডারের সর্বশেষ অবস্থা জানতে ',
+  load_fail_h:'পণ্যের তথ্য লোড করা যায়নি', load_fail_p:'সার্ভারে সমস্যা হচ্ছে, একটু পর আবার চেষ্টা করুন', retry_btn:'↻ আবার চেষ্টা করুন',
+  contact_direct:'অর্ডার বা যেকোনো প্রশ্নে সরাসরি যোগাযোগ করুন', whatsapp_msg_btn:'💬 হোয়াটসঅ্যাপে মেসেজ দিন',
+  customer_service:'গ্রাহক সেবা', order_tracking:'📦 অর্ডার ট্র্যাকিং', return_refund:'রিটার্ন ও রিফান্ড', delivery_info:'ডেলিভারি তথ্য', contact_us:'যোগাযোগ করুন',
+  about_suffix:'সম্পর্কে', about_us:'আমাদের সম্পর্কে', terms_policy:'শর্তাবলী ও নীতি', payment_methods:'পেমেন্ট মেথড', contact_follow:'যোগাযোগ / ফলো করুন',
+  copyright:'© ২০২৬ NextGenTechBD — সর্বস্বত্ব সংরক্ষিত', made_with_love:'ভালোবাসা দিয়ে তৈরি 🧡 বাংলাদেশে',
+  home:'হোম', category:'ক্যাটাগরি', account:'অ্যাকাউন্ট', checkout:'চেকআউট',
+  track_phone_label:'মোবাইল নম্বর দিন (যে নম্বরে অর্ডার করেছেন)', search_btn:'🔍 খুঁজুন', track_initial_hint:'অর্ডার দেখতে উপরে নম্বর লিখে খুঁজুন',
+  contact_line_prefix:'📞 ', contact_line_suffix:' — হোয়াটসঅ্যাপ ও টেলিগ্রামে মেসেজ দিন',
+  cod_badge:'💵 ক্যাশ অন ডেলিভারি', bkash_badge:'📱 বিকাশ', nagad_badge:'📱 নগদ', rocket_badge:'📱 রকেট'
+ },
+ en:{
+  track_order:'📦 Track Order', whatsapp_contact:'💬 Chat on WhatsApp', login_signup:'👤 Login / Sign up',
+  tagline:'Everything, one address!', search_placeholder:'Search products… e.g. headphone, panjabi, rice',
+  wishlist:'Wishlist', cart:'Cart', loading_products:'Loading products…',
+  all_products:'All Products', flash_sale_chip:'⚡ Flash Sale',
+  mega_sale_h:'Mega Sale is Live!', mega_sale_p:'Up to 70% off — limited time offer', buy_now_cta:'Shop Now',
+  flash_daily_h:'Daily Flash Sale', flash_daily_p:'New deals at 10 AM — first come, first served', flash_deals_cta:'See Flash Deals',
+  free_delivery_h:'Free Delivery!', free_delivery_p:'Free delivery nationwide on orders ৳1999+', start_shopping_cta:'Start Shopping',
+  grocery_h:'Grocery Market', grocery_p:'Rice, oil, honey, dates — shop from home', shop_now_cta:'Shop Now',
+  home_living:'Home & Living', discount40:'Up to 40% off', beauty_care:'Beauty Care', original_product:'100% Original Products',
+  categories:'🗂️ Categories', flash_sale:'⚡ Flash Sale', ends_at:'Ends in:', see_all:'See All ›',
+  just_for_you:'🎯 Picked For You', load_more:'Load More ↓',
+  sold_count_suffix:' sold', left_prefix:'Only ', left_suffix:' left!',
+  sort_label:'Sort:', sort_pop:'Popularity', sort_new:'Newest', sort_plow:'Price: Low → High', sort_phigh:'Price: High → Low', sort_off:'Biggest Discount',
+  home_crumb:'Home', products_count_suffix:' items', no_products_title:'No products found', no_products_desc:'Try browsing another category',
+  search_crumb:'Search', results_suffix:' results', no_results:'No results', no_results_title:'Sorry, nothing found', no_results_desc_a:'No products match. Check spelling or try something else.',
+  wish_crumb:'Wishlist', wish_title:'❤️ My Wishlist', wish_count_suffix:'', wish_empty_title:'Your wishlist is empty', wish_empty_desc:'Tap 🤍 on any product to save it here',
+  free_delivery_tag:'ফ্রি ডেলিভারি', hot_tag:'হট', new_tag:'নতুন', verified_tag:'ভেরিফায়েড',
+  free_delivery_lbl:'🚚 Free Delivery', hot_lbl:'🔥 Hot', new_lbl:'✨ New', verified_lbl:'✔ Verified',
+  select_color:'Select color:', select_size:'Select size:', quantity:'Quantity:',
+  add_to_cart_btn:'🛒 Add to Cart', buy_now_btn:'⚡ Buy Now',
+  perk1_h:'Fast Delivery', perk1_p:'1–2 days in Dhaka, 2–4 days outside',
+  perk2_h:'Cash on Delivery', perk2_p:'Pay when you receive the product',
+  perk3_h:'7-Day Return', perk3_p:'Easy return if there is an issue',
+  perk4_h:'Verified Product', perk4_p:'100% original guarantee',
+  ratings_word:'ratings', description_h:'📋 Product Description',
+  category_label:'Category:', brand_label:'Brand:', brand_value:'NextGenTechBD Select ✔ Verified Seller',
+  condition_label:'Condition:', condition_value:'Brand new, original product',
+  delivery_label:'Delivery:', delivery_value:'Courier service nationwide — free on orders ৳1999+!',
+  payment_label:'Payment:', payment_value:'Cash on Delivery / bKash / Nagad / Card',
+  more_like_this:'✨ More Like This',
+  wish_removed:'💔 Removed from wishlist', wish_added:'❤️ Added to wishlist',
+  added_to_cart:'✅ Added to cart: ', search_empty_toast:'🔍 Type something to search!',
+  my_cart:'My Cart', cart_empty_title:'Your cart is empty!', cart_empty_desc:'Add your favorite products to start shopping', start_shopping_btn:'🛍️ Start Shopping',
+  remove_item:'🗑️ Remove', add_more_free:'🎁 Add ', add_more_free2:' more for free delivery!', free_congrats:'🎉 Congrats! You get free delivery',
+  total_items_lbl:'Total items (', total_items_lbl2:')', delivery_fee_lbl:'Delivery fee', free_word:'Free 🎉', subtotal_lbl:'Subtotal',
+  checkout_btn:'🚚 Checkout', cart_first_toast:'🛒 Add items to your cart first!',
+  name_label:'Your Name *', name_ph:'John Doe', name_err:'Please enter your full name',
+  phone_label:'Mobile Number *', phone_err:'Enter a valid 11-digit mobile number (01…)',
+  district_label:'District *', address_label:'Full Address *', address_ph:'House/Holding, Road, Area, Thana', address_err:'Enter a detailed address (min 10 characters)',
+  note_label:'Extra Instructions (optional)', note_ph:'e.g. Call before delivery / landmark etc.',
+  payment_method_label:'Payment Method', cod_full:'Cash on Delivery', cod_desc:'Pay the delivery person when you receive the product',
+  bkash:'bKash', nagad:'Nagad', rocket:'Rocket', send_money_suffix:' — Send Money to this number',
+  grand_total_lbl:'Grand Total', confirm_order_btn:'✅ Confirm Order', processing:'⏳ Processing order…',
+  order_saved_h:'Order submitted!', thanks_prefix:'Thanks ', thanks_suffix:'! Your order details have been sent via WhatsApp.',
+  order_no_lbl:'Order No: ', paid_amount_lbl:'Amount Payable: ', pay_on_delivery_note:' — pay on delivery',
+  wa_resend_note:'📞 If the WhatsApp chat did not open, tap the button below — our representative will call to confirm your order shortly',
+  eta_note:'Expected delivery: ', eta_note2:'', resend_wa_btn:'💬 Resend on WhatsApp', continue_shopping_btn:'🛍️ Continue Shopping',
+  track_phone_hint:'📱 Enter a valid 11-digit mobile number',
+  track_contact_h:'📦 Contact us to check order status', track_contact_p:'Send us your mobile number on WhatsApp or Telegram — we\u2019ll let you know right away',
+  account_greet:'Welcome, ', total_orders:'Total Orders', wishlist_word:'Wishlist', my_orders:'My Orders:', loading_dots:'⏳ Loading…',
+  contact_support_btn:'💬 Contact Support', logout_btn:'Log Out', logout_toast:'Logged out',
+  welcome_h:'Welcome to NextGenTechBD!', welcome_p:'Log in to order faster', enter_signup_btn:'→ Log in / Sign up',
+  terms_note:'By continuing, you agree to our terms (Demo — no data leaves this device)',
+  name_err2:'Enter your name (at least 3 characters)', phone_err2:'Enter a valid 11-digit number', welcome_toast:'🎉 Welcome, ',
+  track_status_link:'contact us on WhatsApp', track_status_prefix:'For the latest order status, ',
+  load_fail_h:'Could not load product data', load_fail_p:'There seems to be a server issue, please try again shortly', retry_btn:'↻ Try Again',
+  contact_direct:'Contact us directly for orders or any questions', whatsapp_msg_btn:'💬 Message on WhatsApp',
+  customer_service:'Customer Service', order_tracking:'📦 Order Tracking', return_refund:'Returns & Refunds', delivery_info:'Delivery Info', contact_us:'Contact Us',
+  about_suffix:'', about_us:'About Us', terms_policy:'Terms & Policy', payment_methods:'Payment Methods', contact_follow:'Contact / Follow',
+  copyright:'© 2026 NextGenTechBD — All rights reserved', made_with_love:'Made with love 🧡 in Bangladesh',
+  home:'Home', category:'Category', account:'Account', checkout:'Checkout',
+  track_phone_label:'Enter the mobile number used for the order', search_btn:'🔍 Search', track_initial_hint:'Enter your number above to check order status',
+  contact_line_prefix:'📞 ', contact_line_suffix:' — message us on WhatsApp or Telegram',
+  cod_badge:'💵 Cash on Delivery', bkash_badge:'📱 bKash', nagad_badge:'📱 Nagad', rocket_badge:'📱 Rocket'
+ }
+};
+const t=k=>(T[LANG]&&T[LANG][k]!==undefined)?T[LANG][k]:(T.bn[k]!==undefined?T.bn[k]:k);
+function applyLang(){
+ document.documentElement.lang=LANG;
+ document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.getAttribute('data-i18n'))});
+ document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.setAttribute('placeholder',t(el.getAttribute('data-i18n-placeholder')))});
+ document.querySelectorAll('#langSwitch span').forEach(s=>s.classList.toggle('on',s.dataset.lang===LANG));
+ updateTopUser();
+}
+function setLang(l){
+ if(l===LANG)return;
+ LANG=l;save('sb_lang',LANG);
+ applyLang();applySettings();render(false);
+ if($('cartDrawer').classList.contains('on'))renderCart();
+}
+
+/* ================= API ================= */
+function sessionHeaders(){const t=localStorage.getItem('ngtbd_session_token');const h={'Content-Type':'application/json'};if(t)h['X-Session-Token']=t;return h}
+async function apiGet(u){const r=await fetch(u,{headers:sessionHeaders()});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'সমস্যা হয়েছে');return j}
+async function apiSend(u,m,b){const r=await fetch(u,{method:m,headers:sessionHeaders(),body:JSON.stringify(b||{})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'সমস্যা হয়েছে');return j}
+
+/* ================= DATA (স্ট্যাটিক JSON ফাইল থেকে — অ্যাডমিন প্যানেল দিয়ে GitHub-এ আপডেট হয়) ================= */
+let CATS=[],PRODUCTS=[];
+let SETTINGS={contact:{phone:'01717877955',whatsapp:'8801717877955',telegram:'8801717877955',facebook:'https://www.facebook.com/share/19KVN4rZkS/',email:'tnextgen04@gmail.com'},payment:{bkash:'01717877955',nagad:'01717877955',rocket:'01717877955',cod:true}};
+const STATUS_L={pending:'🕐 অপেক্ষমান',confirmed:'✔ নিশ্চিত',shipped:'🚚 পাঠানো হয়েছে',delivered:'✅ ডেলিভার্ড',cancelled:'✖ বাতিল'};
+const STATUS_C={pending:'#b07800',confirmed:'#2b6de8',shipped:'#7c3aed',delivered:'#06a94a',cancelled:'#d92646'};
+async function fetchProducts(){
+  const j=await apiGet('/api/products');
+  PRODUCTS=j.products;CATS=j.categories;
+}
+async function fetchSettings(){
+  try{const j=await apiGet('/api/settings');SETTINGS=Object.assign({},SETTINGS,j)}catch(e){}
+  applySettings();
+}
+function waLink(msg){return 'https://wa.me/'+SETTINGS.contact.whatsapp+(msg?'?text='+encodeURIComponent(msg):'')}
+function tgLink(){return 'https://t.me/+'+SETTINGS.contact.telegram}
+function openWhatsApp(){window.open(waLink('আসসালামু আলাইকুম, আমি NextGenTechBD সাইট থেকে যোগাযোগ করছি।'),'_blank')}
+function applySettings(){
+  const c=SETTINGS.contact,p=SETTINGS.payment;
+  const wa=$('waIcon'),tg=$('tgIcon'),fb=$('fbIcon'),gm=$('gmIcon');
+  if(wa)wa.href=waLink('আসসালামু আলাইকুম, আমি NextGenTechBD সাইট থেকে যোগাযোগ করছি।');
+  if(tg)tg.href=tgLink();
+  if(fb)fb.href=c.facebook;
+  if(gm)gm.href='mailto:'+c.email;
+  const fl=$('footContactLine');if(fl)fl.textContent=t('contact_line_prefix')+c.phone+t('contact_line_suffix');
+  const pb=$('payBadges');
+  if(pb){
+    let h='';
+    if(p.cod)h+='<span class="pay-badge">'+t('cod_badge')+'</span>';
+    if(p.bkash)h+='<span class="pay-badge">'+t('bkash_badge')+'</span>';
+    if(p.nagad)h+='<span class="pay-badge">'+t('nagad_badge')+'</span>';
+    if(p.rocket)h+='<span class="pay-badge">'+t('rocket_badge')+'</span>';
+    pb.innerHTML=h;
+  }
+}
+const catName=id=>{const c=CATS.find(c=>c.id===id);return c?nameOf(c):(LANG==='en'?'Other':'অন্যান্য')};
+const catEmoji=id=>{const c=CATS.find(c=>c.id===id);return c?c.e:'📦'};
+/* Returns bilingual name: uses name_en if present & site is in English, otherwise the original (বাংলা) name */
+const nameOf=item=>(LANG==='en'&&item.name_en)?item.name_en:item.name;
+/* Renders a product/category visual: photo if uploaded via admin panel, else the emoji icon */
+const photoOrEmoji=(item,emojiClass)=>item.img?'<img class="cphoto" src="'+item.img+'" alt="'+(nameOf(item)||'').replace(/"/g,'&quot;')+'" loading="lazy">':'<span class="'+emojiClass+'">'+item.e+'</span>';
+
+const GRADS=[
+ ['#FFF3E0','#FFE0B2'],['#E3F2FD','#BBDEFB'],['#F3E5F5','#E1BEE7'],['#E8F5E9','#C8E6C9'],
+ ['#FCE4EC','#F8BBD0'],['#FFFDE7','#FFF9C4'],['#E0F7FA','#B2EBF2'],['#FBE9E7','#FFCCBC']
+];
+const grad=id=>'linear-gradient(135deg,'+GRADS[id%8][0]+','+GRADS[id%8][1]+')';
+const money=n=>'৳'+Number(n).toLocaleString('en-US');
+const byId=id=>PRODUCTS.find(p=>p.id===id);
+
+/* ================= STATE ================= */
+const state={
+ view:{type:'home'},
+ cart:load('sb_cart',{}),
+ wish:load('sb_wish',[]),
+ user:load('sb_user',null),
+ more:false,
+ slide:0
+};
+let directBuy=null,pQty=1,selColorV=null,selSizeV=null,lastPhone='';
+const persist=()=>{save('sb_cart',state.cart);save('sb_wish',state.wish);save('sb_user',state.user)};
+
+/* ================= HELPERS ================= */
+const app=()=>document.getElementById('app');
+const $=id=>document.getElementById(id);
+function toast(msg){const t=$('toast');t.innerHTML=msg;t.classList.add('on');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('on'),2400)}
+function stars(r){const w=(r/5*100).toFixed(1);return '<span class="stars">★★★★★<span class="sf" style="width:'+w+'%">★★★★★</span></span>'}
+function tagClass(tag){return tag==='ফ্রি ডেলিভারি'?'tag-free':tag==='হট'?'tag-hot':tag==='নতুন'?'tag-new':'tag-ver'}
+function tagLabel(tag){return tag==='ফ্রি ডেলিভারি'?t('free_delivery_lbl'):tag==='হট'?t('hot_lbl'):tag==='নতুন'?t('new_lbl'):t('verified_lbl')}
+const cartCount=()=>Object.values(state.cart).reduce((a,b)=>a+b,0);
+const cartSubtotal=()=>Object.entries(state.cart).reduce((a,[id,q])=>a+(byId(+id)?byId(+id).price*q:0),0);
+function updateBadges(){
+ const c=cartCount(),w=state.wish.length;
+ const cb=$('cartBadge'),wb=$('wishBadge');
+ cb.style.display=c?'flex':'none';cb.textContent=c;
+ wb.style.display=w?'flex':'none';wb.textContent=w;
+ if(c){cb.classList.add('pop');setTimeout(()=>cb.classList.remove('pop'),220)}
+}
+
+/* ================= NAVIGATION ================= */
+function go(v){state.view=v;state.more=false;render();window.scrollTo({top:0,behavior:'smooth'})}
+function goHome(){go({type:'home'})}
+function goCat(id){go({type:'cat',id:id,sort:'pop'})}
+function goProduct(id){directBuy=null;pQty=1;const p=byId(id);selColorV=p&&p.colors?p.colors[0]:null;selSizeV=p&&p.sizes?p.sizes[0]:null;go({type:'product',id:id})}
+function goWish(){go({type:'wish'})}
+function doSearch(q){if(!q){toast(t('search_empty_toast'));return}go({type:'search',q:q,sort:'pop'})}
+function setSort(v){state.view.sort=v;render(false)}
+function scrollToId(id){const el=$(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
+function showFlash(){if(state.view.type!=='home'){go({type:'home'});setTimeout(()=>scrollToId('flashSec'),100)}else scrollToId('flashSec')}
+function showCats(){if(state.view.type!=='home'){go({type:'home'});setTimeout(()=>scrollToId('catSec'),100)}else scrollToId('catSec')}
+
+/* ================= CARD TEMPLATES ================= */
+function cardHTML(p){
+ const wished=state.wish.includes(p.id);
+ return '<div class="card" onclick="goProduct('+p.id+')">'+
+  '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+
+   '<span class="off-badge">-'+p.off+'%</span>'+
+   '<button class="wbtn'+(wished?' on':'')+'" onclick="toggleWish('+p.id+',event)" title="'+t('wishlist')+'">'+(wished?'❤️':'🤍')+'</button>'+
+   photoOrEmoji(p,'cemoji')+
+   '<button class="qadd" onclick="addToCart('+p.id+',event)" title="'+t('cart')+'">🛒</button>'+
+  '</div>'+
+  '<div class="cbody">'+
+   '<div class="cname">'+nameOf(p)+'</div>'+
+   '<div class="cprice"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s></div>'+
+   '<div class="crate">'+stars(p.r)+' '+p.r.toFixed(1)+'<span>('+p.rv.toLocaleString('en-US')+')</span></div>'+
+   '<span class="ctag '+tagClass(p.tag)+'">'+tagLabel(p.tag)+'</span>'+
+  '</div>'+
+ '</div>';
+}
+const gridHTML=list=>'<div class="grid">'+list.map(cardHTML).join('')+'</div>';
+
+/* ================= VIEWS ================= */
+const SLIDES=()=>[
+ {g:'linear-gradient(135deg,#ff512f,#dd2476)',e:'🎉',h:t('mega_sale_h'),p:t('mega_sale_p'),cta:t('buy_now_cta'),act:"goCat('all')"},
+ {g:'linear-gradient(135deg,#f83600,#f9d423)',e:'⚡',h:t('flash_daily_h'),p:t('flash_daily_p'),cta:t('flash_deals_cta'),act:'showFlash()'},
+ {g:'linear-gradient(135deg,#4776e6,#8e54e9)',e:'🚚',h:t('free_delivery_h'),p:t('free_delivery_p'),cta:t('start_shopping_cta'),act:"goCat('all')"},
+ {g:'linear-gradient(135deg,#11998e,#38ef7d)',e:'🛒',h:t('grocery_h'),p:t('grocery_p'),cta:t('shop_now_cta'),act:"goCat('g')"}
+];
+
+function renderNavbar(){
+ const items=[{id:'all',name:t('all_products'),e:'🗂️'}].concat(CATS.map(c=>({id:c.id,name:nameOf(c),e:c.e})));
+ $('navbar').innerHTML=
+  '<span class="navchip hot" onclick="showFlash()">'+t('flash_sale_chip')+'</span>'+
+  items.map(i=>{
+   const on=(state.view.type==='cat'&&state.view.id===i.id)?' active':'';
+   return '<span class="navchip'+on+'" onclick="goCat(\''+i.id+'\')">'+i.e+' '+i.name+'</span>';
+  }).join('');
+}
+
+function renderHome(){
+ const SL=SLIDES();
+ const flash=PRODUCTS.filter(p=>p.f).slice(0,10);
+ const justShown=state.more?PRODUCTS.slice():PRODUCTS.slice(0,16);
+ app().innerHTML='<div class="fade">'+
+ /* hero */
+ '<div class="container"><div class="hero-row">'+
+  '<div class="carousel" id="carousel">'+SL.map((s,i)=>'<div class="slide'+(i===state.slide?' on':'')+'" style="background:'+s.g+'"><span class="big">'+s.e+'</span><h2>'+s.h+'</h2><p>'+s.p+'</p><button class="cta" onclick="'+s.act+'">'+s.cta+'</button></div>').join('')+
+  '<button class="caro-arrow l" onclick="slide('+(state.slide-1+SL.length)%SL.length+')">‹</button>'+
+  '<button class="caro-arrow r" onclick="slide('+(state.slide+1)%SL.length+')">›</button>'+
+  '<div class="dots">'+SL.map((s,i)=>'<span class="dot'+(i===state.slide?' on':'')+'" onclick="slide('+i+')"></span>').join('')+'</div>'+
+  '</div>'+
+  '<div class="side-banners">'+
+   '<div class="side-banner" style="background:linear-gradient(135deg,#1f4037,#99f2c8)" onclick="goCat(\'h\')"><span class="be">🏠</span><h3>'+t('home_living')+'</h3><p>'+t('discount40')+'</p></div>'+
+   '<div class="side-banner" style="background:linear-gradient(135deg,#ec6f66,#f3a183)" onclick="goCat(\'b\')"><span class="be">💄</span><h3>'+t('beauty_care')+'</h3><p>'+t('original_product')+'</p></div>'+
+  '</div>'+
+ '</div></div>'+
+ /* categories */
+ '<div class="container"><div class="section" id="catSec"><div class="section-head"><h2>'+t('categories')+'</h2></div>'+
+  '<div class="cat-circles">'+CATS.map(c=>'<div class="cat-circle" onclick="goCat(\''+c.id+'\')"><span class="ring'+(c.img?' has-photo':'')+'">'+photoOrEmoji(c,'')+'</span><span>'+nameOf(c)+'</span></div>').join('')+'</div>'+
+ '</div></div>'+
+ /* flash */
+ '<div class="container"><div class="section flash" id="flashSec">'+
+  '<div class="flash-head"><h2>'+t('flash_sale')+'</h2>'+
+   '<div class="countdown"><span>'+t('ends_at')+'</span><span class="cd-box" id="cdH">০০</span><span class="colon">:</span><span class="cd-box" id="cdM">০০</span><span class="colon">:</span><span class="cd-box" id="cdS">০০</span></div>'+
+   '<span class="see-all" onclick="goCat(\'all\')" style="color:#fff">'+t('see_all')+'</span></div>'+
+  '<div class="flash-body"><div class="flash-scroll">'+flash.map(flashCard).join('')+'</div></div>'+
+ '</div></div>'+
+ /* just for you */
+ '<div class="container"><div class="section"><div class="section-head"><h2>'+t('just_for_you')+'</h2><span class="see-all" onclick="goCat(\'all\')">'+t('see_all')+'</span></div>'+
+  gridHTML(justShown)+
+  (!state.more&&PRODUCTS.length>16?'<button class="load-more" onclick="state.more=true;render(false)">'+t('load_more')+'</button>':'')+
+ '</div></div></div>';
+ updateCountdown();
+}
+
+function flashCard(p){
+ const remain=Math.max(4,Math.round(p.sold*0.25));
+ const pct=Math.min(96,Math.round(p.sold/(p.sold+remain)*100));
+ return '<div class="fcard" onclick="goProduct('+p.id+')">'+
+  '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+';height:150px"><span class="off-badge">-'+p.off+'%</span>'+photoOrEmoji(p,'cemoji')+'</div>'+
+  '<div class="cbody" style="padding:8px 6px"><div class="cname">'+nameOf(p)+'</div>'+
+  '<div class="cprice"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s></div>'+
+  '<div class="sold-line" style="font-size:11.5px;color:#888;margin:4px 0 2px">'+p.sold.toLocaleString('en-US')+t('sold_count_suffix')+'</div>'+
+  '<div class="sold-bar"><span class="fill" style="width:'+pct+'%"></span><span class="lbl">'+t('left_prefix')+remain+t('left_suffix')+'</span></div>'+
+  '</div></div>';
+}
+
+function sortList(list,sort){
+ const l=list.slice();
+ if(sort==='plow')l.sort((a,b)=>a.price-b.price);
+ else if(sort==='phigh')l.sort((a,b)=>b.price-a.price);
+ else if(sort==='off')l.sort((a,b)=>b.off-a.off);
+ else if(sort==='new')l.sort((a,b)=>b.id-a.id);
+ else l.sort((a,b)=>b.sold-a.sold);
+ return l;
+}
+const sortSelect=()=>'<div class="sort-wrap">'+t('sort_label')+' <select onchange="setSort(this.value)">'+
+ '<option value="pop"'+(state.view.sort==='pop'?' selected':'')+'>'+t('sort_pop')+'</option>'+
+ '<option value="new"'+(state.view.sort==='new'?' selected':'')+'>'+t('sort_new')+'</option>'+
+ '<option value="plow"'+(state.view.sort==='plow'?' selected':'')+'>'+t('sort_plow')+'</option>'+
+ '<option value="phigh"'+(state.view.sort==='phigh'?' selected':'')+'>'+t('sort_phigh')+'</option>'+
+ '<option value="off"'+(state.view.sort==='off'?' selected':'')+'>'+t('sort_off')+'</option></select></div>';
+
+function renderCat(){
+ const v=state.view;
+ const isAll=v.id==='all';
+ const list=sortList(isAll?PRODUCTS:PRODUCTS.filter(p=>p.cat===v.id),v.sort);
+ const title=isAll?t('all_products'):catEmoji(v.id)+' '+catName(v.id);
+ app().innerHTML='<div class="container fade">'+
+ '<div class="crumb"><b onclick="goHome()">'+t('home_crumb')+'</b> › '+title+'</div>'+
+ '<div class="listing-top"><h1>'+title+'</h1><span class="cnt">('+list.length+t('products_count_suffix')+')</span>'+sortSelect()+'</div>'+
+ (list.length?gridHTML(list):emptyHTML('😕',t('no_products_title'),t('no_products_desc')))+
+ '</div>';
+}
+
+function renderSearch(){
+ const v=state.view;const q=v.q.toLowerCase();
+ const list=sortList(PRODUCTS.filter(p=>nameOf(p).toLowerCase().includes(q)||p.name.toLowerCase().includes(q)||catName(p.cat).toLowerCase().includes(q)),v.sort);
+ app().innerHTML='<div class="container fade">'+
+ '<div class="crumb"><b onclick="goHome()">'+t('home_crumb')+'</b> › '+t('search_crumb')+'</div>'+
+ '<div class="listing-top"><h1>🔎 “'+v.q+'”</h1><span class="cnt">'+(list.length?list.length+t('results_suffix'):t('no_results'))+'</span>'+sortSelect()+'</div>'+
+ (list.length?gridHTML(list):emptyHTML('😥',t('no_results_title'),'“'+v.q+'” '+t('no_results_desc_a')))+
+ '</div>';
+}
+
+function renderWish(){
+ const list=PRODUCTS.filter(p=>state.wish.includes(p.id));
+ app().innerHTML='<div class="container fade">'+
+ '<div class="crumb"><b onclick="goHome()">'+t('home_crumb')+'</b> › '+t('wish_crumb')+'</div>'+
+ '<div class="listing-top"><h1>'+t('wish_title')+'</h1><span class="cnt">('+list.length+t('wish_count_suffix')+')</span></div>'+
+ (list.length?gridHTML(list):emptyHTML('🤍',t('wish_empty_title'),t('wish_empty_desc')))+
+ '</div>';
+}
+
+function emptyHTML(e,h,p){return '<div class="section"><div class="empty-state"><div class="ee">'+e+'</div><h3>'+h+'</h3><p>'+p+'</p></div></div>'}
+
+/* ---------- product detail ---------- */
+function renderProduct(){
+ const p=byId(state.view.id);if(!p){goHome();return}
+ const related=PRODUCTS.filter(x=>x.cat===p.cat&&x.id!==p.id).slice(0,5);
+ let colorsHtml='';
+ if(p.colors)colorsHtml='<div class="variants"><div class="lbl">'+t('select_color')+'</div><div class="vchips">'+p.colors.map(c=>'<button class="vchip'+(c===selColorV?' sel':'')+'" onclick="selColor(\''+c+'\')">'+c+'</button>').join('')+'</div></div>';
+ let sizesHtml='';
+ if(p.sizes)sizesHtml='<div class="variants"><div class="lbl">'+t('select_size')+'</div><div class="vchips">'+p.sizes.map(s=>'<button class="vchip'+(s===selSizeV?' sel':'')+'" onclick="selSize(\''+s+'\')">'+s+'</button>').join('')+'</div></div>';
+ const pname=nameOf(p);
+ app().innerHTML='<div class="container fade">'+
+ '<div class="crumb"><b onclick="goHome()">'+t('home_crumb')+'</b> › <b onclick="goCat(\''+p.cat+'\')">'+catName(p.cat)+'</b> › '+pname.slice(0,32)+'</div>'+
+ '<div class="section" style="margin-top:12px"><div class="pd">'+
+  '<div class="pd-visual'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'"><span class="off-badge">-'+p.off+'%</span>'+photoOrEmoji(p,'big')+'</div>'+
+  '<div class="pd-info">'+
+   '<h1>'+pname+'</h1>'+
+   '<div class="pd-rate"><span>'+stars(p.r)+' '+p.r.toFixed(1)+'</span><span>'+t('ratings_word')+' ('+p.rv.toLocaleString('en-US')+')</span><span>|</span><span>'+p.sold.toLocaleString('en-US')+t('sold_count_suffix')+'</span></div>'+
+   '<div class="pd-price-box"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s><span class="off-badge">-'+p.off+'%</span></div>'+
+   colorsHtml+sizesHtml+
+   '<div class="qty-row"><span style="font-size:13px;color:#777">'+t('quantity')+'</span><div class="qty-box"><button onclick="changePQty(-1)">−</button><span class="qv">'+pQty+'</span><button onclick="changePQty(1)">+</button></div></div>'+
+   '<div class="pd-btns"><button class="btn btn-cart" onclick="addToCart('+p.id+',null,'+pQty+')">'+t('add_to_cart_btn')+'</button><button class="btn btn-buy" onclick="buyNow('+p.id+')">'+t('buy_now_btn')+'</button></div>'+
+   '<div class="pd-perks">'+
+    '<div class="perk"><span class="pe">🚚</span><div><b>'+t('perk1_h')+'</b>'+t('perk1_p')+'</div></div>'+
+    '<div class="perk"><span class="pe">💵</span><div><b>'+t('perk2_h')+'</b>'+t('perk2_p')+'</div></div>'+
+    '<div class="perk"><span class="pe">↩️</span><div><b>'+t('perk3_h')+'</b>'+t('perk3_p')+'</div></div>'+
+    '<div class="perk"><span class="pe">✔️</span><div><b>'+t('perk4_h')+'</b>'+t('perk4_p')+'</div></div>'+
+   '</div>'+
+  '</div>'+
+ '</div></div>'+
+ '<div class="section"><div class="section-head"><h2>'+t('description_h')+'</h2></div>'+
+  '<ul style="padding-left:20px;line-height:2;color:#555;font-size:14px">'+
+   '<li><b>'+t('category_label')+'</b> '+catName(p.cat)+'</li>'+
+   '<li><b>'+t('brand_label')+'</b> '+t('brand_value')+'</li>'+
+   '<li><b>'+t('condition_label')+'</b> '+t('condition_value')+'</li>'+
+   '<li><b>'+t('delivery_label')+'</b> '+t('delivery_value')+'</li>'+
+   '<li><b>'+t('payment_label')+'</b> '+t('payment_value')+'</li>'+
+  '</ul></div>'+
+ (related.length?'<div class="section"><div class="section-head"><h2>'+t('more_like_this')+'</h2><span class="see-all" onclick="goCat(\''+p.cat+'\')">'+t('see_all')+'</span></div>'+gridHTML(related)+'</div>':'')+
+ '</div>';
+}
+function changePQty(d){pQty=Math.min(20,Math.max(1,pQty+d));$('app').querySelector('.qv').textContent=pQty}
+function selColor(c){selColorV=c;render(false)}
+function selSize(s){selSizeV=s;render(false)}
+
+/* ================= RENDER ================= */
+function render(scrollTop){
+ renderNavbar();
+ const t=state.view.type;
+ if(t==='home')renderHome();
+ else if(t==='cat')renderCat();
+ else if(t==='search')renderSearch();
+ else if(t==='product')renderProduct();
+ else if(t==='wish')renderWish();
+ if(scrollTop!==false)window.scrollTo({top:0});
+ updateBadges();
+}
+
+/* ================= WISHLIST ================= */
+function toggleWish(id,ev){
+ if(ev)ev.stopPropagation();
+ const i=state.wish.indexOf(id);
+ if(i>=0){state.wish.splice(i,1);toast(t('wish_removed'))}
+ else{state.wish.push(id);toast(t('wish_added'))}
+ persist();render(false);if($('cartDrawer').classList.contains('on'))renderCart();
+}
+
+/* ================= CART ================= */
+function addToCart(id,ev,qty){
+ if(ev)ev.stopPropagation();
+ qty=qty||1;
+ state.cart[id]=(state.cart[id]||0)+qty;
+ persist();updateBadges();
+ toast(t('added_to_cart')+'<b>'+nameOf(byId(id)).slice(0,26)+'…</b>');
+ if($('cartDrawer').classList.contains('on'))renderCart();
+}
+function buyNow(id){directBuy={id:id,qty:pQty};openCheckout()}
+function incQty(id){state.cart[id]++;persist();updateBadges();renderCart()}
+function decQty(id){if(state.cart[id]>1){state.cart[id]--}else{delete state.cart[id]}persist();updateBadges();renderCart()}
+function rmItem(id){delete state.cart[id];persist();updateBadges();renderCart()}
+
+function openCart(){$('overlay').classList.add('on');$('cartDrawer').classList.add('on');renderCart();document.body.style.overflow='hidden'}
+function closeCart(){if($('checkoutModal').classList.contains('on'))return;$('overlay').classList.remove('on');$('cartDrawer').classList.remove('on');document.body.style.overflow=''}
+function closeAll(){closeCart();closeCheckout();closeSell()}
+
+function renderCart(){
+ const ids=Object.keys(state.cart);
+ $('drawerCount').textContent=cartCount();
+ if(!ids.length){
+  $('drawerItems').innerHTML='<div class="empty-state"><div class="ee">🛒</div><h3>'+t('cart_empty_title')+'</h3><p>'+t('cart_empty_desc')+'</p></div>';
+  $('drawerFoot').innerHTML='<button class="btn-block" onclick="closeCart();goCat(\'all\')">'+t('start_shopping_btn')+'</button>';
+  return;
+ }
+ const sub=cartSubtotal();
+ const freeLeft=1999-sub;
+ $('drawerItems').innerHTML=ids.map(id=>{const p=byId(+id),q=state.cart[id];if(!p)return'';
+  return '<div class="ci"><div class="ciem'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+photoOrEmoji(p,'')+'</div>'+
+  '<div class="cinfo"><div class="nm">'+nameOf(p)+'</div><div class="pr">'+money(p.price)+' <s style="color:#bbb;font-weight:400;font-size:11.5px">'+money(p.old)+'</s></div>'+
+  '<div class="rm" onclick="rmItem('+id+')">'+t('remove_item')+'</div></div>'+
+  '<div class="ci-qty"><button onclick="incQty('+id+')">+</button><span class="q">'+q+'</span><button onclick="decQty('+id+')">−</button></div></div>';
+ }).join('');
+ $('drawerFoot').innerHTML=
+  (freeLeft>0?'<div class="free-ship-note warn">'+t('add_more_free')+'<b>'+money(freeLeft)+'</b>'+t('add_more_free2')+'</div>':'<div class="free-ship-note">'+t('free_congrats')+'</div>')+
+  '<div class="totals"><div class="row"><span>'+t('total_items_lbl')+cartCount()+t('total_items_lbl2')+'</span><span>'+money(sub)+'</span></div>'+
+  '<div class="row"><span>'+t('delivery_fee_lbl')+'</span><span>'+(sub>=1999?t('free_word'):(LANG==='en'?'Calculated at checkout':'চেকআউটে হিসাব'))+'</span></div>'+
+  '<div class="row grand"><span>'+t('subtotal_lbl')+'</span><span>'+money(sub)+'</span></div></div>'+
+  '<button class="btn-block" onclick="openCheckout()">'+t('checkout_btn')+'</button>';
+}
+
+/* ================= CHECKOUT ================= */
+function ckItems(){
+ if(directBuy){const p=byId(directBuy.id);return p?[{p:p,q:directBuy.qty}]:[]}
+ return Object.keys(state.cart).map(id=>({p:byId(+id),q:state.cart[id]})).filter(i=>i.p);
+}
+function openCheckout(){
+ const items=ckItems();
+ if(!items.length){toast(t('cart_first_toast'));return}
+ closeCart();
+ const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
+ $('checkoutBody').innerHTML=
+  '<div class="ck-items">'+items.map(i=>'<div class="cki"><span>'+i.p.e+' '+nameOf(i.p).slice(0,30)+' × '+i.q+'</span><b>'+money(i.p.price*i.q)+'</b></div>').join('')+'</div>'+
+  '<form onsubmit="event.preventDefault();placeOrder()">'+
+  '<div class="fgroup"><label>'+t('name_label')+'</label><input id="ckName" value="'+(state.user?state.user.name.replace(/"/g,'&quot;'):'')+'" placeholder="'+t('name_ph')+'"><div class="ferr" id="ckErrName">'+t('name_err')+'</div></div>'+
+  '<div class="fgroup"><label>'+t('phone_label')+'</label><input id="ckPhone" value="'+(state.user?state.user.phone:'')+'" placeholder="01XXXXXXXXX" maxlength="11" inputmode="numeric"><div class="ferr" id="ckErrPhone">'+t('phone_err')+'</div></div>'+
+  '<div class="fgroup"><label>'+t('district_label')+'</label><select id="ckDist" onchange="recalcCk()">'+districtOptions()+'</select></div>'+
+  '<div class="fgroup"><label>'+t('address_label')+'</label><textarea id="ckAddr" placeholder="'+t('address_ph')+'"></textarea><div class="ferr" id="ckErrAddr">'+t('address_err')+'</div></div>'+
+  '<div class="fgroup"><label>'+t('note_label')+'</label><textarea id="ckNote" style="min-height:48px" placeholder="'+t('note_ph')+'"></textarea></div>'+
+  '<div class="fgroup"><label>'+t('payment_method_label')+'</label>'+
+   '<div class="payopts" style="grid-template-columns:1fr">'+
+   '<label class="payopt sel" data-pay="ক্যাশ অন ডেলিভারি" onclick="pickPay(this)"><span class="pe">💵</span><span>'+t('cod_full')+'<br><small style="color:#888;font-weight:400">'+t('cod_desc')+'</small></span></label>'+
+   '<label class="payopt" data-pay="বিকাশ" onclick="pickPay(this)"><span class="pe">📱</span><span>'+t('bkash')+'<br><small style="color:#888;font-weight:400">'+SETTINGS.payment.bkash+t('send_money_suffix')+'</small></span></label>'+
+   '<label class="payopt" data-pay="নগদ" onclick="pickPay(this)"><span class="pe">📱</span><span>'+t('nagad')+'<br><small style="color:#888;font-weight:400">'+SETTINGS.payment.nagad+t('send_money_suffix')+'</small></span></label>'+
+   '<label class="payopt" data-pay="রকেট" onclick="pickPay(this)"><span class="pe">📱</span><span>'+t('rocket')+'<br><small style="color:#888;font-weight:400">'+SETTINGS.payment.rocket+t('send_money_suffix')+'</small></span></label>'+
+  '</div></div>'+
+  '<div class="totals" style="background:#fafafa;border-radius:10px;padding:12px 14px;margin-bottom:14px">'+
+   '<div class="row"><span>'+t('subtotal_lbl')+'</span><span>'+money(sub)+'</span></div>'+
+   '<div class="row"><span>'+t('delivery_fee_lbl')+'</span><span id="ckFee">'+(sub>=1999?t('free_word'):'—')+'</span></div>'+
+   '<div class="row grand"><span>'+t('grand_total_lbl')+'</span><span id="ckGrand"></span></div>'+
+  '</div>'+
+  '<button class="btn-block" id="ckSubmit" type="submit">'+t('confirm_order_btn')+'</button>'+
+  '</form>';
+ recalcCk();
+ $('checkoutModal').classList.add('on');document.body.style.overflow='hidden';
+}
+const DISTRICTS=[['ঢাকা','Dhaka'],['চট্টগ্রাম','Chattogram'],['খুলনা','Khulna'],['রাজশাহী','Rajshahi'],['সিলেট','Sylhet'],['বরিশাল','Barishal'],['রংপুর','Rangpur'],['ময়মনসিংহ','Mymensingh'],['কুমিল্লা','Cumilla'],['নারায়ণগঞ্জ','Narayanganj']];
+const districtOptions=()=>DISTRICTS.map(d=>'<option value="'+d[0]+'">'+(LANG==='en'?d[1]:d[0])+'</option>').join('');
+function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel')}
+function ckFeeOf(){const items=ckItems();const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);if(sub>=1999)return 0;const d=$('ckDist');return d&&d.value==='ঢাকা'?60:120}
+function recalcCk(){
+ const items=ckItems();const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
+ const fee=ckFeeOf();
+ $('ckFee').innerHTML=fee===0?t('free_word'):money(fee);
+ $('ckGrand').textContent=money(sub+fee);
+}
+function closeCheckout(){$('checkoutModal').classList.remove('on');directBuy=null;document.body.style.overflow=''}
+async function placeOrder(){
+ const name=$('ckName').value.trim(),phone=$('ckPhone').value.trim(),addr=$('ckAddr').value.trim();
+ let ok=true;
+ const mark=(id,bad)=>{const e=$(id);e.style.display=bad?'block':'none';if(bad)ok=false};
+ mark('ckErrName',name.length<3);
+ mark('ckErrPhone',!/^01[3-9]\d{8}$/.test(phone));
+ mark('ckErrAddr',addr.length<10);
+ if(!ok)return;
+ const items=ckItems();
+ const dist=$('ckDist').value;
+ const pay=document.querySelector('.payopt.sel').dataset.pay||'ক্যাশ অন ডেলিভারি';
+ const note=($('ckNote')?$('ckNote').value.trim():'').slice(0,200);
+ const btn=$('ckSubmit');btn.disabled=true;btn.textContent=t('processing');
+
+ const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
+ const fee=ckFeeOf();
+ const total=sub+fee;
+ const orderNo='SB'+Date.now().toString().slice(-8);
+ const eta=new Date(Date.now()+3*24*3600*1000).toISOString();
+ const itemLines=items.map(i=>i.p.e+' '+nameOf(i.p)+' × '+i.q+' — '+money(i.p.price*i.q));
+ const waMsg='🛍️ নতুন অর্ডার — '+orderNo+'\n\n👤 নাম: '+name+'\n📱 মোবাইল: '+phone+'\n📍 ঠিকানা: '+addr+' ('+dist+')\n💳 পেমেন্ট: '+pay+
+  (note?'\n📝 নোট: '+note:'')+'\n\n🧾 পণ্যসমূহ:\n'+itemLines.join('\n')+'\n\nসাব-টোটাল: '+money(sub)+'\nডেলিভারি ফি: '+(fee===0?'ফ্রি':money(fee))+'\nসর্বমোট: '+money(total);
+
+ // D1 ডেটাবেজে ব্যাকআপ রেকর্ড হিসেবে জমা হবে (অ্যাডমিন প্যানেল → অর্ডারসমূহ)
+ try{
+  await apiSend('/api/orders','POST',{orderNo,name,phone,address:addr,district:dist,payment:pay,note,items:itemLines,subtotal:sub,deliveryFee:fee,total});
+ }catch(e){/* ডেটাবেজে সেভ ব্যর্থ হলেও নিচে হোয়াটসঅ্যাপে অর্ডারটি পাঠানো হবে */}
+
+ lastPhone=phone;
+ if(!directBuy){state.cart={};persist();updateBadges()}
+ directBuy=null;
+ showSuccess({no:orderNo,total:total,pay:pay,eta:eta},name,waMsg);
+}
+function showSuccess(order,name,waMsg){
+ let eta='';
+ try{eta=new Date(order.eta).toLocaleDateString(LANG==='en'?'en-US':'bn-BD',{day:'numeric',month:'long'})}catch(e){eta=LANG==='en'?'within 3 days':'৩ দিনের মধ্যে'}
+ window.open(waLink(waMsg),'_blank');
+ $('checkoutBody').innerHTML='<div class="success-pane"><div class="se">🎉</div><h2>'+t('order_saved_h')+'</h2>'+
+ '<p>'+t('thanks_prefix')+'<b>'+name+'</b>'+t('thanks_suffix')+'</p>'+
+ '<div class="ono">'+t('order_no_lbl')+order.no+'</div>'+
+ '<p>'+t('paid_amount_lbl')+'<b>'+money(order.total)+'</b> ('+order.pay+')'+t('pay_on_delivery_note')+'</p>'+
+ '<p>'+t('wa_resend_note')+'</p>'+
+ '<p style="font-size:12.5px;margin-top:6px">'+t('eta_note')+'<b>'+eta+'</b>'+t('eta_note2')+'</p>'+
+ '<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn-block" style="min-width:170px" onclick="window.open(waLink('+JSON.stringify(waMsg)+'),\'_blank\')">'+t('resend_wa_btn')+'</button>'+
+ '<button class="btn btn-cart" style="min-width:150px" onclick="closeCheckout();goHome()">'+t('continue_shopping_btn')+'</button></div></div>';
+}
+
+/* ================= ORDER TRACKING ও লগইন (এখন /orders/ পেজে হয়) =================
+   গ্রাহকের রিয়েল লগইন, অর্ডার হিস্টরি ও ট্র্যাকিং এখন আলাদা /orders/ পেজে করা হয় (নিজস্ব ব্যাকএন্ড API সহ, X-Session-Token হেডার দিয়ে)।
+   এখানে শুধু /orders/ পেজে লগইন করা থাকলে (localStorage-এ সেভ থাকা টোকেন দিয়ে) তার নাম-ফোন এই হোমপেজেও
+   (টপবার + চেকআউট প্রিফিল) দেখানোর জন্য /api/customer/me কল করে সিঙ্ক করা হয়। */
+async function syncCustomerFromOrdersPage(){
+ const token=localStorage.getItem('ngtbd_session_token');
+ if(!token){ updateTopUser(); return; }
+ try{
+  const j=await apiGet('/api/customer/me');
+  if(j&&j.customer){ state.user={name:j.customer.name,phone:j.customer.phone}; persist(); }
+ }catch(e){
+  localStorage.removeItem('ngtbd_session_token');
+ }
+ updateTopUser();
+}
+function updateTopUser(){const el=$('topUserSpan');if(el)el.textContent=state.user?'👤 '+state.user.name:t('login_signup')}
+
+/* ================= CAROUSEL & COUNTDOWN ================= */
+function slide(i){const n=SLIDES().length;state.slide=(i+n)%n;const c=$('carousel');if(!c)return;
+ const sl=c.querySelectorAll('.slide'),dt=c.querySelectorAll('.dot');
+ sl.forEach((s,x)=>s.classList.toggle('on',x===state.slide));
+ dt.forEach((d,x)=>d.classList.toggle('on',x===state.slide))}
+let tick=0;
+setInterval(()=>{
+ tick++;
+ if(tick%4===0&&state.view.type==='home')slide(state.slide+1);
+ updateCountdown();
+},1000);
+function flashTarget(){const d=new Date(),t=new Date(d);t.setHours(10,0,0,0);if(d>=t)t.setDate(t.getDate()+1);return t}
+function updateCountdown(){
+ const h=$('cdH');if(!h)return;
+ let s=Math.max(0,Math.floor((flashTarget()-new Date())/1000));
+ const hh=String(Math.floor(s/3600)).padStart(2,'0'),mm=String(Math.floor(s%3600/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0');
+ h.textContent=hh;$('cdM').textContent=mm;$('cdS').textContent=ss;
+}
+
+/* ================= BOOT ================= */
+async function boot(){
+ applyLang();
+ syncCustomerFromOrdersPage();
+ try{
+  await fetchProducts();
+  fetchSettings();
+  render();
+ }catch(e){
+  app().innerHTML='<div class="container"><div class="section"><div class="empty-state"><div class="ee">🔌</div><h3>'+t('load_fail_h')+'</h3><p>'+t('load_fail_p')+'</p><button class="load-more" onclick="boot()">'+t('retry_btn')+'</button></div></div></div>';
+ }
+}
+boot();
+</script>
+</body>
+</html>

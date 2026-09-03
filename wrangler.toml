@@ -1,0 +1,10 @@
+name = "nextgentechbd"
+pages_build_output_dir = "public"
+compatibility_date = "2026-08-01"
+
+# D1 ডেটাবেজ বাইন্ডিং — Cloudflare-এ D1 ডেটাবেজ তৈরি করার পর database_id বসিয়ে দিন
+# (Cloudflare Pages ড্যাশবোর্ড থেকেও এই বাইন্ডিং যোগ করা যায় — DEPLOY-GUIDE.md দেখুন)
+[[d1_databases]]
+binding = "DB"
+database_name = "nextgentechbd-db"
+database_id = "YOUR-DATABASE-ID-HERE"
