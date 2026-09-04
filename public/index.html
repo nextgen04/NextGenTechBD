@@ -409,14 +409,14 @@ footer{background:#fff;margin-top:26px;border-top:3px solid var(--orange)}
       <div class="foot-col">
         <h4 data-i18n="customer_service">গ্রাহক সেবা</h4>
         <a onclick="location.href='/orders/'" data-i18n="order_tracking">📦 অর্ডার ট্র্যাকিং</a>
-        <a onclick="openWhatsApp()" data-i18n="return_refund">রিটার্ন ও রিফান্ড</a>
-        <a onclick="openWhatsApp()" data-i18n="delivery_info">ডেলিভারি তথ্য</a>
+        <a onclick="openInfoModal('return')" data-i18n="return_refund">রিটার্ন ও রিফান্ড</a>
+        <a onclick="openInfoModal('delivery')" data-i18n="delivery_info">ডেলিভারি তথ্য</a>
         <a onclick="openWhatsApp()" data-i18n="contact_us">যোগাযোগ করুন</a>
       </div>
       <div class="foot-col">
         <h4>NextGenTechBD <span data-i18n="about_suffix">সম্পর্কে</span></h4>
-        <a data-i18n="about_us">আমাদের সম্পর্কে</a>
-        <a data-i18n="terms_policy">শর্তাবলী ও নীতি</a>
+        <a onclick="openInfoModal('about')" data-i18n="about_us">আমাদের সম্পর্কে</a>
+        <a onclick="openInfoModal('terms')" data-i18n="terms_policy">শর্তাবলী ও নীতি</a>
       </div>
       <div class="foot-col">
         <h4 data-i18n="payment_methods">পেমেন্ট মেথড</h4>
@@ -464,6 +464,14 @@ footer{background:#fff;margin-top:26px;border-top:3px solid var(--orange)}
   <div class="drawer-items" id="drawerItems"></div>
   <div class="drawer-foot" id="drawerFoot"></div>
 </aside>
+
+<!-- ============ INFO MODAL (আমাদের সম্পর্কে / শর্তাবলী / ডেলিভারি / রিটার্ন) ============ -->
+<div class="modal-wrap" id="infoModal" onclick="if(event.target===this)closeInfoModal()">
+  <div class="modal">
+    <div class="modal-head"><h3 id="infoModalTitle">তথ্য</h3><button class="x" onclick="closeInfoModal()">✕</button></div>
+    <div class="modal-body" id="infoModalBody" style="padding:18px 20px;line-height:1.8;font-size:14px;color:#444"></div>
+  </div>
+</div>
 
 <!-- ============ CHECKOUT MODAL ============ -->
 <div class="modal-wrap" id="checkoutModal" onclick="if(event.target===this)closeCheckout()">
@@ -643,6 +651,7 @@ async function apiSend(u,m,b){const r=await fetch(u,{method:m,headers:sessionHea
 /* ================= DATA (স্ট্যাটিক JSON ফাইল থেকে — অ্যাডমিন প্যানেল দিয়ে GitHub-এ আপডেট হয়) ================= */
 let CATS=[],PRODUCTS=[];
 let SETTINGS={contact:{phone:'01717877955',whatsapp:'8801717877955',telegram:'8801717877955',facebook:'https://www.facebook.com/share/19KVN4rZkS/',email:'tnextgen04@gmail.com'},payment:{bkash:'01717877955',nagad:'01717877955',rocket:'01717877955',cod:true}};
+let SITE_TEXT={};
 const STATUS_L={pending:'🕐 অপেক্ষমান',confirmed:'✔ নিশ্চিত',shipped:'🚚 পাঠানো হয়েছে',delivered:'✅ ডেলিভার্ড',cancelled:'✖ বাতিল'};
 const STATUS_C={pending:'#b07800',confirmed:'#2b6de8',shipped:'#7c3aed',delivered:'#06a94a',cancelled:'#d92646'};
 async function fetchProducts(){
@@ -653,6 +662,10 @@ async function fetchSettings(){
   try{const j=await apiGet('/api/settings');SETTINGS=Object.assign({},SETTINGS,j)}catch(e){}
   applySettings();
 }
+async function fetchSiteText(){
+  try{SITE_TEXT=await apiGet('/api/site-text')}catch(e){SITE_TEXT={}}
+}
+function siteText(key,fallback){return (SITE_TEXT&&SITE_TEXT[key])||fallback}
 function waLink(msg){return 'https://wa.me/'+SETTINGS.contact.whatsapp+(msg?'?text='+encodeURIComponent(msg):'')}
 function tgLink(){return 'https://t.me/+'+SETTINGS.contact.telegram}
 function openWhatsApp(){window.open(waLink('আসসালামু আলাইকুম, আমি NextGenTechBD সাইট থেকে যোগাযোগ করছি।'),'_blank')}
@@ -786,18 +799,18 @@ function renderHome(){
   '</div>'+
  '</div></div>'+
  /* categories */
- '<div class="container"><div class="section" id="catSec"><div class="section-head"><h2>'+t('categories')+'</h2></div>'+
+ '<div class="container"><div class="section" id="catSec"><div class="section-head"><h2>'+siteText('categories_title',t('categories'))+'</h2></div>'+
   '<div class="cat-circles">'+CATS.map(c=>'<div class="cat-circle" onclick="goCat(\''+c.id+'\')"><span class="ring'+(c.img?' has-photo':'')+'">'+photoOrEmoji(c,'')+'</span><span>'+nameOf(c)+'</span></div>').join('')+'</div>'+
  '</div></div>'+
  /* flash */
  '<div class="container"><div class="section flash" id="flashSec">'+
-  '<div class="flash-head"><h2>'+t('flash_sale')+'</h2>'+
+  '<div class="flash-head"><h2>'+siteText('flash_sale_title',t('flash_sale'))+'</h2>'+
    '<div class="countdown"><span>'+t('ends_at')+'</span><span class="cd-box" id="cdH">০০</span><span class="colon">:</span><span class="cd-box" id="cdM">০০</span><span class="colon">:</span><span class="cd-box" id="cdS">০০</span></div>'+
    '<span class="see-all" onclick="goCat(\'all\')" style="color:#fff">'+t('see_all')+'</span></div>'+
   '<div class="flash-body"><div class="flash-scroll">'+flash.map(flashCard).join('')+'</div></div>'+
  '</div></div>'+
  /* just for you */
- '<div class="container"><div class="section"><div class="section-head"><h2>'+t('just_for_you')+'</h2><span class="see-all" onclick="goCat(\'all\')">'+t('see_all')+'</span></div>'+
+ '<div class="container"><div class="section"><div class="section-head"><h2>'+siteText('just_for_you_title',t('just_for_you'))+'</h2><span class="see-all" onclick="goCat(\'all\')">'+t('see_all')+'</span></div>'+
   gridHTML(justShown)+
   (!state.more&&PRODUCTS.length>16?'<button class="load-more" onclick="state.more=true;render(false)">'+t('load_more')+'</button>':'')+
  '</div></div></div>';
@@ -946,7 +959,47 @@ function rmItem(id){delete state.cart[id];persist();updateBadges();renderCart()}
 
 function openCart(){$('overlay').classList.add('on');$('cartDrawer').classList.add('on');renderCart();document.body.style.overflow='hidden'}
 function closeCart(){if($('checkoutModal').classList.contains('on'))return;$('overlay').classList.remove('on');$('cartDrawer').classList.remove('on');document.body.style.overflow=''}
-function closeAll(){closeCart();closeCheckout();closeSell()}
+function closeAll(){closeCart();closeCheckout();closeSell();closeInfoModal()}
+
+/* ================= INFO MODAL (আমাদের সম্পর্কে/শর্তাবলী/ডেলিভারি/রিটার্ন) ================= */
+const INFO_CONTENT={
+ about:{
+  title:'🏢 আমাদের সম্পর্কে',
+  html:()=>'<p><b>NextGenTechBD</b> একটি বিশ্বস্ত অনলাইন শপিং প্ল্যাটফর্ম, যেখানে ইলেকট্রনিক্স, ফ্যাশন, হোম, বিউটি, গ্রোসারি সহ নানা ধরনের পণ্য সহজে ও নিরাপদে অর্ডার করা যায়।</p>'+
+   '<p>আমরা বিশ্বাস করি প্রতিটি গ্রাহক ভালো মানের পণ্য, সঠিক মূল্য এবং দ্রুত ডেলিভারি পাওয়ার যোগ্য। তাই প্রতিটি পণ্য যাচাই করে তালিকাভুক্ত করা হয় এবং সরাসরি হোয়াটসঅ্যাপ/টেলিগ্রামে যোগাযোগ রাখা হয় যাতে যেকোনো প্রশ্নের দ্রুত উত্তর পাওয়া যায়।</p>'+
+   '<p>📞 যোগাযোগ: '+(SETTINGS.contact&&SETTINGS.contact.phone||'—')+'<br>📧 ইমেইল: '+(SETTINGS.contact&&SETTINGS.contact.email||'—')+'</p>'
+ },
+ terms:{
+  title:'📜 শর্তাবলী ও নীতি',
+  html:()=>'<p><b>১. অর্ডার নিশ্চিতকরণ:</b> ওয়েবসাইটে অর্ডার দেওয়ার পর হোয়াটসঅ্যাপ/ফোনে যোগাযোগ করে অর্ডারটি নিশ্চিত করা হয়। নিশ্চিত না হওয়া পর্যন্ত অর্ডার প্রসেসিং শুরু হয় না।</p>'+
+   '<p><b>২. মূল্য পরিবর্তন:</b> বাজারদর অনুযায়ী পণ্যের মূল্য পূর্ব-নোটিশ ছাড়াই পরিবর্তন হতে পারে। অর্ডার নিশ্চিত হওয়ার সময়ের মূল্যই চূড়ান্ত ধরা হবে।</p>'+
+   '<p><b>৩. পণ্যের ছবি:</b> পণ্যের প্রকৃত রং/ডিজাইনে সামান্য পার্থক্য থাকতে পারে (স্ক্রিন সেটিংসের কারণে)।</p>'+
+   '<p><b>৪. পেমেন্ট:</b> ক্যাশ অন ডেলিভারি ছাড়াও বিকাশ/নগদ/রকেটে অগ্রিম পেমেন্ট করা যায়। অগ্রিম পেমেন্টের ক্ষেত্রে ট্রানজেকশন আইডি সংরক্ষণ করে রাখার অনুরোধ করা হচ্ছে।</p>'+
+   '<p>বিস্তারিত জানতে বা কোনো অসঙ্গতি মনে হলে অর্ডার করার আগে সরাসরি যোগাযোগ করুন।</p>'
+ },
+ delivery:{
+  title:'🚚 ডেলিভারি নীতিমালা',
+  html:()=>'<p><b>ডেলিভারি সময়:</b> ঢাকার ভেতরে সাধারণত ১–২ কার্যদিবস, ঢাকার বাইরে ২–৫ কার্যদিবস সময় লাগে (এলাকাভেদে কিছুটা কম-বেশি হতে পারে)।</p>'+
+   '<p><b>ডেলিভারি চার্জ:</b> ৳১৯৯৯ বা তার বেশি অর্ডারে ফ্রি ডেলিভারি। এর কম অর্ডারে এলাকাভেদে সাধারণ ডেলিভারি চার্জ প্রযোজ্য হবে, যা চেকআউটের সময় দেখানো হয়।</p>'+
+   '<p><b>ডেলিভারি পার্টনার:</b> নির্ভরযোগ্য কুরিয়ার সার্ভিসের মাধ্যমে পণ্য পাঠানো হয়, এবং অর্ডার পাঠানোর পর ট্র্যাকিং তথ্য জানিয়ে দেওয়া হয়।</p>'+
+   '<p><b>অর্ডার ট্র্যাক করুন:</b> যেকোনো সময় <a href="/orders/" style="color:var(--orange);font-weight:700">/orders</a> পেজ থেকে অর্ডার আইডি ও মোবাইল নম্বর দিয়ে সর্বশেষ অবস্থা দেখতে পারবেন।</p>'
+ },
+ return:{
+  title:'↩️ রিটার্ন ও রিফান্ড নীতিমালা',
+  html:()=>'<p><b>রিটার্নের শর্ত:</b> পণ্য হাতে পাওয়ার ৩ দিনের মধ্যে ত্রুটিপূর্ণ, ভুল বা ড্যামেজড পণ্যের ক্ষেত্রে রিটার্ন/এক্সচেঞ্জের অনুরোধ করা যাবে।</p>'+
+   '<p><b>শর্তসাপেক্ষ:</b> পণ্যের প্যাকেজিং, ট্যাগ ও আনুষঙ্গিক জিনিসপত্র অক্ষত থাকতে হবে এবং পণ্যটি ব্যবহার করা যাবে না।</p>'+
+   '<p><b>রিফান্ড:</b> রিটার্ন গ্রহণের পর যাচাই সাপেক্ষে বিকাশ/নগদ/রকেটে অথবা পরবর্তী অর্ডারে সমন্বয়ের মাধ্যমে রিফান্ড দেওয়া হয় (সাধারণত ৩–৭ কার্যদিবস সময় লাগে)।</p>'+
+   '<p><b>দাবি জানাতে:</b> পণ্যের ছবি/ভিডিওসহ হোয়াটসঅ্যাপে অর্ডার আইডি জানিয়ে যোগাযোগ করুন — দ্রুত সমাধান করার চেষ্টা করা হবে।</p>'
+ }
+};
+function openInfoModal(key){
+ const c=INFO_CONTENT[key]; if(!c)return;
+ $('infoModalTitle').textContent=c.title;
+ $('infoModalBody').innerHTML=c.html();
+ $('infoModal').classList.add('on');
+ document.body.style.overflow='hidden';
+}
+function closeInfoModal(){$('infoModal').classList.remove('on');document.body.style.overflow=''}
 
 function renderCart(){
  const ids=Object.keys(state.cart);
@@ -1106,7 +1159,7 @@ async function boot(){
  applyLang();
  syncCustomerFromOrdersPage();
  try{
-  await fetchProducts();
+  await Promise.all([fetchProducts(), fetchSiteText()]);
   fetchSettings();
   render();
  }catch(e){

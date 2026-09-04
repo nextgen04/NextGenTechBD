@@ -82,6 +82,7 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
       <div class="tab" data-tab="products" onclick="switchTab('products')">🛍️ পণ্যসমূহ</div>
       <div class="tab" data-tab="categories" onclick="switchTab('categories')">🗂️ ক্যাটাগরি</div>
       <div class="tab" data-tab="settings" onclick="switchTab('settings')">⚙️ দোকানের সেটিংস</div>
+      <div class="tab" data-tab="hometext" onclick="switchTab('hometext')">📝 হোমপেজ টেক্সট</div>
       <div class="tab" data-tab="orders" onclick="switchTab('orders')">📦 অর্ডারসমূহ</div>
     </div>
     <div id="msgBox"></div>
@@ -150,6 +151,7 @@ function switchTab(name){
   if(name==='products') renderProducts();
   else if(name==='categories') renderCategories();
   else if(name==='settings') renderSettings();
+  else if(name==='hometext') renderHomeText();
   else if(name==='orders') renderOrders();
 }
 
@@ -176,6 +178,13 @@ async function renderProducts(){
             <div class="field"><label>বিক্রয় মূল্য (৳) *</label><input id="p_price" type="number" required /></div>
             <div class="field"><label>আগের মূল্য (৳)</label><input id="p_old" type="number" /></div>
             <div class="field"><label>ইমোজি আইকন</label><input id="p_e" class="emoji-input" placeholder="📱" /></div>
+          </div>
+          <div class="field">
+            <label>পণ্যের ছবি (আপলোড করলে ইমোজির বদলে আসল ছবি দেখাবে)</label>
+            <input type="file" id="p_img_file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadProductImage(this)" />
+            <input type="hidden" id="p_img" />
+            <div id="p_img_status" style="font-size:12px;color:#888;margin-top:6px"></div>
+            <img id="p_img_preview" style="display:none;max-width:110px;max-height:110px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #eee" />
           </div>
           <div class="grid3">
             <div class="field"><label>রেটিং (০-৫)</label><input id="p_r" type="number" step="0.1" /></div>
@@ -204,7 +213,7 @@ async function renderProducts(){
           <tbody>
             ${products.map(p=>`
               <tr>
-                <td>${p.e||''} ${p.name}</td>
+                <td>${p.img?`<img src="${p.img}" style="width:30px;height:30px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:6px">`:''}${p.e||''} ${p.name}</td>
                 <td>${catName(p.cat)}</td>
                 <td>৳${p.price}${p.old?` <s style="color:#aaa">৳${p.old}</s>`:''}</td>
                 <td>${p.f?'✅':'—'}</td>
@@ -220,8 +229,30 @@ async function renderProducts(){
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
 }
 function resetProductForm(){
-  ['p_id','p_name','p_name_en','p_price','p_old','p_e','p_r','p_rv','p_sold','p_tag','p_colors','p_sizes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  ['p_id','p_name','p_name_en','p_price','p_old','p_e','p_r','p_rv','p_sold','p_tag','p_colors','p_sizes','p_img'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
   document.getElementById('p_f').checked=false;
+  document.getElementById('p_img_file').value='';
+  document.getElementById('p_img_status').textContent='';
+  const prev=document.getElementById('p_img_preview'); prev.src=''; prev.style.display='none';
+}
+async function uploadProductImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('p_img_status');
+  statusEl.textContent = '⏳ আপলোড হচ্ছে…';
+  try{
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch(API+'/admin/upload', { method:'POST', headers:{'X-Admin-Key':ADMIN_KEY}, body:fd });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
+    document.getElementById('p_img').value = j.url;
+    const prev = document.getElementById('p_img_preview');
+    prev.src = j.url; prev.style.display='block';
+    statusEl.textContent = '✅ ছবি আপলোড হয়েছে';
+  }catch(e){
+    statusEl.textContent = '❌ '+e.message;
+  }
 }
 function editProduct(p){
   document.getElementById('p_id').value=p.id;
@@ -238,6 +269,11 @@ function editProduct(p){
   document.getElementById('p_colors').value=(p.colors||[]).join(', ');
   document.getElementById('p_sizes').value=(p.sizes||[]).join(', ');
   document.getElementById('p_f').checked=!!p.f;
+  document.getElementById('p_img').value=p.img||'';
+  document.getElementById('p_img_file').value='';
+  document.getElementById('p_img_status').textContent='';
+  const prev=document.getElementById('p_img_preview');
+  if(p.img){ prev.src=p.img; prev.style.display='block'; } else { prev.src=''; prev.style.display='none'; }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 async function saveProduct(ev){
@@ -248,7 +284,8 @@ async function saveProduct(ev){
     id: val('p_id') || undefined,
     name: val('p_name'), name_en: val('p_name_en'), cat: val('p_cat'),
     price: Number(val('p_price')), old: val('p_old')?Number(val('p_old')):undefined,
-    e: val('p_e'), r: val('p_r')?Number(val('p_r')):undefined, rv: val('p_rv')?Number(val('p_rv')):undefined,
+    e: val('p_e'), img: val('p_img') || undefined,
+    r: val('p_r')?Number(val('p_r')):undefined, rv: val('p_rv')?Number(val('p_rv')):undefined,
     sold: val('p_sold')?Number(val('p_sold')):undefined, tag: val('p_tag'),
     colors: splitList(val('p_colors')), sizes: splitList(val('p_sizes')),
     f: document.getElementById('p_f').checked
@@ -382,6 +419,35 @@ async function saveSettings(){
   try{
     await adminApi('/admin/settings','PUT',body);
     showMsg('✅ সেটিংস সংরক্ষণ হয়েছে','ok');
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+
+/* ============ HOMEPAGE TEXT ============ */
+async function renderHomeText(){
+  const c = document.getElementById('tabContent');
+  try{
+    const t = await adminApi('/admin/site-text');
+    c.innerHTML = `
+      <div class="card">
+        <h2>📝 হোমপেজের সেকশন-শিরোনাম</h2>
+        <p style="color:#888;font-size:12.5px;margin-bottom:14px">হোমপেজে "ফ্ল্যাশ সেল" ও তার আশেপাশের সেকশনগুলোর শিরোনাম এখান থেকে বদলাতে পারবেন — সেভ করলেই সাথে সাথে সাইটে (রিফ্রেশ করলে) দেখা যাবে।</p>
+        <div class="field"><label>⚡ ফ্ল্যাশ সেল সেকশনের শিরোনাম</label><input id="ht_flash" value="${(t.flash_sale_title||'').replace(/"/g,'&quot;')}" placeholder="⚡ ফ্ল্যাশ সেল" /></div>
+        <div class="field"><label>🗂️ ক্যাটাগরি সেকশনের শিরোনাম</label><input id="ht_cats" value="${(t.categories_title||'').replace(/"/g,'&quot;')}" placeholder="🗂️ ক্যাটাগরি সমূহ" /></div>
+        <div class="field"><label>🎯 "আপনার জন্য বাছাই করা" সেকশনের শিরোনাম</label><input id="ht_jfy" value="${(t.just_for_you_title||'').replace(/"/g,'&quot;')}" placeholder="🎯 আপনার জন্য বাছাই করা" /></div>
+        <button class="btn" onclick="saveHomeText()">💾 সংরক্ষণ করুন</button>
+      </div>`;
+  }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
+}
+async function saveHomeText(){
+  const val = id => document.getElementById(id).value.trim();
+  const body = {
+    flash_sale_title: val('ht_flash'),
+    categories_title: val('ht_cats'),
+    just_for_you_title: val('ht_jfy')
+  };
+  try{
+    await adminApi('/admin/site-text','PUT',body);
+    showMsg('✅ হোমপেজ টেক্সট সংরক্ষণ হয়েছে','ok');
   }catch(e){ showMsg('❌ '+e.message,'error'); }
 }
 

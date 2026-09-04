@@ -4,13 +4,14 @@
   "version": "1.0.0",
   "description": "NextGenTechBD — Cloudflare Pages + D1 ব্যাকএন্ড সহ ই-কমার্স সাইট",
   "scripts": {
-    "dev": "wrangler pages dev public --d1=DB",
+    "dev": "wrangler pages dev public --d1=DB --r2=IMAGES",
     "db:init": "wrangler d1 execute nextgentechbd-db --remote --file=./schema.sql",
     "db:seed": "wrangler d1 execute nextgentechbd-db --remote --file=./seed.sql",
     "db:init:local": "wrangler d1 execute nextgentechbd-db --local --file=./schema.sql",
     "db:seed:local": "wrangler d1 execute nextgentechbd-db --local --file=./seed.sql",
     "deploy": "wrangler pages deploy public",
-    "db:migrate:customers": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/001_add_customer_accounts.sql"
+    "db:migrate:customers": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/001_add_customer_accounts.sql",
+    "db:migrate:sitetext": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/003_add_site_text.sql"
   },
   "devDependencies": {
     "wrangler": "^3.90.0"

@@ -82,6 +82,16 @@ CREATE TABLE IF NOT EXISTS customer_sessions (
   FOREIGN KEY (customer_id) REFERENCES customers(id)
 );
 
+-- হোমপেজের সম্পাদনাযোগ্য টেক্সট (ফ্ল্যাশ সেল/ক্যাটাগরি/আপনার জন্য বাছাই করা — সেকশনের শিরোনাম)
+CREATE TABLE IF NOT EXISTS site_text (
+  key        TEXT PRIMARY KEY,
+  value      TEXT NOT NULL,
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('flash_sale_title', '⚡ ফ্ল্যাশ সেল');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('categories_title', '🗂️ ক্যাটাগরি সমূহ');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('just_for_you_title', '🎯 আপনার জন্য বাছাই করা');
+
 CREATE INDEX IF NOT EXISTS idx_products_cat ON products(cat);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at);
