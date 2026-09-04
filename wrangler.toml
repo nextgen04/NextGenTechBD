@@ -9,8 +9,5 @@ binding = "DB"
 database_name = "nextgentechbd-db"
 database_id = "YOUR-DATABASE-ID-HERE"
 
-# R2 বাকেট বাইন্ডিং — পণ্যের ছবি আপলোড/সংরক্ষণের জন্য (Cloudflare-এ R2 বাকেট তৈরি করার পর নাম বসিয়ে দিন)
-# (Cloudflare Pages ড্যাশবোর্ড থেকেও এই বাইন্ডিং যোগ করা যায় — DEPLOY-GUIDE.md দেখুন)
-[[r2_buckets]]
-binding = "IMAGES"
-bucket_name = "nextgentechbd-images"
+# পণ্যের ছবি আপলোডের জন্য কোনো বাইন্ডিং লাগে না — ছবি সরাসরি GitHub রিপোতে কমিট হয় (public/uploads/products/)।
+# শুধু GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO Environment Variables Cloudflare Pages ড্যাশবোর্ডে সেট করলেই হবে — DEPLOY-GUIDE.md দেখুন।
