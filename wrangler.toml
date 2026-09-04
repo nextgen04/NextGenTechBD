@@ -7,7 +7,7 @@ compatibility_date = "2026-08-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "nextgentechbd-db"
-database_id = "YOUR-DATABASE-ID-HERE"
+database_id = "a633667d-b696-4ee2-ab26-f003ceb342b2"
 
 # পণ্যের ছবি আপলোডের জন্য কোনো বাইন্ডিং লাগে না — ছবি সরাসরি GitHub রিপোতে কমিট হয় (public/uploads/products/)।
 # শুধু GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO Environment Variables Cloudflare Pages ড্যাশবোর্ডে সেট করলেই হবে — DEPLOY-GUIDE.md দেখুন।
