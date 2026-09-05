@@ -765,10 +765,10 @@ const gridHTML=list=>'<div class="grid">'+list.map(cardHTML).join('')+'</div>';
 
 /* ================= VIEWS ================= */
 const SLIDES=()=>[
- {g:'linear-gradient(135deg,#ff512f,#dd2476)',e:'🎉',h:t('mega_sale_h'),p:t('mega_sale_p'),cta:t('buy_now_cta'),act:"goCat('all')"},
- {g:'linear-gradient(135deg,#f83600,#f9d423)',e:'⚡',h:t('flash_daily_h'),p:t('flash_daily_p'),cta:t('flash_deals_cta'),act:'showFlash()'},
- {g:'linear-gradient(135deg,#4776e6,#8e54e9)',e:'🚚',h:t('free_delivery_h'),p:t('free_delivery_p'),cta:t('start_shopping_cta'),act:"goCat('all')"},
- {g:'linear-gradient(135deg,#11998e,#38ef7d)',e:'🛒',h:t('grocery_h'),p:t('grocery_p'),cta:t('shop_now_cta'),act:"goCat('g')"}
+ {g:'linear-gradient(135deg,#ff512f,#dd2476)',e:'🎉',h:siteText('hero1_h',t('mega_sale_h')),p:siteText('hero1_p',t('mega_sale_p')),cta:siteText('hero1_cta',t('buy_now_cta')),act:"goCat('all')"},
+ {g:'linear-gradient(135deg,#f83600,#f9d423)',e:'⚡',h:siteText('hero2_h',t('flash_daily_h')),p:siteText('hero2_p',t('flash_daily_p')),cta:siteText('hero2_cta',t('flash_deals_cta')),act:'showFlash()'},
+ {g:'linear-gradient(135deg,#4776e6,#8e54e9)',e:'🚚',h:siteText('hero3_h',t('free_delivery_h')),p:siteText('hero3_p',t('free_delivery_p')),cta:siteText('hero3_cta',t('start_shopping_cta')),act:"goCat('all')"},
+ {g:'linear-gradient(135deg,#11998e,#38ef7d)',e:'🛒',h:siteText('hero4_h',t('grocery_h')),p:siteText('hero4_p',t('grocery_p')),cta:siteText('hero4_cta',t('shop_now_cta')),act:"goCat('g')"}
 ];
 
 function renderNavbar(){
@@ -794,8 +794,8 @@ function renderHome(){
   '<div class="dots">'+SL.map((s,i)=>'<span class="dot'+(i===state.slide?' on':'')+'" onclick="slide('+i+')"></span>').join('')+'</div>'+
   '</div>'+
   '<div class="side-banners">'+
-   '<div class="side-banner" style="background:linear-gradient(135deg,#1f4037,#99f2c8)" onclick="goCat(\'h\')"><span class="be">🏠</span><h3>'+t('home_living')+'</h3><p>'+t('discount40')+'</p></div>'+
-   '<div class="side-banner" style="background:linear-gradient(135deg,#ec6f66,#f3a183)" onclick="goCat(\'b\')"><span class="be">💄</span><h3>'+t('beauty_care')+'</h3><p>'+t('original_product')+'</p></div>'+
+   '<div class="side-banner" style="background:linear-gradient(135deg,#1f4037,#99f2c8)" onclick="goCat(\'h\')"><span class="be">🏠</span><h3>'+siteText('promo1_h',t('home_living'))+'</h3><p>'+siteText('promo1_p',t('discount40'))+'</p></div>'+
+   '<div class="side-banner" style="background:linear-gradient(135deg,#ec6f66,#f3a183)" onclick="goCat(\'b\')"><span class="be">💄</span><h3>'+siteText('promo2_h',t('beauty_care'))+'</h3><p>'+siteText('promo2_p',t('original_product'))+'</p></div>'+
   '</div>'+
  '</div></div>'+
  /* categories */

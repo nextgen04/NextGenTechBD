@@ -428,14 +428,52 @@ async function renderHomeText(){
   const c = document.getElementById('tabContent');
   try{
     const t = await adminApi('/admin/site-text');
+    const v = (k, fb) => ((t[k] ?? fb) || '').toString().replace(/"/g,'&quot;');
     c.innerHTML = `
       <div class="card">
         <h2>📝 হোমপেজের সেকশন-শিরোনাম</h2>
         <p style="color:#888;font-size:12.5px;margin-bottom:14px">হোমপেজে "ফ্ল্যাশ সেল" ও তার আশেপাশের সেকশনগুলোর শিরোনাম এখান থেকে বদলাতে পারবেন — সেভ করলেই সাথে সাথে সাইটে (রিফ্রেশ করলে) দেখা যাবে।</p>
-        <div class="field"><label>⚡ ফ্ল্যাশ সেল সেকশনের শিরোনাম</label><input id="ht_flash" value="${(t.flash_sale_title||'').replace(/"/g,'&quot;')}" placeholder="⚡ ফ্ল্যাশ সেল" /></div>
-        <div class="field"><label>🗂️ ক্যাটাগরি সেকশনের শিরোনাম</label><input id="ht_cats" value="${(t.categories_title||'').replace(/"/g,'&quot;')}" placeholder="🗂️ ক্যাটাগরি সমূহ" /></div>
-        <div class="field"><label>🎯 "আপনার জন্য বাছাই করা" সেকশনের শিরোনাম</label><input id="ht_jfy" value="${(t.just_for_you_title||'').replace(/"/g,'&quot;')}" placeholder="🎯 আপনার জন্য বাছাই করা" /></div>
-        <button class="btn" onclick="saveHomeText()">💾 সংরক্ষণ করুন</button>
+        <div class="field"><label>⚡ ফ্ল্যাশ সেল সেকশনের শিরোনাম</label><input id="ht_flash" value="${v('flash_sale_title','')}" placeholder="⚡ ফ্ল্যাশ সেল" /></div>
+        <div class="field"><label>🗂️ ক্যাটাগরি সেকশনের শিরোনাম</label><input id="ht_cats" value="${v('categories_title','')}" placeholder="🗂️ ক্যাটাগরি সমূহ" /></div>
+        <div class="field"><label>🎯 "আপনার জন্য বাছাই করা" সেকশনের শিরোনাম</label><input id="ht_jfy" value="${v('just_for_you_title','')}" placeholder="🎯 আপনার জন্য বাছাই করা" /></div>
+      </div>
+
+      <div class="card">
+        <h2>🎠 হিরো ব্যানার — বড় ক্যারোসেল (৪টা স্লাইড)</h2>
+        <p style="color:#888;font-size:12.5px;margin-bottom:14px">হোমপেজের একদম উপরের বড় স্লাইডশো-র লেখা ও বাটনের টেক্সট।</p>
+
+        <p style="font-weight:600;margin:10px 0 6px">১) মেগা সেল স্লাইড</p>
+        <div class="field"><label>শিরোনাম</label><input id="ht_h1h" value="${v('hero1_h','মেগা সেল চলছে!')}" placeholder="মেগা সেল চলছে!" /></div>
+        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h1p" value="${v('hero1_p','')}" placeholder="৭০% পর্যন্ত ছাড় — সীমিত সময়ের অফার" /></div>
+        <div class="field"><label>বাটনের লেখা</label><input id="ht_h1c" value="${v('hero1_cta','')}" placeholder="এখনই কিনুন" /></div>
+
+        <p style="font-weight:600;margin:16px 0 6px">২) ফ্ল্যাশ সেল স্লাইড</p>
+        <div class="field"><label>শিরোনাম</label><input id="ht_h2h" value="${v('hero2_h','')}" placeholder="ফ্ল্যাশ সেল প্রতিদিন" /></div>
+        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h2p" value="${v('hero2_p','')}" placeholder="সকাল ১০টায় নতুন ডিল — আগে আসলে আগে পাবেন" /></div>
+        <div class="field"><label>বাটনের লেখা</label><input id="ht_h2c" value="${v('hero2_cta','')}" placeholder="ফ্ল্যাশ ডিল দেখুন" /></div>
+
+        <p style="font-weight:600;margin:16px 0 6px">৩) ফ্রি ডেলিভারি স্লাইড</p>
+        <div class="field"><label>শিরোনাম</label><input id="ht_h3h" value="${v('hero3_h','')}" placeholder="ফ্রি ডেলিভারি!" /></div>
+        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h3p" value="${v('hero3_p','')}" placeholder="৳১৯৯৯+ অর্ডারে সারাদেশে ফ্রি ডেলিভারি" /></div>
+        <div class="field"><label>বাটনের লেখা</label><input id="ht_h3c" value="${v('hero3_cta','')}" placeholder="শপিং শুরু করুন" /></div>
+
+        <p style="font-weight:600;margin:16px 0 6px">৪) গ্রোসারি স্লাইড</p>
+        <div class="field"><label>শিরোনাম</label><input id="ht_h4h" value="${v('hero4_h','')}" placeholder="গ্রোসারি বাজার" /></div>
+        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h4p" value="${v('hero4_p','')}" placeholder="চাল, তেল, মধু, খেজুর — ঘরে বসে বাজার" /></div>
+        <div class="field"><label>বাটনের লেখা</label><input id="ht_h4c" value="${v('hero4_cta','')}" placeholder="বাজার করুন" /></div>
+      </div>
+
+      <div class="card">
+        <h2>🏠 হিরোর ডানপাশের ২টা প্রোমো কার্ড</h2>
+        <p style="font-weight:600;margin:10px 0 6px">১) হোম ও লিভিং কার্ড</p>
+        <div class="field"><label>শিরোনাম</label><input id="ht_p1h" value="${v('promo1_h','')}" placeholder="হোম ও লিভিং" /></div>
+        <div class="field"><label>সাব-টেক্সট</label><input id="ht_p1p" value="${v('promo1_p','')}" placeholder="৪০% পর্যন্ত ছাড়" /></div>
+
+        <p style="font-weight:600;margin:16px 0 6px">২) বিউটি কেয়ার কার্ড</p>
+        <div class="field"><label>শিরোনাম</label><input id="ht_p2h" value="${v('promo2_h','')}" placeholder="বিউটি কেয়ার" /></div>
+        <div class="field"><label>সাব-টেক্সট</label><input id="ht_p2p" value="${v('promo2_p','')}" placeholder="অরিজিনাল প্রোডাক্ট" /></div>
+
+        <button class="btn" onclick="saveHomeText()">💾 সব সংরক্ষণ করুন</button>
       </div>`;
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
 }
@@ -444,7 +482,13 @@ async function saveHomeText(){
   const body = {
     flash_sale_title: val('ht_flash'),
     categories_title: val('ht_cats'),
-    just_for_you_title: val('ht_jfy')
+    just_for_you_title: val('ht_jfy'),
+    hero1_h: val('ht_h1h'), hero1_p: val('ht_h1p'), hero1_cta: val('ht_h1c'),
+    hero2_h: val('ht_h2h'), hero2_p: val('ht_h2p'), hero2_cta: val('ht_h2c'),
+    hero3_h: val('ht_h3h'), hero3_p: val('ht_h3p'), hero3_cta: val('ht_h3c'),
+    hero4_h: val('ht_h4h'), hero4_p: val('ht_h4p'), hero4_cta: val('ht_h4c'),
+    promo1_h: val('ht_p1h'), promo1_p: val('ht_p1p'),
+    promo2_h: val('ht_p2h'), promo2_p: val('ht_p2p')
   };
   try{
     await adminApi('/admin/site-text','PUT',body);

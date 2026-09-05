@@ -91,6 +91,24 @@ CREATE TABLE IF NOT EXISTS site_text (
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('flash_sale_title', '⚡ ফ্ল্যাশ সেল');
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('categories_title', '🗂️ ক্যাটাগরি সমূহ');
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('just_for_you_title', '🎯 আপনার জন্য বাছাই করা');
+-- হিরো ব্যানারের ৪টা স্লাইড (উপরের বড় ক্যারোসেল)
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero1_h', 'মেগা সেল চলছে!');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero1_p', '৭০% পর্যন্ত ছাড় — সীমিত সময়ের অফার');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero1_cta', 'এখনই কিনুন');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero2_h', 'ফ্ল্যাশ সেল প্রতিদিন');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero2_p', 'সকাল ১০টায় নতুন ডিল — আগে আসলে আগে পাবেন');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero2_cta', 'ফ্ল্যাশ ডিল দেখুন');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero3_h', 'ফ্রি ডেলিভারি!');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero3_p', '৳১৯৯৯+ অর্ডারে সারাদেশে ফ্রি ডেলিভারি');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero3_cta', 'শপিং শুরু করুন');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero4_h', 'গ্রোসারি বাজার');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero4_p', 'চাল, তেল, মধু, খেজুর — ঘরে বসে বাজার');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('hero4_cta', 'বাজার করুন');
+-- হিরোর ডানপাশের দুটো প্রোমো কার্ড
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo1_h', 'হোম ও লিভিং');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo1_p', '৪০% পর্যন্ত ছাড়');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo2_h', 'বিউটি কেয়ার');
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo2_p', 'অরিজিনাল প্রোডাক্ট');
 
 CREATE INDEX IF NOT EXISTS idx_products_cat ON products(cat);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);

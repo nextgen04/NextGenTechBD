@@ -162,6 +162,11 @@ Environment variable বা D1 বাইন্ডিং যোগ করার �
 > npx wrangler d1 execute nextgentechbd-db --remote --file=./migrations/001_add_customer_accounts.sql
 > ```
 > নতুন করে সাইট বসাচ্ছেন? এই ধাপ লাগবে না — ধাপ ৫-এর `schema.sql`-এই সবকিছু আগে থেকে আছে।
+>
+> 🔄 **হিরো ব্যানার/প্রোমো কার্ড এডিট করার ফিচার নতুন যোগ হয়েছে?** আগে থেকেই সাইট চালু থাকলে এই মাইগ্রেশনটাও চালাতে হবে (নাহলে অ্যাডমিন প্যানেলে হোমপেজ টেক্সট ট্যাবে এরর আসবে):
+> ```bash
+> npx wrangler d1 execute nextgentechbd-db --remote --file=./migrations/004_add_hero_promo_text.sql
+> ```
 
 ---
 
