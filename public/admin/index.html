@@ -180,7 +180,7 @@ async function renderProducts(){
             <div class="field"><label>ইমোজি আইকন</label><input id="p_e" class="emoji-input" placeholder="📱" /></div>
           </div>
           <div class="field">
-            <label>পণ্যের ছবি (সর্বোচ্চ ২MB — আপলোড করলে GitHub-এ কমিট হয়, সাইটে লাইভ হতে ১-২ মিনিট লাগতে পারে)</label>
+            <label>পণ্যের ছবি (সর্বোচ্চ ৮MB — Cloudinary-তে আপলোড হয়, সাথে সাথে সাইটে দেখা যাবে)</label>
             <input type="file" id="p_img_file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadProductImage(this)" />
             <input type="hidden" id="p_img" />
             <div id="p_img_status" style="font-size:12px;color:#888;margin-top:6px"></div>
@@ -240,9 +240,9 @@ async function uploadProductImage(input){
   if(!file) return;
   const statusEl = document.getElementById('p_img_status');
   const prev = document.getElementById('p_img_preview');
-  // তাৎক্ষণিক লোকাল প্রিভিউ দেখানো হয় (GitHub-এ কমিট/রিডেপ্লয় শেষ না হওয়া পর্যন্ত আসল লিংক লাইভ হয় না)
+  // তাৎক্ষণিক লোকাল প্রিভিউ দেখানো হয়, আপলোড শেষ হলে আসল Cloudinary লিংক বসে যাবে
   prev.src = URL.createObjectURL(file); prev.style.display='block';
-  statusEl.textContent = '⏳ GitHub-এ কমিট হচ্ছে…';
+  statusEl.textContent = '⏳ আপলোড হচ্ছে…';
   try{
     const fd = new FormData();
     fd.append('file', file);
@@ -250,7 +250,7 @@ async function uploadProductImage(input){
     const j = await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
     document.getElementById('p_img').value = j.url;
-    statusEl.innerHTML = '✅ কমিট হয়েছে। <b>'+(j.note||'সাইটে লাইভ হতে ১-২ মিনিট সময় লাগতে পারে।')+'</b>';
+    statusEl.innerHTML = '✅ '+(j.note||'ছবি আপলোড হয়েছে।');
   }catch(e){
     statusEl.textContent = '❌ '+e.message;
   }
