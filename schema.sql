@@ -109,6 +109,8 @@ INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo1_h', 'হোম ও 
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo1_p', '৪০% পর্যন্ত ছাড়');
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo2_h', 'বিউটি কেয়ার');
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('promo2_p', 'অরিজিনাল প্রোডাক্ট');
+-- ফ্ল্যাশ সেল হেডারের কাস্টম ব্যানার ছবি (খালি থাকলে ডিফল্ট রঙিন গ্রেডিয়েন্ট দেখায়)
+INSERT OR IGNORE INTO site_text (key, value) VALUES ('flash_banner_img', '');
 
 CREATE INDEX IF NOT EXISTS idx_products_cat ON products(cat);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);

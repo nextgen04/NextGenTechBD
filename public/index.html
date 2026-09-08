@@ -804,7 +804,7 @@ function renderHome(){
  '</div></div>'+
  /* flash */
  '<div class="container"><div class="section flash" id="flashSec">'+
-  '<div class="flash-head"><h2>'+siteText('flash_sale_title',t('flash_sale'))+'</h2>'+
+  (()=>{ const bimg=siteText('flash_banner_img',''); return '<div class="flash-head"'+(bimg?' style="background-image:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.15)),url(\''+bimg.replace(/'/g,"%27")+'\');background-size:cover;background-position:center"':'')+'>'; })()+'<h2>'+siteText('flash_sale_title',t('flash_sale'))+'</h2>'+
    '<div class="countdown"><span>'+t('ends_at')+'</span><span class="cd-box" id="cdH">০০</span><span class="colon">:</span><span class="cd-box" id="cdM">০০</span><span class="colon">:</span><span class="cd-box" id="cdS">০০</span></div>'+
    '<span class="see-all" onclick="goCat(\'all\')" style="color:#fff">'+t('see_all')+'</span></div>'+
   '<div class="flash-body"><div class="flash-scroll">'+flash.map(flashCard).join('')+'</div></div>'+

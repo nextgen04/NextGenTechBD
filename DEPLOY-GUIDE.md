@@ -167,6 +167,11 @@ Environment variable বা D1 বাইন্ডিং যোগ করার �
 > ```bash
 > npx wrangler d1 execute nextgentechbd-db --remote --file=./migrations/004_add_hero_promo_text.sql
 > ```
+>
+> 🔄 **ফ্ল্যাশ সেল ব্যানার ছবি আপলোডের ফিচার নতুন যোগ হয়েছে?** আগে থেকেই সাইট চালু থাকলে এটাও চালান:
+> ```bash
+> npx wrangler d1 execute nextgentechbd-db --remote --file=./migrations/005_add_flash_banner_img.sql
+> ```
 
 ---
 

@@ -464,6 +464,16 @@ async function renderHomeText(){
       </div>
 
       <div class="card">
+        <h2>⚡ ফ্ল্যাশ সেল ব্যানার ছবি</h2>
+        <p style="color:#888;font-size:12.5px;margin-bottom:14px">ফ্ল্যাশ সেল সেকশনের লাল-কমলা হেডারে একটা কাস্টম ব্যানার ছবি দিতে চাইলে এখানে আপলোড করুন (ছবির উপর লেখা পড়তে সুবিধার জন্য হালকা কালো শেড অটোমেটিক বসে যায়)। ছবি না দিলে আগের মতোই রঙিন গ্রেডিয়েন্ট দেখাবে।</p>
+        <input type="file" id="fb_file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadFlashBanner(this)" />
+        <input type="hidden" id="ht_flash_banner" value="${v('flash_banner_img','')}" />
+        <div id="fb_status" style="font-size:12px;color:#888;margin-top:6px"></div>
+        <img id="fb_preview" src="${v('flash_banner_img','')}" style="display:${v('flash_banner_img','')?'block':'none'};max-width:260px;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #eee" />
+        <button type="button" class="btn" style="background:#999;margin-top:8px" onclick="removeFlashBanner()">🗑️ ছবি সরিয়ে ডিফল্ট গ্রেডিয়েন্টে ফিরে যান</button>
+      </div>
+
+      <div class="card">
         <h2>🏠 হিরোর ডানপাশের ২টা প্রোমো কার্ড</h2>
         <p style="font-weight:600;margin:10px 0 6px">১) হোম ও লিভিং কার্ড</p>
         <div class="field"><label>শিরোনাম</label><input id="ht_p1h" value="${v('promo1_h','')}" placeholder="হোম ও লিভিং" /></div>
@@ -477,6 +487,32 @@ async function renderHomeText(){
       </div>`;
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
 }
+async function uploadFlashBanner(input){
+  const file = input.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('fb_status');
+  const prev = document.getElementById('fb_preview');
+  prev.src = URL.createObjectURL(file); prev.style.display='block';
+  statusEl.textContent = '⏳ আপলোড হচ্ছে…';
+  try{
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch(API+'/admin/upload', { method:'POST', headers:{'X-Admin-Key':ADMIN_KEY}, body:fd });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
+    document.getElementById('ht_flash_banner').value = j.url;
+    prev.src = j.url;
+    statusEl.innerHTML = '✅ '+(j.note||'ছবি আপলোড হয়েছে।')+' — নিচে "সব সংরক্ষণ করুন" চাপতে ভুলবেন না।';
+  }catch(e){
+    statusEl.textContent = '❌ '+e.message;
+  }
+}
+function removeFlashBanner(){
+  document.getElementById('ht_flash_banner').value = '';
+  document.getElementById('fb_file').value = '';
+  document.getElementById('fb_preview').style.display = 'none';
+  document.getElementById('fb_status').textContent = 'ছবি সরানো হয়েছে — "সব সংরক্ষণ করুন" চেপে সেভ করুন।';
+}
 async function saveHomeText(){
   const val = id => document.getElementById(id).value.trim();
   const body = {
@@ -488,7 +524,8 @@ async function saveHomeText(){
     hero3_h: val('ht_h3h'), hero3_p: val('ht_h3p'), hero3_cta: val('ht_h3c'),
     hero4_h: val('ht_h4h'), hero4_p: val('ht_h4p'), hero4_cta: val('ht_h4c'),
     promo1_h: val('ht_p1h'), promo1_p: val('ht_p1p'),
-    promo2_h: val('ht_p2h'), promo2_p: val('ht_p2p')
+    promo2_h: val('ht_p2h'), promo2_p: val('ht_p2p'),
+    flash_banner_img: val('ht_flash_banner')
   };
   try{
     await adminApi('/admin/site-text','PUT',body);
