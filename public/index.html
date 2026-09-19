@@ -656,7 +656,9 @@ const STATUS_L={pending:'🕐 অপেক্ষমান',confirmed:'✔ নি
 const STATUS_C={pending:'#b07800',confirmed:'#2b6de8',shipped:'#7c3aed',delivered:'#06a94a',cancelled:'#d92646'};
 async function fetchProducts(){
   const j=await apiGet('/api/products');
-  PRODUCTS=j.products;CATS=j.categories;
+  /* off = ছাড়ের শতাংশ, আগের দাম (old) ও বিক্রয় মূল্য (price) থেকে হিসাব করা হয় — DB-তে আলাদা করে রাখা হয় না */
+  PRODUCTS=(j.products||[]).map(p=>Object.assign({},p,{off:(p.old&&p.old>p.price)?Math.round((1-p.price/p.old)*100):0}));
+  CATS=j.categories;
 }
 async function fetchSettings(){
   try{const j=await apiGet('/api/settings');SETTINGS=Object.assign({},SETTINGS,j)}catch(e){}
@@ -693,6 +695,8 @@ const catEmoji=id=>{const c=CATS.find(c=>c.id===id);return c?c.e:'📦'};
 const nameOf=item=>(LANG==='en'&&item.name_en)?item.name_en:item.name;
 /* Renders a product/category visual: photo if uploaded via admin panel, else the emoji icon */
 const photoOrEmoji=(item,emojiClass)=>item.img?'<img class="cphoto" src="'+item.img+'" alt="'+(nameOf(item)||'').replace(/"/g,'&quot;')+'" loading="lazy">':'<span class="'+emojiClass+'">'+(item.e||'📦')+'</span>';
+/* ছাড় (discount) থাকলেই ব্যাজ দেখায়, ০% বা ছাড় না থাকলে কিছুই রেন্ডার করে না */
+const offBadge=p=>p.off>0?'<span class="off-badge">-'+p.off+'%</span>':'';
 
 const GRADS=[
  ['#FFF3E0','#FFE0B2'],['#E3F2FD','#BBDEFB'],['#F3E5F5','#E1BEE7'],['#E8F5E9','#C8E6C9'],
@@ -748,7 +752,7 @@ function cardHTML(p){
  const wished=state.wish.includes(p.id);
  return '<div class="card" onclick="goProduct('+p.id+')">'+
   '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+
-   '<span class="off-badge">-'+p.off+'%</span>'+
+   offBadge(p)+
    '<button class="wbtn'+(wished?' on':'')+'" onclick="toggleWish('+p.id+',event)" title="'+t('wishlist')+'">'+(wished?'❤️':'🤍')+'</button>'+
    photoOrEmoji(p,'cemoji')+
    '<button class="qadd" onclick="addToCart('+p.id+',event)" title="'+t('cart')+'">🛒</button>'+
@@ -777,7 +781,7 @@ function renderNavbar(){
   '<span class="navchip hot" onclick="showFlash()">'+t('flash_sale_chip')+'</span>'+
   items.map(i=>{
    const on=(state.view.type==='cat'&&state.view.id===i.id)?' active':'';
-   return '<span class="navchip'+on+'" onclick="goCat(\''+i.id+'\')">'+i.e+' '+i.name+'</span>';
+   return '<span class="navchip'+on+'" onclick="goCat(\''+i.id+'\')">'+(i.e||'📦')+' '+i.name+'</span>';
   }).join('');
 }
 
@@ -821,7 +825,7 @@ function flashCard(p){
  const remain=Math.max(4,Math.round(p.sold*0.25));
  const pct=Math.min(96,Math.round(p.sold/(p.sold+remain)*100));
  return '<div class="fcard" onclick="goProduct('+p.id+')">'+
-  '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+';height:150px"><span class="off-badge">-'+p.off+'%</span>'+photoOrEmoji(p,'cemoji')+'</div>'+
+  '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+';height:150px">'+offBadge(p)+photoOrEmoji(p,'cemoji')+'</div>'+
   '<div class="cbody" style="padding:8px 6px"><div class="cname">'+nameOf(p)+'</div>'+
   '<div class="cprice"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s></div>'+
   '<div class="sold-line" style="font-size:11.5px;color:#888;margin:4px 0 2px">'+p.sold.toLocaleString('en-US')+t('sold_count_suffix')+'</div>'+
@@ -890,11 +894,11 @@ function renderProduct(){
  app().innerHTML='<div class="container fade">'+
  '<div class="crumb"><b onclick="goHome()">'+t('home_crumb')+'</b> › <b onclick="goCat(\''+p.cat+'\')">'+catName(p.cat)+'</b> › '+pname.slice(0,32)+'</div>'+
  '<div class="section" style="margin-top:12px"><div class="pd">'+
-  '<div class="pd-visual'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'"><span class="off-badge">-'+p.off+'%</span>'+photoOrEmoji(p,'big')+'</div>'+
+  '<div class="pd-visual'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+offBadge(p)+photoOrEmoji(p,'big')+'</div>'+
   '<div class="pd-info">'+
    '<h1>'+pname+'</h1>'+
    '<div class="pd-rate"><span>'+stars(p.r)+' '+p.r.toFixed(1)+'</span><span>'+t('ratings_word')+' ('+p.rv.toLocaleString('en-US')+')</span><span>|</span><span>'+p.sold.toLocaleString('en-US')+t('sold_count_suffix')+'</span></div>'+
-   '<div class="pd-price-box"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s><span class="off-badge">-'+p.off+'%</span></div>'+
+   '<div class="pd-price-box"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s>'+offBadge(p)+'</div>'+
    colorsHtml+sizesHtml+
    '<div class="qty-row"><span style="font-size:13px;color:#777">'+t('quantity')+'</span><div class="qty-box"><button onclick="changePQty(-1)">−</button><span class="qv">'+pQty+'</span><button onclick="changePQty(1)">+</button></div></div>'+
    '<div class="pd-btns"><button class="btn btn-cart" onclick="addToCart('+p.id+',null,'+pQty+')">'+t('add_to_cart_btn')+'</button><button class="btn btn-buy" onclick="buyNow('+p.id+')">'+t('buy_now_btn')+'</button></div>'+
