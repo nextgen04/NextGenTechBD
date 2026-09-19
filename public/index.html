@@ -657,6 +657,9 @@ const STATUS_C={pending:'#b07800',confirmed:'#2b6de8',shipped:'#7c3aed',delivere
 async function fetchProducts(){
   const j=await apiGet('/api/products');
   PRODUCTS=j.products;CATS=j.categories;
+  PRODUCTS.forEach(p=>{
+    p.off = (p.old && p.old > p.price) ? Math.round((p.old-p.price)/p.old*100) : 0;
+  });
 }
 async function fetchSettings(){
   try{const j=await apiGet('/api/settings');SETTINGS=Object.assign({},SETTINGS,j)}catch(e){}
@@ -748,14 +751,14 @@ function cardHTML(p){
  const wished=state.wish.includes(p.id);
  return '<div class="card" onclick="goProduct('+p.id+')">'+
   '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+
-   '<span class="off-badge">-'+p.off+'%</span>'+
+   (p.off?'<span class="off-badge">-'+p.off+'%</span>':'')+
    '<button class="wbtn'+(wished?' on':'')+'" onclick="toggleWish('+p.id+',event)" title="'+t('wishlist')+'">'+(wished?'❤️':'🤍')+'</button>'+
    photoOrEmoji(p,'cemoji')+
    '<button class="qadd" onclick="addToCart('+p.id+',event)" title="'+t('cart')+'">🛒</button>'+
   '</div>'+
   '<div class="cbody">'+
    '<div class="cname">'+nameOf(p)+'</div>'+
-   '<div class="cprice"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s></div>'+
+   '<div class="cprice"><span class="np">'+money(p.price)+'</span>'+(p.old?'<s>'+money(p.old)+'</s>':'')+'</div>'+
    '<div class="crate">'+stars(p.r)+' '+p.r.toFixed(1)+'<span>('+p.rv.toLocaleString('en-US')+')</span></div>'+
    '<span class="ctag '+tagClass(p.tag)+'">'+tagLabel(p.tag)+'</span>'+
   '</div>'+
@@ -765,10 +768,10 @@ const gridHTML=list=>'<div class="grid">'+list.map(cardHTML).join('')+'</div>';
 
 /* ================= VIEWS ================= */
 const SLIDES=()=>[
- {g:'linear-gradient(135deg,#ff512f,#dd2476)',e:'🎉',h:siteText('hero1_h',t('mega_sale_h')),p:siteText('hero1_p',t('mega_sale_p')),cta:siteText('hero1_cta',t('buy_now_cta')),act:"goCat('all')"},
- {g:'linear-gradient(135deg,#f83600,#f9d423)',e:'⚡',h:siteText('hero2_h',t('flash_daily_h')),p:siteText('hero2_p',t('flash_daily_p')),cta:siteText('hero2_cta',t('flash_deals_cta')),act:'showFlash()'},
- {g:'linear-gradient(135deg,#4776e6,#8e54e9)',e:'🚚',h:siteText('hero3_h',t('free_delivery_h')),p:siteText('hero3_p',t('free_delivery_p')),cta:siteText('hero3_cta',t('start_shopping_cta')),act:"goCat('all')"},
- {g:'linear-gradient(135deg,#11998e,#38ef7d)',e:'🛒',h:siteText('hero4_h',t('grocery_h')),p:siteText('hero4_p',t('grocery_p')),cta:siteText('hero4_cta',t('shop_now_cta')),act:"goCat('g')"}
+ {g:'linear-gradient(135deg,#ff512f,#dd2476)',e:'🎉',h:t('mega_sale_h'),p:t('mega_sale_p'),cta:t('buy_now_cta'),act:"goCat('all')"},
+ {g:'linear-gradient(135deg,#f83600,#f9d423)',e:'⚡',h:t('flash_daily_h'),p:t('flash_daily_p'),cta:t('flash_deals_cta'),act:'showFlash()'},
+ {g:'linear-gradient(135deg,#4776e6,#8e54e9)',e:'🚚',h:t('free_delivery_h'),p:t('free_delivery_p'),cta:t('start_shopping_cta'),act:"goCat('all')"},
+ {g:'linear-gradient(135deg,#11998e,#38ef7d)',e:'🛒',h:t('grocery_h'),p:t('grocery_p'),cta:t('shop_now_cta'),act:"goCat('g')"}
 ];
 
 function renderNavbar(){
@@ -794,8 +797,8 @@ function renderHome(){
   '<div class="dots">'+SL.map((s,i)=>'<span class="dot'+(i===state.slide?' on':'')+'" onclick="slide('+i+')"></span>').join('')+'</div>'+
   '</div>'+
   '<div class="side-banners">'+
-   '<div class="side-banner" style="background:linear-gradient(135deg,#1f4037,#99f2c8)" onclick="goCat(\'h\')"><span class="be">🏠</span><h3>'+siteText('promo1_h',t('home_living'))+'</h3><p>'+siteText('promo1_p',t('discount40'))+'</p></div>'+
-   '<div class="side-banner" style="background:linear-gradient(135deg,#ec6f66,#f3a183)" onclick="goCat(\'b\')"><span class="be">💄</span><h3>'+siteText('promo2_h',t('beauty_care'))+'</h3><p>'+siteText('promo2_p',t('original_product'))+'</p></div>'+
+   '<div class="side-banner" style="background:linear-gradient(135deg,#1f4037,#99f2c8)" onclick="goCat(\'h\')"><span class="be">🏠</span><h3>'+t('home_living')+'</h3><p>'+t('discount40')+'</p></div>'+
+   '<div class="side-banner" style="background:linear-gradient(135deg,#ec6f66,#f3a183)" onclick="goCat(\'b\')"><span class="be">💄</span><h3>'+t('beauty_care')+'</h3><p>'+t('original_product')+'</p></div>'+
   '</div>'+
  '</div></div>'+
  /* categories */
@@ -804,7 +807,7 @@ function renderHome(){
  '</div></div>'+
  /* flash */
  '<div class="container"><div class="section flash" id="flashSec">'+
-  (()=>{ const bimg=siteText('flash_banner_img',''); return '<div class="flash-head"'+(bimg?' style="background-image:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.15)),url(\''+bimg.replace(/'/g,"%27")+'\');background-size:cover;background-position:center"':'')+'>'; })()+'<h2>'+siteText('flash_sale_title',t('flash_sale'))+'</h2>'+
+  '<div class="flash-head"><h2>'+siteText('flash_sale_title',t('flash_sale'))+'</h2>'+
    '<div class="countdown"><span>'+t('ends_at')+'</span><span class="cd-box" id="cdH">০০</span><span class="colon">:</span><span class="cd-box" id="cdM">০০</span><span class="colon">:</span><span class="cd-box" id="cdS">০০</span></div>'+
    '<span class="see-all" onclick="goCat(\'all\')" style="color:#fff">'+t('see_all')+'</span></div>'+
   '<div class="flash-body"><div class="flash-scroll">'+flash.map(flashCard).join('')+'</div></div>'+
@@ -821,9 +824,9 @@ function flashCard(p){
  const remain=Math.max(4,Math.round(p.sold*0.25));
  const pct=Math.min(96,Math.round(p.sold/(p.sold+remain)*100));
  return '<div class="fcard" onclick="goProduct('+p.id+')">'+
-  '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+';height:150px"><span class="off-badge">-'+p.off+'%</span>'+photoOrEmoji(p,'cemoji')+'</div>'+
+  '<div class="cimg'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+';height:150px">'+(p.off?'<span class="off-badge">-'+p.off+'%</span>':'')+photoOrEmoji(p,'cemoji')+'</div>'+
   '<div class="cbody" style="padding:8px 6px"><div class="cname">'+nameOf(p)+'</div>'+
-  '<div class="cprice"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s></div>'+
+  '<div class="cprice"><span class="np">'+money(p.price)+'</span>'+(p.old?'<s>'+money(p.old)+'</s>':'')+'</div>'+
   '<div class="sold-line" style="font-size:11.5px;color:#888;margin:4px 0 2px">'+p.sold.toLocaleString('en-US')+t('sold_count_suffix')+'</div>'+
   '<div class="sold-bar"><span class="fill" style="width:'+pct+'%"></span><span class="lbl">'+t('left_prefix')+remain+t('left_suffix')+'</span></div>'+
   '</div></div>';
@@ -890,11 +893,11 @@ function renderProduct(){
  app().innerHTML='<div class="container fade">'+
  '<div class="crumb"><b onclick="goHome()">'+t('home_crumb')+'</b> › <b onclick="goCat(\''+p.cat+'\')">'+catName(p.cat)+'</b> › '+pname.slice(0,32)+'</div>'+
  '<div class="section" style="margin-top:12px"><div class="pd">'+
-  '<div class="pd-visual'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'"><span class="off-badge">-'+p.off+'%</span>'+photoOrEmoji(p,'big')+'</div>'+
+  '<div class="pd-visual'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+(p.off?'<span class="off-badge">-'+p.off+'%</span>':'')+photoOrEmoji(p,'big')+'</div>'+
   '<div class="pd-info">'+
    '<h1>'+pname+'</h1>'+
    '<div class="pd-rate"><span>'+stars(p.r)+' '+p.r.toFixed(1)+'</span><span>'+t('ratings_word')+' ('+p.rv.toLocaleString('en-US')+')</span><span>|</span><span>'+p.sold.toLocaleString('en-US')+t('sold_count_suffix')+'</span></div>'+
-   '<div class="pd-price-box"><span class="np">'+money(p.price)+'</span><s>'+money(p.old)+'</s><span class="off-badge">-'+p.off+'%</span></div>'+
+   '<div class="pd-price-box"><span class="np">'+money(p.price)+'</span>'+(p.old?'<s>'+money(p.old)+'</s>':'')+(p.off?'<span class="off-badge">-'+p.off+'%</span>':'')+'</div>'+
    colorsHtml+sizesHtml+
    '<div class="qty-row"><span style="font-size:13px;color:#777">'+t('quantity')+'</span><div class="qty-box"><button onclick="changePQty(-1)">−</button><span class="qv">'+pQty+'</span><button onclick="changePQty(1)">+</button></div></div>'+
    '<div class="pd-btns"><button class="btn btn-cart" onclick="addToCart('+p.id+',null,'+pQty+')">'+t('add_to_cart_btn')+'</button><button class="btn btn-buy" onclick="buyNow('+p.id+')">'+t('buy_now_btn')+'</button></div>'+
@@ -1013,7 +1016,7 @@ function renderCart(){
  const freeLeft=1999-sub;
  $('drawerItems').innerHTML=ids.map(id=>{const p=byId(+id),q=state.cart[id];if(!p)return'';
   return '<div class="ci"><div class="ciem'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+photoOrEmoji(p,'')+'</div>'+
-  '<div class="cinfo"><div class="nm">'+nameOf(p)+'</div><div class="pr">'+money(p.price)+' <s style="color:#bbb;font-weight:400;font-size:11.5px">'+money(p.old)+'</s></div>'+
+  '<div class="cinfo"><div class="nm">'+nameOf(p)+'</div><div class="pr">'+money(p.price)+' '+(p.old?'<s style="color:#bbb;font-weight:400;font-size:11.5px">'+money(p.old)+'</s>':'')+'</div>'+
   '<div class="rm" onclick="rmItem('+id+')">'+t('remove_item')+'</div></div>'+
   '<div class="ci-qty"><button onclick="incQty('+id+')">+</button><span class="q">'+q+'</span><button onclick="decQty('+id+')">−</button></div></div>';
  }).join('');
