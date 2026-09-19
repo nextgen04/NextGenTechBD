@@ -15,6 +15,6 @@ INSERT OR IGNORE INTO site_text (key, value) VALUES ('flash_sale_title', '⚡ �
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('categories_title', '🗂️ ক্যাটাগরি সমূহ');
 INSERT OR IGNORE INTO site_text (key, value) VALUES ('just_for_you_title', '🎯 আপনার জন্য বাছাই করা');
 
--- নোট: পণ্যের ছবি আপলোড ফিচারের জন্য কোনো নতুন টেবিল লাগে না — ছবি Cloudinary-তে (ফ্রি, কার্ড লাগে না) আপলোড হয়।
--- শুধু Cloudflare Pages প্রজেক্টে CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
--- এই Environment Variables যোগ করতে হবে, বিস্তারিত DEPLOY-GUIDE.md-এ আছে।
+-- নোট: পণ্যের ছবি আপলোড ফিচারের জন্য কোনো নতুন টেবিল লাগে না — ছবি সরাসরি GitHub রিপোতে কমিট হয়।
+-- শুধু Cloudflare Pages প্রজেক্টে GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO এই Environment Variables যোগ করতে হবে,
+-- বিস্তারিত DEPLOY-GUIDE.md-এ আছে।
