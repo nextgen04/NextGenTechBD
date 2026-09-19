@@ -7,7 +7,7 @@ compatibility_date = "2026-08-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "nextgentechbd-db"
-database_id = "YOUR-DATABASE-ID-HERE"
+database_id = "a1b2c3d4-e5f6-7890-1234-567890abcdef""
 
 # পণ্যের ছবি আপলোডের জন্য কোনো বাইন্ডিং লাগে না — ছবি Cloudinary-তে (ফ্রি, কার্ড লাগে না) আপলোড হয়।
 # শুধু CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET Environment Variables Cloudflare Pages ড্যাশবোর্ডে সেট করলেই হবে — DEPLOY-GUIDE.md দেখুন।
