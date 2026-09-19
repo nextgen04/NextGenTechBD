@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex" />
 <title>NextGenTechBD — অ্যাডমিন প্যানেল</title>
+<link rel="icon" href="/assets/logo.png" />
 <style>
 :root{--orange:#F85606;--orange-dark:#e04a04;--bg:#f4f4f4;--card:#fff;--text:#222;--muted:#8a8a8a;--border:#ececec;--radius:10px;--shadow:0 2px 10px rgba(0,0,0,.07)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -58,7 +59,7 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
 <!-- ===================== LOGIN ===================== -->
 <div id="loginWrap">
   <div class="login-card">
-    <h1>🛍️ NextGenTechBD</h1>
+    <h1><img src="/assets/logo.png" alt="NextGenTechBD" style="height:36px;vertical-align:middle;margin-right:6px"> NextGenTechBD</h1>
     <p>অ্যাডমিন প্যানেলে ঢুকতে আপনার অ্যাডমিন কী দিন</p>
     <div class="field">
       <label>অ্যাডমিন কী (Admin Key)</label>
@@ -73,7 +74,7 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
 <div id="app" class="hidden">
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand">🛍️ NextGenTechBD — অ্যাডমিন</div>
+      <div class="brand"><img src="/assets/logo.png" alt="NextGenTechBD" style="height:24px;vertical-align:middle;margin-right:4px"> NextGenTechBD — অ্যাডমিন</div>
       <button class="btn gray small" onclick="doLogout()">লগআউট</button>
     </div>
   </header>
@@ -180,8 +181,8 @@ async function renderProducts(){
             <div class="field"><label>ইমোজি আইকন</label><input id="p_e" class="emoji-input" placeholder="📱" /></div>
           </div>
           <div class="field">
-            <label>পণ্যের ছবি (সর্বোচ্চ ৮MB — Cloudinary-তে আপলোড হয়, সাথে সাথে সাইটে দেখা যাবে)</label>
-            <input type="file" id="p_img_file" accept="image/*" onchange="uploadProductImage(this)" />
+            <label>পণ্যের ছবি (সর্বোচ্চ ৫MB — আপলোড করলে সাথে সাথেই লাইভ হয়ে যাবে)</label>
+            <input type="file" id="p_img_file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadProductImage(this)" />
             <input type="hidden" id="p_img" />
             <div id="p_img_status" style="font-size:12px;color:#888;margin-top:6px"></div>
             <img id="p_img_preview" style="display:none;max-width:110px;max-height:110px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #eee" />
@@ -240,7 +241,6 @@ async function uploadProductImage(input){
   if(!file) return;
   const statusEl = document.getElementById('p_img_status');
   const prev = document.getElementById('p_img_preview');
-  // তাৎক্ষণিক লোকাল প্রিভিউ দেখানো হয়, আপলোড শেষ হলে আসল Cloudinary লিংক বসে যাবে
   prev.src = URL.createObjectURL(file); prev.style.display='block';
   statusEl.textContent = '⏳ আপলোড হচ্ছে…';
   try{
@@ -250,7 +250,8 @@ async function uploadProductImage(input){
     const j = await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
     document.getElementById('p_img').value = j.url;
-    statusEl.innerHTML = '✅ '+(j.note||'ছবি আপলোড হয়েছে।');
+    prev.src = j.url;
+    statusEl.textContent = '✅ ছবি আপলোড হয়েছে';
   }catch(e){
     statusEl.textContent = '❌ '+e.message;
   }
@@ -322,15 +323,8 @@ async function renderCategories(){
             <div class="field"><label>Name (English)</label><input id="c_name_en" /></div>
           </div>
           <div class="grid3">
-            <div class="field"><label>ইমোজি আইকন (ছবি না দিলে এটা দেখাবে)</label><input id="c_e" class="emoji-input" placeholder="📱" /></div>
+            <div class="field"><label>ইমোজি আইকন</label><input id="c_e" class="emoji-input" placeholder="📱" /></div>
             <div class="field"><label>ক্রম (Sort Order)</label><input id="c_sort" type="number" value="0" /></div>
-          </div>
-          <div class="field">
-            <label>ক্যাটাগরির ছবি (ঐচ্ছিক — সর্বোচ্চ ৮MB, Cloudinary-তে আপলোড হয়)</label>
-            <input type="file" id="c_img_file" accept="image/*" onchange="uploadCategoryImage(this)" />
-            <input type="hidden" id="c_img" />
-            <div id="c_img_status" style="font-size:12px;color:#888;margin-top:6px"></div>
-            <img id="c_img_preview" style="display:none;max-width:110px;max-height:110px;object-fit:cover;border-radius:50%;margin-top:8px;border:1px solid #eee" />
           </div>
           <div class="row-actions">
             <button type="submit" class="btn">💾 সংরক্ষণ করুন</button>
@@ -346,7 +340,7 @@ async function renderCategories(){
             ${categories.map(x=>`
               <tr>
                 <td>${x.id}</td>
-                <td>${x.img?`<img src="${x.img}" style="width:26px;height:26px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-right:6px">`:''}${x.e||''} ${x.name}</td>
+                <td>${x.e||''} ${x.name}</td>
                 <td class="row-actions">
                   <button class="btn gray small" onclick='editCategory(${JSON.stringify(x)})'>✏️ এডিট</button>
                   <button class="btn red small" onclick="deleteCategory('${x.id}')">🗑️ মুছুন</button>
@@ -358,31 +352,8 @@ async function renderCategories(){
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
 }
 function resetCatForm(){
-  ['c_id','c_name','c_name_en','c_e','c_img'].forEach(id=>document.getElementById(id).value='');
+  ['c_id','c_name','c_name_en','c_e'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('c_sort').value='0';
-  document.getElementById('c_img_file').value='';
-  document.getElementById('c_img_status').textContent='';
-  const prev=document.getElementById('c_img_preview'); prev.src=''; prev.style.display='none';
-}
-async function uploadCategoryImage(input){
-  const file = input.files[0];
-  if(!file) return;
-  const statusEl = document.getElementById('c_img_status');
-  const prev = document.getElementById('c_img_preview');
-  // তাৎক্ষণিক লোকাল প্রিভিউ দেখানো হয়, আপলোড শেষ হলে আসল Cloudinary লিংক বসে যাবে
-  prev.src = URL.createObjectURL(file); prev.style.display='block';
-  statusEl.textContent = '⏳ আপলোড হচ্ছে…';
-  try{
-    const fd = new FormData();
-    fd.append('file', file);
-    const r = await fetch(API+'/admin/upload', { method:'POST', headers:{'X-Admin-Key':ADMIN_KEY}, body:fd });
-    const j = await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
-    document.getElementById('c_img').value = j.url;
-    statusEl.innerHTML = '✅ '+(j.note||'ছবি আপলোড হয়েছে।');
-  }catch(e){
-    statusEl.textContent = '❌ '+e.message;
-  }
 }
 function editCategory(x){
   document.getElementById('c_id').value=x.id;
@@ -390,17 +361,12 @@ function editCategory(x){
   document.getElementById('c_name_en').value=x.name_en||'';
   document.getElementById('c_e').value=x.e||'';
   document.getElementById('c_sort').value=x.sort_order||0;
-  document.getElementById('c_img').value=x.img||'';
-  document.getElementById('c_img_file').value='';
-  document.getElementById('c_img_status').textContent='';
-  const prev=document.getElementById('c_img_preview');
-  if(x.img){ prev.src=x.img; prev.style.display='block'; } else { prev.src=''; prev.style.display='none'; }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 async function saveCategory(ev){
   ev.preventDefault();
   const val = id => document.getElementById(id).value.trim();
-  const body = { id: val('c_id'), name: val('c_name'), name_en: val('c_name_en'), e: val('c_e'), img: val('c_img') || undefined, sort_order: Number(val('c_sort'))||0 };
+  const body = { id: val('c_id'), name: val('c_name'), name_en: val('c_name_en'), e: val('c_e'), sort_order: Number(val('c_sort'))||0 };
   try{
     await adminApi('/admin/categories','POST',body);
     showMsg('✅ ক্যাটাগরি সংরক্ষণ হয়েছে','ok');
@@ -463,104 +429,23 @@ async function renderHomeText(){
   const c = document.getElementById('tabContent');
   try{
     const t = await adminApi('/admin/site-text');
-    const v = (k, fb) => ((t[k] ?? fb) || '').toString().replace(/"/g,'&quot;');
     c.innerHTML = `
       <div class="card">
         <h2>📝 হোমপেজের সেকশন-শিরোনাম</h2>
         <p style="color:#888;font-size:12.5px;margin-bottom:14px">হোমপেজে "ফ্ল্যাশ সেল" ও তার আশেপাশের সেকশনগুলোর শিরোনাম এখান থেকে বদলাতে পারবেন — সেভ করলেই সাথে সাথে সাইটে (রিফ্রেশ করলে) দেখা যাবে।</p>
-        <div class="field"><label>⚡ ফ্ল্যাশ সেল সেকশনের শিরোনাম</label><input id="ht_flash" value="${v('flash_sale_title','')}" placeholder="⚡ ফ্ল্যাশ সেল" /></div>
-        <div class="field"><label>🗂️ ক্যাটাগরি সেকশনের শিরোনাম</label><input id="ht_cats" value="${v('categories_title','')}" placeholder="🗂️ ক্যাটাগরি সমূহ" /></div>
-        <div class="field"><label>🎯 "আপনার জন্য বাছাই করা" সেকশনের শিরোনাম</label><input id="ht_jfy" value="${v('just_for_you_title','')}" placeholder="🎯 আপনার জন্য বাছাই করা" /></div>
-      </div>
-
-      <div class="card">
-        <h2>🎠 হিরো ব্যানার — বড় ক্যারোসেল (৪টা স্লাইড)</h2>
-        <p style="color:#888;font-size:12.5px;margin-bottom:14px">হোমপেজের একদম উপরের বড় স্লাইডশো-র লেখা ও বাটনের টেক্সট।</p>
-
-        <p style="font-weight:600;margin:10px 0 6px">১) মেগা সেল স্লাইড</p>
-        <div class="field"><label>শিরোনাম</label><input id="ht_h1h" value="${v('hero1_h','মেগা সেল চলছে!')}" placeholder="মেগা সেল চলছে!" /></div>
-        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h1p" value="${v('hero1_p','')}" placeholder="৭০% পর্যন্ত ছাড় — সীমিত সময়ের অফার" /></div>
-        <div class="field"><label>বাটনের লেখা</label><input id="ht_h1c" value="${v('hero1_cta','')}" placeholder="এখনই কিনুন" /></div>
-
-        <p style="font-weight:600;margin:16px 0 6px">২) ফ্ল্যাশ সেল স্লাইড</p>
-        <div class="field"><label>শিরোনাম</label><input id="ht_h2h" value="${v('hero2_h','')}" placeholder="ফ্ল্যাশ সেল প্রতিদিন" /></div>
-        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h2p" value="${v('hero2_p','')}" placeholder="সকাল ১০টায় নতুন ডিল — আগে আসলে আগে পাবেন" /></div>
-        <div class="field"><label>বাটনের লেখা</label><input id="ht_h2c" value="${v('hero2_cta','')}" placeholder="ফ্ল্যাশ ডিল দেখুন" /></div>
-
-        <p style="font-weight:600;margin:16px 0 6px">৩) ফ্রি ডেলিভারি স্লাইড</p>
-        <div class="field"><label>শিরোনাম</label><input id="ht_h3h" value="${v('hero3_h','')}" placeholder="ফ্রি ডেলিভারি!" /></div>
-        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h3p" value="${v('hero3_p','')}" placeholder="৳১৯৯৯+ অর্ডারে সারাদেশে ফ্রি ডেলিভারি" /></div>
-        <div class="field"><label>বাটনের লেখা</label><input id="ht_h3c" value="${v('hero3_cta','')}" placeholder="শপিং শুরু করুন" /></div>
-
-        <p style="font-weight:600;margin:16px 0 6px">৪) গ্রোসারি স্লাইড</p>
-        <div class="field"><label>শিরোনাম</label><input id="ht_h4h" value="${v('hero4_h','')}" placeholder="গ্রোসারি বাজার" /></div>
-        <div class="field"><label>সাব-টেক্সট</label><input id="ht_h4p" value="${v('hero4_p','')}" placeholder="চাল, তেল, মধু, খেজুর — ঘরে বসে বাজার" /></div>
-        <div class="field"><label>বাটনের লেখা</label><input id="ht_h4c" value="${v('hero4_cta','')}" placeholder="বাজার করুন" /></div>
-      </div>
-
-      <div class="card">
-        <h2>⚡ ফ্ল্যাশ সেল ব্যানার ছবি</h2>
-        <p style="color:#888;font-size:12.5px;margin-bottom:14px">ফ্ল্যাশ সেল সেকশনের লাল-কমলা হেডারে একটা কাস্টম ব্যানার ছবি দিতে চাইলে এখানে আপলোড করুন (ছবির উপর লেখা পড়তে সুবিধার জন্য হালকা কালো শেড অটোমেটিক বসে যায়)। ছবি না দিলে আগের মতোই রঙিন গ্রেডিয়েন্ট দেখাবে।</p>
-        <input type="file" id="fb_file" accept="image/*" onchange="uploadFlashBanner(this)" />
-        <input type="hidden" id="ht_flash_banner" value="${v('flash_banner_img','')}" />
-        <div id="fb_status" style="font-size:12px;color:#888;margin-top:6px"></div>
-        <img id="fb_preview" src="${v('flash_banner_img','')}" style="display:${v('flash_banner_img','')?'block':'none'};max-width:260px;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #eee" />
-        <button type="button" class="btn" style="background:#999;margin-top:8px" onclick="removeFlashBanner()">🗑️ ছবি সরিয়ে ডিফল্ট গ্রেডিয়েন্টে ফিরে যান</button>
-      </div>
-
-      <div class="card">
-        <h2>🏠 হিরোর ডানপাশের ২টা প্রোমো কার্ড</h2>
-        <p style="font-weight:600;margin:10px 0 6px">১) হোম ও লিভিং কার্ড</p>
-        <div class="field"><label>শিরোনাম</label><input id="ht_p1h" value="${v('promo1_h','')}" placeholder="হোম ও লিভিং" /></div>
-        <div class="field"><label>সাব-টেক্সট</label><input id="ht_p1p" value="${v('promo1_p','')}" placeholder="৪০% পর্যন্ত ছাড়" /></div>
-
-        <p style="font-weight:600;margin:16px 0 6px">২) বিউটি কেয়ার কার্ড</p>
-        <div class="field"><label>শিরোনাম</label><input id="ht_p2h" value="${v('promo2_h','')}" placeholder="বিউটি কেয়ার" /></div>
-        <div class="field"><label>সাব-টেক্সট</label><input id="ht_p2p" value="${v('promo2_p','')}" placeholder="অরিজিনাল প্রোডাক্ট" /></div>
-
-        <button class="btn" onclick="saveHomeText()">💾 সব সংরক্ষণ করুন</button>
+        <div class="field"><label>⚡ ফ্ল্যাশ সেল সেকশনের শিরোনাম</label><input id="ht_flash" value="${(t.flash_sale_title||'').replace(/"/g,'&quot;')}" placeholder="⚡ ফ্ল্যাশ সেল" /></div>
+        <div class="field"><label>🗂️ ক্যাটাগরি সেকশনের শিরোনাম</label><input id="ht_cats" value="${(t.categories_title||'').replace(/"/g,'&quot;')}" placeholder="🗂️ ক্যাটাগরি সমূহ" /></div>
+        <div class="field"><label>🎯 "আপনার জন্য বাছাই করা" সেকশনের শিরোনাম</label><input id="ht_jfy" value="${(t.just_for_you_title||'').replace(/"/g,'&quot;')}" placeholder="🎯 আপনার জন্য বাছাই করা" /></div>
+        <button class="btn" onclick="saveHomeText()">💾 সংরক্ষণ করুন</button>
       </div>`;
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
-}
-async function uploadFlashBanner(input){
-  const file = input.files[0];
-  if(!file) return;
-  const statusEl = document.getElementById('fb_status');
-  const prev = document.getElementById('fb_preview');
-  prev.src = URL.createObjectURL(file); prev.style.display='block';
-  statusEl.textContent = '⏳ আপলোড হচ্ছে…';
-  try{
-    const fd = new FormData();
-    fd.append('file', file);
-    const r = await fetch(API+'/admin/upload', { method:'POST', headers:{'X-Admin-Key':ADMIN_KEY}, body:fd });
-    const j = await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
-    document.getElementById('ht_flash_banner').value = j.url;
-    prev.src = j.url;
-    statusEl.innerHTML = '✅ '+(j.note||'ছবি আপলোড হয়েছে।')+' — নিচে "সব সংরক্ষণ করুন" চাপতে ভুলবেন না।';
-  }catch(e){
-    statusEl.textContent = '❌ '+e.message;
-  }
-}
-function removeFlashBanner(){
-  document.getElementById('ht_flash_banner').value = '';
-  document.getElementById('fb_file').value = '';
-  document.getElementById('fb_preview').style.display = 'none';
-  document.getElementById('fb_status').textContent = 'ছবি সরানো হয়েছে — "সব সংরক্ষণ করুন" চেপে সেভ করুন।';
 }
 async function saveHomeText(){
   const val = id => document.getElementById(id).value.trim();
   const body = {
     flash_sale_title: val('ht_flash'),
     categories_title: val('ht_cats'),
-    just_for_you_title: val('ht_jfy'),
-    hero1_h: val('ht_h1h'), hero1_p: val('ht_h1p'), hero1_cta: val('ht_h1c'),
-    hero2_h: val('ht_h2h'), hero2_p: val('ht_h2p'), hero2_cta: val('ht_h2c'),
-    hero3_h: val('ht_h3h'), hero3_p: val('ht_h3p'), hero3_cta: val('ht_h3c'),
-    hero4_h: val('ht_h4h'), hero4_p: val('ht_h4p'), hero4_cta: val('ht_h4c'),
-    promo1_h: val('ht_p1h'), promo1_p: val('ht_p1p'),
-    promo2_h: val('ht_p2h'), promo2_p: val('ht_p2p'),
-    flash_banner_img: val('ht_flash_banner')
+    just_for_you_title: val('ht_jfy')
   };
   try{
     await adminApi('/admin/site-text','PUT',body);
