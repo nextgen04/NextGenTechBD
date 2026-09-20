@@ -8,7 +8,7 @@
 <meta property="og:title" content="NextGenTechBD — সব কিছু, এক ঠিকানায়!">
 <meta property="og:description" content="সব ধরনের পণ্য ঘরে বসে অর্ডার করুন — ক্যাশ অন ডেলিভারিতে!">
 <title>NextGenTechBD — অনলাইন শপিং বাংলাদেশ</title>
-<link rel="icon" href="/assets/logo.png">
+<link rel="icon" href="/assets/logo-icon.png">
 <style>
 :root{
   --orange:#F85606;
@@ -53,7 +53,8 @@ input,select,textarea{font-family:inherit;font-size:14px;outline:none}
 header{background:#fff;box-shadow:0 1px 0 var(--border);position:sticky;top:0;z-index:500}
 .header-main{display:flex;align-items:center;gap:18px;padding:14px 0}
 .logo{display:flex;align-items:center;gap:8px;font-size:28px;font-weight:800;white-space:nowrap;cursor:pointer}
-.logo .logo-img{height:42px;width:auto;display:block}
+.logo .logo-icon-img{height:42px;width:auto;display:block}
+.logo .logo-img{height:32px;width:auto;display:block}
 .logo .logo-icon{font-size:30px}
 .logo b{color:var(--orange)}
 .logo small{display:block;font-size:10.5px;font-weight:500;color:var(--muted);letter-spacing:.3px}
@@ -71,7 +72,8 @@ header{background:#fff;box-shadow:0 1px 0 var(--border);position:sticky;top:0;z-
 @media(max-width:768px){
   .header-main{flex-wrap:wrap;gap:10px}
   .logo{font-size:23px}
-  .logo .logo-img{height:34px}
+  .logo .logo-icon-img{height:32px}
+  .logo .logo-img{height:24px}
   .search-wrap{order:3;width:100%;max-width:100%}
   .hicon .ht{display:none}
 }
@@ -368,6 +370,7 @@ footer{background:#fff;margin-top:26px;border-top:3px solid var(--orange)}
 <header>
   <div class="container header-main">
     <div class="logo" onclick="goHome()">
+      <img src="/assets/logo-icon.png" alt="" class="logo-icon-img">
       <img src="/assets/logo.png" alt="NextGenTechBD — Tomorrow's Tech, Today." class="logo-img">
       <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">NextGenTechBD</span>
     </div>
