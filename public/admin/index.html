@@ -293,7 +293,7 @@ async function renderProducts(){
           </div>
           <div class="field">
             <label>পণ্যের ছবি (সর্বোচ্চ ৫MB — আপলোড করলে সাথে সাথেই লাইভ হয়ে যাবে)</label>
-            <input type="file" id="p_img_file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadProductImage(this)" />
+            <input type="file" id="p_img_file" accept="image/*" onchange="uploadProductImage(this)" />
             <input type="hidden" id="p_img" />
             <div id="p_img_status" style="font-size:12px;color:#888;margin-top:6px"></div>
             <img id="p_img_preview" style="display:none;max-width:110px;max-height:110px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #eee" />
@@ -490,8 +490,15 @@ async function renderCategories(){
             <div class="field"><label>Name (English)</label><input id="c_name_en" /></div>
           </div>
           <div class="grid3">
-            <div class="field"><label>ইমোজি আইকন</label><input id="c_e" class="emoji-input" placeholder="📱" /></div>
+            <div class="field"><label>ইমোজি আইকন (ছবি না দিলে এটা দেখাবে)</label><input id="c_e" class="emoji-input" placeholder="📱" /></div>
             <div class="field"><label>ক্রম (Sort Order)</label><input id="c_sort" type="number" value="0" /></div>
+          </div>
+          <div class="field">
+            <label>ক্যাটাগরির ছবি (ঐচ্ছিক — সর্বোচ্চ ৮MB, Cloudinary-তে আপলোড হয়)</label>
+            <input type="file" id="c_img_file" accept="image/*" onchange="uploadCategoryImage(this)" />
+            <input type="hidden" id="c_img" />
+            <div id="c_img_status" style="font-size:12px;color:#888;margin-top:6px"></div>
+            <img id="c_img_preview" style="display:none;max-width:110px;max-height:110px;object-fit:cover;border-radius:50%;margin-top:8px;border:1px solid #eee" />
           </div>
           <div class="row-actions">
             <button type="submit" class="btn">💾 সংরক্ষণ করুন</button>
@@ -507,7 +514,7 @@ async function renderCategories(){
             ${categories.map(x=>`
               <tr>
                 <td>${x.id}</td>
-                <td>${x.e||''} ${x.name}</td>
+                <td>${x.img?`<img src="${x.img}" style="width:26px;height:26px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-right:6px">`:''}${x.e||''} ${x.name}</td>
                 <td class="row-actions">
                   <button class="btn gray small" onclick='editCategory(${JSON.stringify(x)})'>✏️ এডিট</button>
                   <button class="btn red small" onclick="deleteCategory('${x.id}')">🗑️ মুছুন</button>
@@ -519,8 +526,30 @@ async function renderCategories(){
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
 }
 function resetCatForm(){
-  ['c_id','c_name','c_name_en','c_e'].forEach(id=>document.getElementById(id).value='');
+  ['c_id','c_name','c_name_en','c_e','c_img'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('c_sort').value='0';
+  document.getElementById('c_img_file').value='';
+  document.getElementById('c_img_status').textContent='';
+  const prev=document.getElementById('c_img_preview'); prev.src=''; prev.style.display='none';
+}
+async function uploadCategoryImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('c_img_status');
+  const prev = document.getElementById('c_img_preview');
+  prev.src = URL.createObjectURL(file); prev.style.display='block';
+  statusEl.textContent = '⏳ আপলোড হচ্ছে…';
+  try{
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch(API+'/admin/upload', { method:'POST', headers:{'X-Admin-Key':ADMIN_KEY}, body:fd });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
+    document.getElementById('c_img').value = j.url;
+    statusEl.innerHTML = '✅ '+(j.note||'ছবি আপলোড হয়েছে।');
+  }catch(e){
+    statusEl.textContent = '❌ '+e.message;
+  }
 }
 function editCategory(x){
   document.getElementById('c_id').value=x.id;
@@ -528,12 +557,17 @@ function editCategory(x){
   document.getElementById('c_name_en').value=x.name_en||'';
   document.getElementById('c_e').value=x.e||'';
   document.getElementById('c_sort').value=x.sort_order||0;
+  document.getElementById('c_img').value=x.img||'';
+  document.getElementById('c_img_file').value='';
+  document.getElementById('c_img_status').textContent='';
+  const prev=document.getElementById('c_img_preview');
+  if(x.img){ prev.src=x.img; prev.style.display='block'; } else { prev.src=''; prev.style.display='none'; }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 async function saveCategory(ev){
   ev.preventDefault();
   const val = id => document.getElementById(id).value.trim();
-  const body = { id: val('c_id'), name: val('c_name'), name_en: val('c_name_en'), e: val('c_e'), sort_order: Number(val('c_sort'))||0 };
+  const body = { id: val('c_id'), name: val('c_name'), name_en: val('c_name_en'), e: val('c_e'), img: val('c_img') || undefined, sort_order: Number(val('c_sort'))||0 };
   try{
     await adminApi('/admin/categories','POST',body);
     showMsg('✅ ক্যাটাগরি সংরক্ষণ হয়েছে','ok');
