@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS orders (
   coupon_code   TEXT,
   discount      INTEGER DEFAULT 0,
   invoice_no    TEXT,
+  seen          INTEGER DEFAULT 0,
   created_at    TEXT DEFAULT (datetime('now')),
   FOREIGN KEY (customer_id) REFERENCES customers(id)
 );
@@ -192,6 +193,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at);
 CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders(customer_id);
 CREATE INDEX IF NOT EXISTS idx_orders_phone ON orders(phone);
+CREATE INDEX IF NOT EXISTS idx_orders_seen ON orders(seen);
 CREATE INDEX IF NOT EXISTS idx_sessions_customer ON customer_sessions(customer_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires ON customer_sessions(expires_at);
 CREATE INDEX IF NOT EXISTS idx_status_history_order ON order_status_history(order_id);

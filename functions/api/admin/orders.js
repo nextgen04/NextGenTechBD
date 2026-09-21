@@ -14,7 +14,7 @@ export async function onRequestGet(context) {
     const status = (url.searchParams.get('status') || '').trim();
 
     let sql =
-      'SELECT id, order_no, name, phone, address, district, payment, note, items, subtotal, delivery_fee, total, status, courier, tracking_id, payment_status, coupon_code, discount, invoice_no, created_at FROM orders WHERE 1=1';
+      'SELECT id, order_no, name, phone, address, district, payment, note, items, subtotal, delivery_fee, total, status, courier, tracking_id, payment_status, coupon_code, discount, invoice_no, seen, created_at FROM orders WHERE 1=1';
     const binds = [];
     if (q) {
       sql += ' AND (order_no LIKE ? OR name LIKE ? OR phone LIKE ?)';

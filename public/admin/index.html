@@ -67,6 +67,11 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
 .badge.warn{background:#fff3d6;color:#a06b00}
 .badge.danger{background:#fdeaea;color:#c22}
 .note-box{background:#fff8e6;border:1px solid #ffe4a3;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#7a5900;margin-bottom:14px}
+.notify-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:10px;background:#d92646;color:#fff;font-size:11px;font-weight:800;margin-left:6px;animation:pulse 1.4s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
+.toast-order{position:fixed;top:16px;right:16px;background:#fff;border-left:4px solid var(--orange);box-shadow:0 6px 24px rgba(0,0,0,.18);border-radius:10px;padding:14px 16px;max-width:320px;z-index:999;cursor:pointer;animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-order b{color:var(--orange-dark)}
 </style>
 </head>
 <body>
@@ -96,7 +101,7 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
   <div class="container">
     <div class="tabs">
       <div class="tab" data-tab="dashboard" onclick="switchTab('dashboard')">📊 ড্যাশবোর্ড</div>
-      <div class="tab" data-tab="orders" onclick="switchTab('orders')">📦 অর্ডারসমূহ</div>
+      <div class="tab" data-tab="orders" onclick="switchTab('orders')">📦 অর্ডারসমূহ<span id="orderNotifyBadge" class="notify-badge hidden">0</span></div>
       <div class="tab" data-tab="customers" onclick="switchTab('customers')">👥 কাস্টমার</div>
       <div class="tab" data-tab="products" onclick="switchTab('products')">🛍️ পণ্যসমূহ</div>
       <div class="tab" data-tab="categories" onclick="switchTab('categories')">🗂️ ক্যাটাগরি</div>
@@ -141,11 +146,13 @@ function doLogout(){
   ADMIN_KEY='';
   document.getElementById('app').classList.add('hidden');
   document.getElementById('loginWrap').classList.remove('hidden');
+  stopOrderNotifications();
 }
 function showApp(){
   document.getElementById('loginWrap').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   switchTab('dashboard');
+  startOrderNotifications();
 }
 
 /* ============ API HELPERS ============ */
@@ -166,6 +173,81 @@ function showMsg(text, type){
   setTimeout(()=>{ box.innerHTML=''; }, 4000);
 }
 
+/* ============ নতুন অর্ডার নোটিফিকেশন ============ */
+const ORIGINAL_TITLE = document.title;
+let NOTIFY_POLL_TIMER = null;
+let LAST_SEEN_IDS = new Set();
+let NOTIFY_FIRST_RUN = true;
+
+function startOrderNotifications(){
+  if(typeof Notification!=='undefined' && Notification.permission==='default'){
+    // অ্যাডমিন প্রথমবার লগইন করলে ব্রাউজার নোটিফিকেশনের অনুমতি চাওয়া হয় (নিরবে ব্যর্থ হলেও সমস্যা নেই)
+    Notification.requestPermission().catch(()=>{});
+  }
+  pollNewOrders();
+  NOTIFY_POLL_TIMER = setInterval(pollNewOrders, 20000); // প্রতি ২০ সেকেন্ডে চেক করবে
+}
+function stopOrderNotifications(){
+  if(NOTIFY_POLL_TIMER){ clearInterval(NOTIFY_POLL_TIMER); NOTIFY_POLL_TIMER=null; }
+  document.title = ORIGINAL_TITLE;
+}
+async function pollNewOrders(){
+  if(!ADMIN_KEY) return;
+  try{
+    const j = await adminApi('/admin/orders/unseen');
+    const badge = document.getElementById('orderNotifyBadge');
+    if(j.count>0){
+      badge.textContent = j.count>99?'99+':j.count;
+      badge.classList.remove('hidden');
+      document.title = '('+j.count+') '+ORIGINAL_TITLE;
+    }else{
+      badge.classList.add('hidden');
+      document.title = ORIGINAL_TITLE;
+    }
+    // নতুন অর্ডার শনাক্ত হলে সাউন্ড + টোস্ট + ব্রাউজার নোটিফিকেশন (প্রথমবার পোল করার সময় দেখানো হয় না, যাতে লগইন করা মাত্রই পুরনো নোটিফিকেশনে সাউন্ড না বাজে)
+    const freshOnes = (j.orders||[]).filter(o=>!LAST_SEEN_IDS.has(o.id));
+    if(!NOTIFY_FIRST_RUN && freshOnes.length){
+      playNotifySound();
+      freshOnes.slice(0,3).forEach(o=>showOrderToast(o));
+      if(typeof Notification!=='undefined' && Notification.permission==='granted'){
+        try{ new Notification('🛍️ নতুন অর্ডার এসেছে!', {body: freshOnes[0].name+' — ৳'+freshOnes[0].total+' ('+freshOnes[0].order_no+')'}); }catch(e){}
+      }
+    }
+    (j.orders||[]).forEach(o=>LAST_SEEN_IDS.add(o.id));
+    NOTIFY_FIRST_RUN = false;
+  }catch(e){ /* পোলিং ব্যর্থ হলেও প্যানেল ব্যবহারে বাধা দেওয়া ঠিক না */ }
+}
+async function markOrdersSeen(){
+  try{
+    await adminApi('/admin/orders/unseen','POST',{});
+    document.getElementById('orderNotifyBadge').classList.add('hidden');
+    document.title = ORIGINAL_TITLE;
+  }catch(e){}
+}
+function showOrderToast(o){
+  const el = document.createElement('div');
+  el.className = 'toast-order';
+  el.innerHTML = '🛍️ <b>নতুন অর্ডার!</b><br>'+o.name+' — ৳'+o.total+'<br><small style="color:#888">'+o.order_no+'</small>';
+  el.onclick = ()=>{ switchTab('orders'); el.remove(); };
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.remove(); }, 8000);
+}
+function playNotifySound(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [880,1108].forEach((freq,i)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sine'; o.frequency.value=freq;
+      o.connect(g); g.connect(ctx.destination);
+      const start = ctx.currentTime + i*0.15;
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(0.25, start+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, start+0.28);
+      o.start(start); o.stop(start+0.3);
+    });
+  }catch(e){}
+}
+
 /* ============ TABS ============ */
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===name));
@@ -175,7 +257,7 @@ function switchTab(name){
   else if(name==='categories') renderCategories();
   else if(name==='settings') renderSettings();
   else if(name==='hometext') renderHomeText();
-  else if(name==='orders') renderOrders();
+  else if(name==='orders'){ renderOrders(); markOrdersSeen(); }
   else if(name==='dashboard') renderDashboard();
   else if(name==='customers') renderCustomers();
   else if(name==='coupons') renderCoupons();
