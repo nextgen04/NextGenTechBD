@@ -52,6 +52,21 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
 .emoji-input{width:64px !important;text-align:center}
 .divider{border-top:1px solid var(--border);margin:14px 0}
 .spinner{text-align:center;padding:30px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.stat-card .n{font-size:24px;font-weight:800;color:var(--orange-dark)}
+.stat-card .l{font-size:12px;color:var(--muted);margin-top:2px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12.5px}
+.bar-row .lbl{width:110px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-row .bar-wrap{flex:1;background:#f0f0f0;border-radius:6px;height:16px;overflow:hidden}
+.bar-row .bar-fill{background:var(--orange);height:100%;border-radius:6px}
+.bar-row .val{width:50px;text-align:right;flex-shrink:0;color:var(--muted)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.badge.ok{background:#e8f8ef;color:#0a7a3d}
+.badge.warn{background:#fff3d6;color:#a06b00}
+.badge.danger{background:#fdeaea;color:#c22}
+.note-box{background:#fff8e6;border:1px solid #ffe4a3;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#7a5900;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -80,11 +95,18 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
   </header>
   <div class="container">
     <div class="tabs">
+      <div class="tab" data-tab="dashboard" onclick="switchTab('dashboard')">📊 ড্যাশবোর্ড</div>
+      <div class="tab" data-tab="orders" onclick="switchTab('orders')">📦 অর্ডারসমূহ</div>
+      <div class="tab" data-tab="customers" onclick="switchTab('customers')">👥 কাস্টমার</div>
       <div class="tab" data-tab="products" onclick="switchTab('products')">🛍️ পণ্যসমূহ</div>
       <div class="tab" data-tab="categories" onclick="switchTab('categories')">🗂️ ক্যাটাগরি</div>
+      <div class="tab" data-tab="coupons" onclick="switchTab('coupons')">🎟️ কুপন ও অফার</div>
+      <div class="tab" data-tab="banners" onclick="switchTab('banners')">🖼️ ব্যানার/স্লাইডার</div>
+      <div class="tab" data-tab="reviews" onclick="switchTab('reviews')">⭐ রিভিউ</div>
       <div class="tab" data-tab="settings" onclick="switchTab('settings')">⚙️ দোকানের সেটিংস</div>
       <div class="tab" data-tab="hometext" onclick="switchTab('hometext')">📝 হোমপেজ টেক্সট</div>
-      <div class="tab" data-tab="orders" onclick="switchTab('orders')">📦 অর্ডারসমূহ</div>
+      <div class="tab" data-tab="security" onclick="switchTab('security')">🔐 সিকিউরিটি</div>
+      <div class="tab" data-tab="backup" onclick="switchTab('backup')">💾 ব্যাকআপ</div>
     </div>
     <div id="msgBox"></div>
     <div id="tabContent"></div>
@@ -123,7 +145,7 @@ function doLogout(){
 function showApp(){
   document.getElementById('loginWrap').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  switchTab('products');
+  switchTab('dashboard');
 }
 
 /* ============ API HELPERS ============ */
@@ -154,6 +176,13 @@ function switchTab(name){
   else if(name==='settings') renderSettings();
   else if(name==='hometext') renderHomeText();
   else if(name==='orders') renderOrders();
+  else if(name==='dashboard') renderDashboard();
+  else if(name==='customers') renderCustomers();
+  else if(name==='coupons') renderCoupons();
+  else if(name==='banners') renderBanners();
+  else if(name==='reviews') renderReviews();
+  else if(name==='security') renderSecurity();
+  else if(name==='backup') renderBackup();
 }
 
 /* ============ PRODUCTS ============ */
@@ -197,6 +226,11 @@ async function renderProducts(){
             <div class="field"><label>রং (কমা দিয়ে আলাদা)</label><input id="p_colors" placeholder="কালো, সাদা" /></div>
             <div class="field"><label>সাইজ (কমা দিয়ে আলাদা)</label><input id="p_sizes" placeholder="S, M, L, XL" /></div>
           </div>
+          <div class="grid3">
+            <div class="field"><label>SKU (পণ্য কোড)</label><input id="p_sku" placeholder="যেমন: HC-EQ34-BLK" /></div>
+            <div class="field"><label>বর্তমান স্টক</label><input id="p_stock" type="number" placeholder="খালি রাখলে স্টক ট্র্যাক হবে না" /></div>
+            <div class="field"><label>লো-স্টক অ্যালার্ট (এর নিচে নামলে সতর্ক করবে)</label><input id="p_low_stock" type="number" placeholder="৫" /></div>
+          </div>
           <div class="field" style="display:flex;align-items:center;gap:8px">
             <input type="checkbox" id="p_f" style="width:auto" /> <label style="margin:0">ফ্ল্যাশ সেলে দেখাবে?</label>
           </div>
@@ -208,29 +242,76 @@ async function renderProducts(){
       </div>
       <div class="card">
         <h2>🛍️ সব পণ্য (${products.length})</h2>
+        <div class="field" style="max-width:320px"><input id="prodSearchBox" placeholder="🔍 নাম/SKU দিয়ে খুঁজুন" oninput="filterProductRows(this.value)" /></div>
         <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>নাম</th><th>ক্যাটাগরি</th><th>মূল্য</th><th>ফ্ল্যাশ</th><th></th></tr></thead>
-          <tbody>
+          <thead><tr><th>নাম</th><th>SKU</th><th>ক্যাটাগরি</th><th>মূল্য</th><th>স্টক</th><th>ফ্ল্যাশ</th><th></th></tr></thead>
+          <tbody id="prodTableBody">
             ${products.map(p=>`
-              <tr>
+              <tr data-search="${(p.name+' '+(p.sku||'')).toLowerCase()}">
                 <td>${p.img?`<img src="${p.img}" style="width:30px;height:30px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:6px">`:''}${p.e||''} ${p.name}</td>
+                <td><small>${p.sku||'—'}</small></td>
                 <td>${catName(p.cat)}</td>
                 <td>৳${p.price}${p.old?` <s style="color:#aaa">৳${p.old}</s>`:''}</td>
+                <td>${stockBadge(p)}</td>
                 <td>${p.f?'✅':'—'}</td>
                 <td class="row-actions">
                   <button class="btn gray small" onclick='editProduct(${JSON.stringify(p)})'>✏️ এডিট</button>
+                  <button class="btn small" onclick="openStockAdjust(${p.id},'${(p.name||'').replace(/'/g,"\\'")}',${p.stock??'null'})">📦 স্টক</button>
                   <button class="btn red small" onclick="deleteProduct(${p.id})">🗑️ মুছুন</button>
                 </td>
               </tr>`).join('')}
           </tbody>
         </table>
         </div>
+      </div>
+      <div id="stockAdjustCard" class="card hidden">
+        <h2>📦 স্টক সমন্বয় — <span id="stockProdName"></span></h2>
+        <div class="grid3">
+          <div class="field"><label>পরিমাণ পরিবর্তন (বাড়াতে + দিন, কমাতে - দিন)</label><input id="stockChange" type="number" placeholder="যেমন: 10 অথবা -5" /></div>
+          <div class="field"><label>কারণ (ঐচ্ছিক)</label><input id="stockReason" placeholder="নতুন চালান / ড্যামেজ / সমন্বয়" /></div>
+        </div>
+        <div class="row-actions">
+          <button class="btn" onclick="submitStockAdjust()">✔ আপডেট করুন</button>
+          <button class="btn gray" onclick="document.getElementById('stockAdjustCard').classList.add('hidden')">✖ বাতিল</button>
+        </div>
       </div>`;
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
 }
+function stockBadge(p){
+  if(p.stock===null||p.stock===undefined) return '<span style="color:#bbb">—</span>';
+  if(p.stock<=0) return '<span class="badge danger">স্টক শেষ</span>';
+  if(p.stock<=(p.low_stock_at||5)) return `<span class="badge warn">মাত্র ${p.stock}টি</span>`;
+  return `<span class="badge ok">${p.stock}টি</span>`;
+}
+function filterProductRows(q){
+  q=q.trim().toLowerCase();
+  document.querySelectorAll('#prodTableBody tr').forEach(tr=>{
+    tr.style.display = tr.dataset.search.includes(q) ? '' : 'none';
+  });
+}
+let STOCK_PRODUCT_ID = null;
+function openStockAdjust(id,name,current){
+  STOCK_PRODUCT_ID = id;
+  document.getElementById('stockProdName').textContent = name+' (বর্তমান: '+(current===null?'ট্র্যাক করা হচ্ছে না':current)+')';
+  document.getElementById('stockChange').value='';
+  document.getElementById('stockReason').value='';
+  document.getElementById('stockAdjustCard').classList.remove('hidden');
+  document.getElementById('stockAdjustCard').scrollIntoView({behavior:'smooth'});
+}
+async function submitStockAdjust(){
+  const change = Number(document.getElementById('stockChange').value);
+  const reason = document.getElementById('stockReason').value.trim();
+  if(!change){ showMsg('❌ পরিমাণ দিন (শূন্য ছাড়া)','error'); return; }
+  try{
+    await adminApi('/admin/stock','POST',{product_id:STOCK_PRODUCT_ID, change, reason});
+    showMsg('✅ স্টক আপডেট হয়েছে','ok');
+    document.getElementById('stockAdjustCard').classList.add('hidden');
+    renderProducts();
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
 function resetProductForm(){
-  ['p_id','p_name','p_name_en','p_price','p_old','p_e','p_r','p_rv','p_sold','p_tag','p_colors','p_sizes','p_img'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  ['p_id','p_name','p_name_en','p_price','p_old','p_e','p_r','p_rv','p_sold','p_tag','p_colors','p_sizes','p_img','p_sku','p_stock','p_low_stock'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
   document.getElementById('p_f').checked=false;
   document.getElementById('p_img_file').value='';
   document.getElementById('p_img_status').textContent='';
@@ -272,6 +353,9 @@ function editProduct(p){
   document.getElementById('p_sizes').value=(p.sizes||[]).join(', ');
   document.getElementById('p_f').checked=!!p.f;
   document.getElementById('p_img').value=p.img||'';
+  document.getElementById('p_sku').value=p.sku||'';
+  document.getElementById('p_stock').value=(p.stock===null||p.stock===undefined)?'':p.stock;
+  document.getElementById('p_low_stock').value=p.low_stock_at||'';
   document.getElementById('p_img_file').value='';
   document.getElementById('p_img_status').textContent='';
   const prev=document.getElementById('p_img_preview');
@@ -290,6 +374,7 @@ async function saveProduct(ev){
     r: val('p_r')?Number(val('p_r')):undefined, rv: val('p_rv')?Number(val('p_rv')):undefined,
     sold: val('p_sold')?Number(val('p_sold')):undefined, tag: val('p_tag'),
     colors: splitList(val('p_colors')), sizes: splitList(val('p_sizes')),
+    sku: val('p_sku'), stock: val('p_stock'), low_stock_at: val('p_low_stock'),
     f: document.getElementById('p_f').checked
   };
   try{
@@ -390,6 +475,14 @@ async function renderSettings(){
     const s = await adminApi('/admin/settings');
     c.innerHTML = `
       <div class="card">
+        <h2>🏪 দোকানের তথ্য</h2>
+        <div class="grid2">
+          <div class="field"><label>দোকানের নাম</label><input id="s_shop_name" value="${s.shop_name||'NextGenTechBD'}" /></div>
+          <div class="field"><label>ঠিকানা</label><input id="s_address" value="${s.address||''}" /></div>
+          <div class="field"><label>মুদ্রা চিহ্ন</label><input id="s_currency" value="${s.currency||'৳'}" /></div>
+          <div class="field"><label>ইনভয়েস প্রিফিক্স</label><input id="s_invoice_prefix" value="${s.invoice_prefix||'INV'}" /></div>
+        </div>
+        <div class="divider"></div>
         <h2>📞 যোগাযোগ</h2>
         <div class="grid2">
           <div class="field"><label>মোবাইল নম্বর</label><input id="s_phone" value="${s.phone||''}" /></div>
@@ -408,6 +501,20 @@ async function renderSettings(){
             <input type="checkbox" id="s_cod" style="width:auto" ${s.cod?'checked':''} /> <label style="margin:0">ক্যাশ অন ডেলিভারি চালু?</label>
           </div>
         </div>
+        <div class="divider"></div>
+        <h2>🚚 ডেলিভারি ও কুরিয়ার</h2>
+        <div class="grid3">
+          <div class="field"><label>ঢাকার ভেতরে ডেলিভারি চার্জ (৳)</label><input id="s_dhaka" type="number" value="${s.delivery_charge_dhaka??60}" /></div>
+          <div class="field"><label>ঢাকার বাইরে ডেলিভারি চার্জ (৳)</label><input id="s_outside" type="number" value="${s.delivery_charge_outside??120}" /></div>
+          <div class="field"><label>ফ্রি ডেলিভারি (এর বেশি অর্ডারে, ৳)</label><input id="s_free_threshold" type="number" value="${s.free_delivery_threshold??1999}" /></div>
+        </div>
+        <div class="field"><label>কুরিয়ার সার্ভিসসমূহ (কমা দিয়ে আলাদা)</label><input id="s_couriers" value="${s.courier_services||''}" placeholder="Pathao, Steadfast, RedX, Sundarban" /></div>
+        <p style="color:#888;font-size:12px;margin-top:-6px">💡 নির্দিষ্ট কুরিয়ারের API ইন্টিগ্রেশন (স্বয়ংক্রিয় ট্র্যাকিং আপডেট) এই ভার্সনে নেই — কুরিয়ারের নাম ও ট্র্যাকিং আইডি অর্ডার পেজ থেকে ম্যানুয়ালি বসাতে হবে।</p>
+        <div class="divider"></div>
+        <h2>🚧 মেইনটেন্যান্স মোড</h2>
+        <div class="field" style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="s_maintenance" style="width:auto" ${s.maintenance_mode?'checked':''} /> <label style="margin:0">চালু করলে গ্রাহকরা সাইটে শুধু "শীঘ্রই আসছে" পেজ দেখবে</label>
+        </div>
         <button class="btn" onclick="saveSettings()">💾 সংরক্ষণ করুন</button>
       </div>`;
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
@@ -416,7 +523,10 @@ async function saveSettings(){
   const val = id => document.getElementById(id).value.trim();
   const body = {
     contact:{phone:val('s_phone'),whatsapp:val('s_whatsapp'),telegram:val('s_telegram'),facebook:val('s_facebook'),email:val('s_email')},
-    payment:{bkash:val('s_bkash'),nagad:val('s_nagad'),rocket:val('s_rocket'),cod:document.getElementById('s_cod').checked}
+    payment:{bkash:val('s_bkash'),nagad:val('s_nagad'),rocket:val('s_rocket'),cod:document.getElementById('s_cod').checked},
+    shop:{name:val('s_shop_name'),address:val('s_address'),currency:val('s_currency'),invoice_prefix:val('s_invoice_prefix')},
+    delivery:{dhaka:val('s_dhaka'),outside:val('s_outside'),free_threshold:val('s_free_threshold'),couriers:val('s_couriers')},
+    maintenance_mode: document.getElementById('s_maintenance').checked
   };
   try{
     await adminApi('/admin/settings','PUT',body);
@@ -454,43 +564,592 @@ async function saveHomeText(){
 }
 
 /* ============ ORDERS ============ */
-const STATUS_L={pending:'🕐 অপেক্ষমান',confirmed:'✔ নিশ্চিত',shipped:'🚚 পাঠানো হয়েছে',delivered:'✅ ডেলিভার্ড',cancelled:'✖ বাতিল'};
+const STATUS_L={pending:'🕐 নতুন/অপেক্ষমান',processing:'⚙️ প্রসেসিং',confirmed:'✔ নিশ্চিত',shipped:'🚚 পাঠানো হয়েছে',delivered:'✅ ডেলিভার্ড',cancelled:'✖ বাতিল',returned:'↩️ রিটার্ন/রিফান্ড'};
+const PAY_STATUS_L={unpaid:'⏳ বকেয়া',paid:'✅ পরিশোধিত',partial:'🔸 আংশিক',refunded:'↩️ ফেরত দেওয়া হয়েছে'};
+let ORDER_FILTERS={q:'',status:''};
 async function renderOrders(){
   const c = document.getElementById('tabContent');
+  c.innerHTML = `
+    <div class="card">
+      <h2>📦 অর্ডারসমূহ</h2>
+      <div class="grid2" style="align-items:end">
+        <div class="field"><label>সার্চ (অর্ডার নং/নাম/ফোন)</label><input id="ordSearch" placeholder="🔍 খুঁজুন" value="${ORDER_FILTERS.q}" onkeydown="if(event.key==='Enter')applyOrderFilters()" /></div>
+        <div class="field">
+          <label>স্ট্যাটাস ফিল্টার</label>
+          <select id="ordStatusFilter" onchange="applyOrderFilters()">
+            <option value="">সব স্ট্যাটাস</option>
+            ${Object.keys(STATUS_L).map(k=>`<option value="${k}" ${ORDER_FILTERS.status===k?'selected':''}>${STATUS_L[k]}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <button class="btn small" onclick="applyOrderFilters()">🔍 খুঁজুন</button>
+    </div>
+    <div id="ordersListWrap"><div class="spinner">লোড হচ্ছে…</div></div>`;
+  await loadOrdersList();
+}
+function applyOrderFilters(){
+  ORDER_FILTERS.q = document.getElementById('ordSearch').value.trim();
+  ORDER_FILTERS.status = document.getElementById('ordStatusFilter').value;
+  loadOrdersList();
+}
+async function loadOrdersList(){
+  const wrap = document.getElementById('ordersListWrap');
+  wrap.innerHTML = '<div class="spinner">লোড হচ্ছে…</div>';
   try{
-    const {orders} = await adminApi('/admin/orders');
-    c.innerHTML = `
+    const qs = new URLSearchParams();
+    if(ORDER_FILTERS.q) qs.set('q', ORDER_FILTERS.q);
+    if(ORDER_FILTERS.status) qs.set('status', ORDER_FILTERS.status);
+    const {orders} = await adminApi('/admin/orders?'+qs.toString());
+    wrap.innerHTML = `
       <div class="card">
-        <h2>📦 অর্ডারসমূহ (${orders.length})</h2>
+        <h2>${orders.length} টি অর্ডার পাওয়া গেছে</h2>
         <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>অর্ডার নং</th><th>কাস্টমার</th><th>মোট</th><th>পেমেন্ট</th><th>স্ট্যাটাস</th><th>তারিখ</th></tr></thead>
+          <thead><tr><th>অর্ডার নং</th><th>কাস্টমার</th><th>মোট</th><th>পেমেন্ট</th><th>কুরিয়ার/ট্র্যাকিং</th><th>পেমেন্ট স্ট্যাটাস</th><th>অর্ডার স্ট্যাটাস</th><th>তারিখ</th><th></th></tr></thead>
           <tbody>
             ${orders.map(o=>`
               <tr>
                 <td>${o.order_no}</td>
                 <td>${o.name}<br><small style="color:#888">${o.phone}</small></td>
-                <td>৳${o.total}</td>
+                <td>৳${o.total}${o.discount?`<br><small style="color:#0a7a3d">-৳${o.discount} (${o.coupon_code||'কুপন'})</small>`:''}</td>
                 <td>${o.payment||'-'}</td>
                 <td>
-                  <select onchange="updateOrderStatus(${o.id}, this.value)">
+                  <input placeholder="কুরিয়ার" value="${o.courier||''}" style="margin-bottom:4px;font-size:12px;padding:5px 6px" onchange="updateOrderField(${o.id},'courier',this.value)" />
+                  <input placeholder="ট্র্যাকিং আইডি" value="${o.tracking_id||''}" style="font-size:12px;padding:5px 6px" onchange="updateOrderField(${o.id},'tracking_id',this.value)" />
+                </td>
+                <td>
+                  <select onchange="updateOrderField(${o.id},'payment_status',this.value)" style="font-size:12px;padding:5px 6px">
+                    ${Object.keys(PAY_STATUS_L).map(k=>`<option value="${k}" ${(o.payment_status||'unpaid')===k?'selected':''}>${PAY_STATUS_L[k]}</option>`).join('')}
+                  </select>
+                </td>
+                <td>
+                  <select onchange="updateOrderField(${o.id},'status',this.value)" style="font-size:12px;padding:5px 6px">
                     ${Object.keys(STATUS_L).map(k=>`<option value="${k}" ${o.status===k?'selected':''}>${STATUS_L[k]}</option>`).join('')}
                   </select>
                 </td>
                 <td><small>${(o.created_at||'').slice(0,16)}</small></td>
+                <td class="row-actions">
+                  <button class="btn gray small" onclick="toggleOrderHistory(${o.id})">🕓 ইতিহাস</button>
+                  <button class="btn small" onclick='printInvoice(${JSON.stringify(o)})'>🖨️ ইনভয়েস</button>
+                </td>
+              </tr>
+              <tr id="ordHist-${o.id}" class="hidden"><td colspan="9"><div id="ordHistBody-${o.id}" style="padding:8px;background:#fafafa;border-radius:8px"></div></td></tr>
+              `).join('')}
+          </tbody>
+        </table>
+        </div>
+        ${orders.length===0?'<p style="color:#888;margin-top:10px">কোনো অর্ডার পাওয়া যায়নি</p>':''}
+      </div>`;
+  }catch(e){ wrap.innerHTML = `<div class="msg error">${e.message}</div>`; }
+}
+async function updateOrderField(id, field, value){
+  try{
+    await adminApi('/admin/orders','PATCH',{id, [field]: value});
+    showMsg('✅ আপডেট হয়েছে','ok');
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function toggleOrderHistory(id){
+  const row = document.getElementById('ordHist-'+id);
+  const body = document.getElementById('ordHistBody-'+id);
+  if(!row.classList.contains('hidden')){ row.classList.add('hidden'); return; }
+  row.classList.remove('hidden');
+  body.innerHTML = 'লোড হচ্ছে…';
+  try{
+    const {history} = await adminApi('/admin/orders/history?id='+id);
+    body.innerHTML = history.length ? history.map(h=>`<div style="font-size:12.5px;padding:4px 0;border-bottom:1px solid #eee">${STATUS_L[h.status]||h.status} — <small style="color:#888">${(h.created_at||'').slice(0,16)}</small>${h.note?' — '+h.note:''}</div>`).join('') : '<span style="color:#888;font-size:12.5px">কোনো ইতিহাস নেই</span>';
+  }catch(e){ body.innerHTML = '<span style="color:#c22;font-size:12.5px">'+e.message+'</span>'; }
+}
+function printInvoice(o){
+  let items=[]; try{ items = typeof o.items==='string' ? JSON.parse(o.items) : o.items; }catch(e){ items=[]; }
+  const itemsHtml = Array.isArray(items) ? items.map(i=>`<div>${typeof i==='string'?i:JSON.stringify(i)}</div>`).join('') : String(items);
+  const w = window.open('','_blank');
+  w.document.write(`
+    <html><head><title>ইনভয়েস ${o.order_no}</title>
+    <style>body{font-family:sans-serif;padding:30px;max-width:600px;margin:0 auto}
+    h1{color:#F85606}.row{display:flex;justify-content:space-between;margin:6px 0}
+    table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:6px 0;border-bottom:1px solid #eee}
+    .total{font-size:18px;font-weight:800;margin-top:12px}</style></head>
+    <body>
+    <h1>NextGenTechBD — ইনভয়েস</h1>
+    <div class="row"><b>অর্ডার নং:</b><span>${o.order_no}</span></div>
+    <div class="row"><b>তারিখ:</b><span>${(o.created_at||'').slice(0,16)}</span></div>
+    <div class="row"><b>কাস্টমার:</b><span>${o.name}</span></div>
+    <div class="row"><b>ফোন:</b><span>${o.phone}</span></div>
+    <div class="row"><b>ঠিকানা:</b><span>${o.address||''} ${o.district||''}</span></div>
+    <div class="row"><b>পেমেন্ট:</b><span>${o.payment||'-'} (${PAY_STATUS_L[o.payment_status]||o.payment_status||''})</span></div>
+    <div class="row"><b>কুরিয়ার:</b><span>${o.courier||'-'} ${o.tracking_id?'('+o.tracking_id+')':''}</span></div>
+    <hr><h3>পণ্যসমূহ</h3>${itemsHtml}<hr>
+    <div class="row"><span>সাবটোটাল</span><span>৳${o.subtotal}</span></div>
+    <div class="row"><span>ডেলিভারি চার্জ</span><span>৳${o.delivery_fee||0}</span></div>
+    ${o.discount?`<div class="row"><span>ছাড় (${o.coupon_code||''})</span><span>-৳${o.discount}</span></div>`:''}
+    <div class="row total"><span>সর্বমোট</span><span>৳${o.total}</span></div>
+    <script>window.print()<\/script>
+    </body></html>`);
+  w.document.close();
+}
+
+/* ============ DASHBOARD ============ */
+async function renderDashboard(){
+  const c = document.getElementById('tabContent');
+  try{
+    const d = await adminApi('/admin/dashboard');
+    const maxWeekly = Math.max(1, ...d.weekly_sales.map(w=>w.revenue));
+    const maxBest = Math.max(1, ...d.best_selling.map(b=>b.sold||0));
+    const maxCat = Math.max(1, ...d.sales_by_category.map(x=>x.products));
+    c.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="n">৳${d.today.revenue}</div><div class="l">আজকের বিক্রি</div></div>
+        <div class="stat-card"><div class="n">${d.today.orders}</div><div class="l">আজকের অর্ডার</div></div>
+        <div class="stat-card"><div class="n">${d.new_customers_today}</div><div class="l">আজকের নতুন কাস্টমার</div></div>
+        <div class="stat-card"><div class="n">৳${d.total_revenue}</div><div class="l">সর্বমোট রেভিনিউ</div></div>
+        <div class="stat-card"><div class="n">${d.pending_orders}</div><div class="l">Pending অর্ডার</div></div>
+        <div class="stat-card"><div class="n">${d.delivered_orders}</div><div class="l">Delivered অর্ডার</div></div>
+        <div class="stat-card"><div class="n">${d.total_customers}</div><div class="l">মোট কাস্টমার</div></div>
+        <div class="stat-card"><div class="n">${d.low_stock.length}</div><div class="l">লো-স্টক পণ্য</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h2>📈 গত ৭ দিনের বিক্রি</h2>
+          ${d.weekly_sales.length? d.weekly_sales.map(w=>`
+            <div class="bar-row"><span class="lbl">${w.day}</span><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(w.revenue/maxWeekly*100)}%"></div></div><span class="val">৳${w.revenue}</span></div>
+          `).join('') : '<p style="color:#888;font-size:13px">এখনো কোনো ডেটা নেই</p>'}
+        </div>
+        <div class="card">
+          <h2>🏆 সর্বাধিক বিক্রিত পণ্য</h2>
+          ${d.best_selling.length? d.best_selling.map(b=>`
+            <div class="bar-row"><span class="lbl">${b.name}</span><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round((b.sold||0)/maxBest*100)}%"></div></div><span class="val">${b.sold||0}</span></div>
+          `).join('') : '<p style="color:#888;font-size:13px">এখনো কোনো ডেটা নেই</p>'}
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h2>🗂️ ক্যাটাগরি অনুযায়ী পণ্য</h2>
+          ${d.sales_by_category.map(x=>`
+            <div class="bar-row"><span class="lbl">${x.cat}</span><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(x.products/maxCat*100)}%"></div></div><span class="val">${x.products}</span></div>
+          `).join('')}
+        </div>
+        <div class="card">
+          <h2>📊 অর্ডার স্ট্যাটাস ব্রেকডাউন</h2>
+          ${d.status_breakdown.map(x=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f2f2f2;font-size:13px"><span>${STATUS_L[x.status]||x.status}</span><b>${x.c}</b></div>`).join('')}
+        </div>
+      </div>
+      ${d.low_stock.length? `
+      <div class="card">
+        <h2>⚠️ লো-স্টক পণ্য</h2>
+        <table><thead><tr><th>নাম</th><th>বর্তমান স্টক</th><th>অ্যালার্ট লিমিট</th></tr></thead>
+        <tbody>${d.low_stock.map(p=>`<tr><td>${p.name}</td><td>${stockBadge(p)}</td><td>${p.low_stock_at}</td></tr>`).join('')}</tbody></table>
+      </div>` : ''}`;
+  }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
+}
+
+/* ============ CUSTOMERS ============ */
+async function renderCustomers(q){
+  const c = document.getElementById('tabContent');
+  try{
+    const qs = q ? '?q='+encodeURIComponent(q) : '';
+    const {customers} = await adminApi('/admin/customers'+qs);
+    c.innerHTML = `
+      <div class="card">
+        <h2>👥 কাস্টমারসমূহ (${customers.length})</h2>
+        <div class="field" style="max-width:320px"><input id="custSearchBox" placeholder="🔍 নাম/ফোন/ইমেইল দিয়ে খুঁজুন" value="${q||''}" onkeydown="if(event.key==='Enter')renderCustomers(this.value)" /></div>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>নাম</th><th>ফোন/ইমেইল</th><th>মোট অর্ডার</th><th>মোট কেনাকাটা</th><th>Pending/Completed</th><th>নোট</th><th>স্ট্যাটাস</th></tr></thead>
+          <tbody>
+            ${customers.map(cu=>`
+              <tr>
+                <td>${cu.name}</td>
+                <td>${cu.phone}<br><small style="color:#888">${cu.email||''}</small></td>
+                <td>${cu.total_orders}</td>
+                <td>৳${cu.total_spent}</td>
+                <td>${cu.pending_orders||0} / ${cu.completed_orders||0}</td>
+                <td><input value="${(cu.notes||'').replace(/"/g,'&quot;')}" placeholder="নোট লিখুন" style="font-size:12px;padding:5px 6px" onchange="updateCustomer(${cu.id},{notes:this.value})" /></td>
+                <td>
+                  ${cu.blocked
+                    ? `<span class="badge danger">ব্লকড</span> <button class="btn gray small" onclick="updateCustomer(${cu.id},{blocked:false})">আনব্লক</button>`
+                    : `<span class="badge ok">সক্রিয়</span> <button class="btn red small" onclick="updateCustomer(${cu.id},{blocked:true})">ব্লক</button>`}
+                </td>
               </tr>`).join('')}
           </tbody>
         </table>
         </div>
-        ${orders.length===0?'<p style="color:#888;margin-top:10px">এখনো কোনো অর্ডার আসেনি</p>':''}
+        ${customers.length===0?'<p style="color:#888;margin-top:10px">কোনো কাস্টমার পাওয়া যায়নি</p>':''}
       </div>`;
   }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
 }
-async function updateOrderStatus(id, status){
+async function updateCustomer(id, patch){
   try{
-    await adminApi('/admin/orders','PATCH',{id,status});
-    showMsg('✅ অর্ডারের স্ট্যাটাস আপডেট হয়েছে','ok');
+    await adminApi('/admin/customers','PATCH',{id, ...patch});
+    showMsg('✅ আপডেট হয়েছে','ok');
+    if(patch.blocked!==undefined) renderCustomers();
   }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+
+/* ============ COUPONS ============ */
+async function renderCoupons(){
+  const c = document.getElementById('tabContent');
+  try{
+    const [{coupons},{categories}] = await Promise.all([adminApi('/admin/coupons'), adminApi('/admin/categories')]);
+    c.innerHTML = `
+      <div class="card">
+        <h2>➕ নতুন কুপন তৈরি / সম্পাদনা</h2>
+        <form onsubmit="saveCoupon(event)">
+          <input type="hidden" id="cp_id" />
+          <div class="grid3">
+            <div class="field"><label>কুপন কোড *</label><input id="cp_code" required placeholder="যেমন: EID50" /></div>
+            <div class="field"><label>টাইপ *</label><select id="cp_type"><option value="percent">শতাংশ (%)</option><option value="fixed">নির্দিষ্ট পরিমাণ (৳)</option></select></div>
+            <div class="field"><label>ভ্যালু *</label><input id="cp_value" type="number" step="0.01" required /></div>
+          </div>
+          <div class="grid3">
+            <div class="field"><label>সর্বনিম্ন কেনাকাটা (৳)</label><input id="cp_min" type="number" value="0" /></div>
+            <div class="field"><label>নির্দিষ্ট ক্যাটাগরি (ঐচ্ছিক)</label><select id="cp_cat"><option value="">সব ক্যাটাগরি</option>${categories.map(x=>`<option value="${x.id}">${x.e||''} ${x.name}</option>`).join('')}</select></div>
+            <div class="field"><label>ব্যবহারসীমা (ঐচ্ছিক)</label><input id="cp_limit" type="number" placeholder="খালি=অসীম" /></div>
+          </div>
+          <div class="grid3">
+            <div class="field"><label>শুরুর তারিখ</label><input id="cp_start" type="date" /></div>
+            <div class="field"><label>শেষ তারিখ</label><input id="cp_end" type="date" /></div>
+            <div class="field" style="display:flex;gap:14px;align-items:center;padding-top:22px">
+              <label style="display:flex;align-items:center;gap:4px;margin:0"><input type="checkbox" id="cp_first" style="width:auto">প্রথম অর্ডার</label>
+              <label style="display:flex;align-items:center;gap:4px;margin:0"><input type="checkbox" id="cp_ship" style="width:auto">ফ্রি শিপিং</label>
+              <label style="display:flex;align-items:center;gap:4px;margin:0"><input type="checkbox" id="cp_active" style="width:auto" checked>সক্রিয়</label>
+            </div>
+          </div>
+          <div class="row-actions">
+            <button type="submit" class="btn">💾 সংরক্ষণ করুন</button>
+            <button type="button" class="btn gray" onclick="resetCouponForm()">✖ ফর্ম খালি করুন</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h2>🎟️ সব কুপন (${coupons.length})</h2>
+        <table>
+          <thead><tr><th>কোড</th><th>ছাড়</th><th>শর্ত</th><th>ব্যবহার</th><th>মেয়াদ</th><th>স্ট্যাটাস</th><th></th></tr></thead>
+          <tbody>
+            ${coupons.map(cp=>`
+              <tr>
+                <td><b>${cp.code}</b></td>
+                <td>${cp.type==='percent'?cp.value+'%':'৳'+cp.value}${cp.free_shipping?' + ফ্রি শিপিং':''}</td>
+                <td><small>${cp.min_purchase?'সর্বনিম্ন ৳'+cp.min_purchase:'—'}${cp.first_order_only?' • প্রথম অর্ডার':''}${cp.cat?' • '+cp.cat:''}</small></td>
+                <td>${cp.used_count}${cp.usage_limit?'/'+cp.usage_limit:''}</td>
+                <td><small>${cp.start_date||'—'} → ${cp.end_date||'অসীম'}</small></td>
+                <td>${cp.active?'<span class="badge ok">সক্রিয়</span>':'<span class="badge danger">বন্ধ</span>'}</td>
+                <td class="row-actions">
+                  <button class="btn gray small" onclick='editCoupon(${JSON.stringify(cp)})'>✏️</button>
+                  <button class="btn red small" onclick="deleteCoupon(${cp.id})">🗑️</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+        ${coupons.length===0?'<p style="color:#888;margin-top:10px">এখনো কোনো কুপন তৈরি হয়নি</p>':''}
+      </div>`;
+  }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
+}
+function resetCouponForm(){
+  ['cp_id','cp_code','cp_value','cp_limit','cp_start','cp_end'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cp_type').value='percent';
+  document.getElementById('cp_cat').value='';
+  document.getElementById('cp_min').value='0';
+  document.getElementById('cp_first').checked=false;
+  document.getElementById('cp_ship').checked=false;
+  document.getElementById('cp_active').checked=true;
+}
+function editCoupon(cp){
+  document.getElementById('cp_id').value=cp.id;
+  document.getElementById('cp_code').value=cp.code;
+  document.getElementById('cp_type').value=cp.type;
+  document.getElementById('cp_value').value=cp.value;
+  document.getElementById('cp_min').value=cp.min_purchase||0;
+  document.getElementById('cp_cat').value=cp.cat||'';
+  document.getElementById('cp_limit').value=cp.usage_limit||'';
+  document.getElementById('cp_start').value=cp.start_date||'';
+  document.getElementById('cp_end').value=cp.end_date||'';
+  document.getElementById('cp_first').checked=!!cp.first_order_only;
+  document.getElementById('cp_ship').checked=!!cp.free_shipping;
+  document.getElementById('cp_active').checked=!!cp.active;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function saveCoupon(ev){
+  ev.preventDefault();
+  const val = id => document.getElementById(id).value.trim();
+  const body = {
+    id: val('cp_id')||undefined, code: val('cp_code'), type: val('cp_type'), value: Number(val('cp_value')),
+    min_purchase: Number(val('cp_min'))||0, cat: val('cp_cat')||undefined,
+    usage_limit: val('cp_limit')||undefined, start_date: val('cp_start')||undefined, end_date: val('cp_end')||undefined,
+    first_order_only: document.getElementById('cp_first').checked, free_shipping: document.getElementById('cp_ship').checked,
+    active: document.getElementById('cp_active').checked
+  };
+  try{
+    await adminApi('/admin/coupons','POST',body);
+    showMsg('✅ কুপন সংরক্ষণ হয়েছে','ok');
+    resetCouponForm();
+    renderCoupons();
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function deleteCoupon(id){
+  if(!confirm('এই কুপনটি মুছে ফেলতে চান?')) return;
+  try{
+    await adminApi('/admin/coupons?id='+id,'DELETE');
+    showMsg('🗑️ কুপন মুছে ফেলা হয়েছে','ok');
+    renderCoupons();
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+
+/* ============ BANNERS ============ */
+async function renderBanners(){
+  const c = document.getElementById('tabContent');
+  try{
+    const {banners} = await adminApi('/admin/banners');
+    c.innerHTML = `
+      <div class="card">
+        <h2>➕ নতুন ব্যানার/স্লাইড যোগ / সম্পাদনা</h2>
+        <form onsubmit="saveBanner(event)">
+          <input type="hidden" id="bn_id" />
+          <div class="grid2">
+            <div class="field"><label>শিরোনাম *</label><input id="bn_title" required /></div>
+            <div class="field"><label>সাবটাইটেল</label><input id="bn_subtitle" /></div>
+          </div>
+          <div class="field">
+            <label>ব্যানার ছবি</label>
+            <input type="file" id="bn_img_file" accept="image/*" onchange="uploadBannerImage(this)" />
+            <input type="hidden" id="bn_img" />
+            <div id="bn_img_status" style="font-size:12px;color:#888;margin-top:6px"></div>
+            <img id="bn_img_preview" style="display:none;max-width:200px;border-radius:8px;margin-top:8px;border:1px solid #eee" />
+          </div>
+          <div class="grid2">
+            <div class="field"><label>বাটন টেক্সট</label><input id="bn_btn_text" placeholder="এখনই কিনুন" /></div>
+            <div class="field"><label>বাটন লিংক</label><input id="bn_btn_url" placeholder="/#category=electronics" /></div>
+          </div>
+          <div class="grid3">
+            <div class="field"><label>শুরুর তারিখ</label><input id="bn_start" type="date" /></div>
+            <div class="field"><label>শেষ তারিখ</label><input id="bn_end" type="date" /></div>
+            <div class="field"><label>ক্রম</label><input id="bn_sort" type="number" value="0" /></div>
+          </div>
+          <div class="field" style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" id="bn_active" style="width:auto" checked /> <label style="margin:0">সক্রিয়?</label>
+          </div>
+          <div class="row-actions">
+            <button type="submit" class="btn">💾 সংরক্ষণ করুন</button>
+            <button type="button" class="btn gray" onclick="resetBannerForm()">✖ ফর্ম খালি করুন</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h2>🖼️ সব ব্যানার (${banners.length})</h2>
+        <table>
+          <thead><tr><th>ছবি</th><th>শিরোনাম</th><th>মেয়াদ</th><th>স্ট্যাটাস</th><th></th></tr></thead>
+          <tbody>
+            ${banners.map(b=>`
+              <tr>
+                <td>${b.img?`<img src="${b.img}" style="width:60px;height:36px;object-fit:cover;border-radius:6px">`:'—'}</td>
+                <td>${b.title}<br><small style="color:#888">${b.subtitle||''}</small></td>
+                <td><small>${b.start_date||'—'} → ${b.end_date||'অসীম'}</small></td>
+                <td>${b.active?'<span class="badge ok">সক্রিয়</span>':'<span class="badge danger">বন্ধ</span>'}</td>
+                <td class="row-actions">
+                  <button class="btn gray small" onclick='editBanner(${JSON.stringify(b)})'>✏️</button>
+                  <button class="btn red small" onclick="deleteBanner(${b.id})">🗑️</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+        ${banners.length===0?'<p style="color:#888;margin-top:10px">এখনো কোনো ব্যানার যোগ করা হয়নি</p>':''}
+      </div>`;
+  }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
+}
+async function uploadBannerImage(input){
+  const file = input.files[0]; if(!file) return;
+  const statusEl = document.getElementById('bn_img_status');
+  const prev = document.getElementById('bn_img_preview');
+  prev.src = URL.createObjectURL(file); prev.style.display='block';
+  statusEl.textContent = '⏳ আপলোড হচ্ছে…';
+  try{
+    const fd = new FormData(); fd.append('file', file);
+    const r = await fetch(API+'/admin/upload', { method:'POST', headers:{'X-Admin-Key':ADMIN_KEY}, body:fd });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error || 'আপলোড ব্যর্থ হয়েছে');
+    document.getElementById('bn_img').value = j.url;
+    prev.src = j.url;
+    statusEl.textContent = '✅ ছবি আপলোড হয়েছে';
+  }catch(e){ statusEl.textContent = '❌ '+e.message; }
+}
+function resetBannerForm(){
+  ['bn_id','bn_title','bn_subtitle','bn_img','bn_btn_text','bn_btn_url','bn_start','bn_end'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bn_sort').value='0';
+  document.getElementById('bn_active').checked=true;
+  document.getElementById('bn_img_file').value='';
+  document.getElementById('bn_img_status').textContent='';
+  const prev=document.getElementById('bn_img_preview'); prev.src=''; prev.style.display='none';
+}
+function editBanner(b){
+  document.getElementById('bn_id').value=b.id;
+  document.getElementById('bn_title').value=b.title||'';
+  document.getElementById('bn_subtitle').value=b.subtitle||'';
+  document.getElementById('bn_img').value=b.img||'';
+  document.getElementById('bn_btn_text').value=b.button_text||'';
+  document.getElementById('bn_btn_url').value=b.button_url||'';
+  document.getElementById('bn_start').value=b.start_date||'';
+  document.getElementById('bn_end').value=b.end_date||'';
+  document.getElementById('bn_sort').value=b.sort_order||0;
+  document.getElementById('bn_active').checked=!!b.active;
+  const prev=document.getElementById('bn_img_preview');
+  if(b.img){ prev.src=b.img; prev.style.display='block'; }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function saveBanner(ev){
+  ev.preventDefault();
+  const val = id => document.getElementById(id).value.trim();
+  const body = {
+    id: val('bn_id')||undefined, title: val('bn_title'), subtitle: val('bn_subtitle'), img: val('bn_img'),
+    button_text: val('bn_btn_text'), button_url: val('bn_btn_url'), start_date: val('bn_start')||undefined, end_date: val('bn_end')||undefined,
+    sort_order: Number(val('bn_sort'))||0, active: document.getElementById('bn_active').checked
+  };
+  try{
+    await adminApi('/admin/banners','POST',body);
+    showMsg('✅ ব্যানার সংরক্ষণ হয়েছে','ok');
+    resetBannerForm();
+    renderBanners();
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function deleteBanner(id){
+  if(!confirm('এই ব্যানারটি মুছে ফেলতে চান?')) return;
+  try{
+    await adminApi('/admin/banners?id='+id,'DELETE');
+    showMsg('🗑️ ব্যানার মুছে ফেলা হয়েছে','ok');
+    renderBanners();
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+
+/* ============ REVIEWS ============ */
+let REVIEW_FILTER='';
+async function renderReviews(){
+  const c = document.getElementById('tabContent');
+  try{
+    const qs = REVIEW_FILTER ? '?status='+REVIEW_FILTER : '';
+    const {reviews} = await adminApi('/admin/reviews'+qs);
+    c.innerHTML = `
+      <div class="card">
+        <h2>⭐ পণ্যের রিভিউ (${reviews.length})</h2>
+        <div class="tabs" style="margin:0 0 14px">
+          ${['','pending','approved','rejected'].map(s=>`<div class="tab ${REVIEW_FILTER===s?'on':''}" onclick="REVIEW_FILTER='${s}';renderReviews()">${s===''?'সব':s==='pending'?'পেন্ডিং':s==='approved'?'অনুমোদিত':'বাতিল'}</div>`).join('')}
+        </div>
+        <table>
+          <thead><tr><th>পণ্য</th><th>গ্রাহক</th><th>রেটিং</th><th>মন্তব্য</th><th>স্ট্যাটাস</th><th>ফিচার্ড</th><th></th></tr></thead>
+          <tbody>
+            ${reviews.map(r=>`
+              <tr>
+                <td>${r.product_name||'পণ্য #'+r.product_id}</td>
+                <td>${r.customer_name}</td>
+                <td>${'⭐'.repeat(r.rating)}</td>
+                <td><small>${(r.comment||'').slice(0,80)}</small></td>
+                <td>
+                  <select onchange="updateReview(${r.id},{status:this.value})" style="font-size:12px;padding:5px 6px">
+                    <option value="pending" ${r.status==='pending'?'selected':''}>পেন্ডিং</option>
+                    <option value="approved" ${r.status==='approved'?'selected':''}>অনুমোদিত</option>
+                    <option value="rejected" ${r.status==='rejected'?'selected':''}>বাতিল</option>
+                  </select>
+                </td>
+                <td><input type="checkbox" style="width:auto" ${r.featured?'checked':''} onchange="updateReview(${r.id},{featured:this.checked})" /></td>
+                <td><button class="btn red small" onclick="deleteReview(${r.id})">🗑️</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+        ${reviews.length===0?'<p style="color:#888;margin-top:10px">এই ফিল্টারে কোনো রিভিউ নেই</p>':''}
+      </div>`;
+  }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
+}
+async function updateReview(id, patch){
+  try{
+    await adminApi('/admin/reviews','PATCH',{id, ...patch});
+    showMsg('✅ আপডেট হয়েছে','ok');
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function deleteReview(id){
+  if(!confirm('এই রিভিউটি মুছে ফেলতে চান?')) return;
+  try{
+    await adminApi('/admin/reviews?id='+id,'DELETE');
+    showMsg('🗑️ রিভিউ মুছে ফেলা হয়েছে','ok');
+    renderReviews();
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+
+/* ============ SECURITY ============ */
+async function renderSecurity(){
+  const c = document.getElementById('tabContent');
+  try{
+    const {logs} = await adminApi('/admin/login-log');
+    c.innerHTML = `
+      <div class="note-box">ℹ️ এই ভার্সনে একটাই অ্যাডমিন কী (ADMIN_KEY) ব্যবহার হয় — একাধিক স্টাফ অ্যাকাউন্ট/পারমিশন সিস্টেম ও 2FA এখনো যোগ করা হয়নি (এগুলোর জন্য বড় আর্কিটেকচার পরিবর্তন লাগবে, চাইলে পরে আলাদাভাবে যোগ করে দেওয়া যাবে)।</div>
+      <div class="card">
+        <h2>🔐 অ্যাডমিন লগইন লগ (সাম্প্রতিক ১০০টি)</h2>
+        <table>
+          <thead><tr><th>ফলাফল</th><th>IP</th><th>ডিভাইস</th><th>সময়</th></tr></thead>
+          <tbody>
+            ${logs.map(l=>`
+              <tr>
+                <td>${l.success?'<span class="badge ok">সফল</span>':'<span class="badge danger">ব্যর্থ</span>'}</td>
+                <td><small>${l.ip||'—'}</small></td>
+                <td><small>${(l.user_agent||'').slice(0,50)}</small></td>
+                <td><small>${(l.created_at||'').slice(0,16)}</small></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+        ${logs.length===0?'<p style="color:#888;margin-top:10px">এখনো কোনো লগইন লগ নেই</p>':''}
+      </div>`;
+  }catch(e){ c.innerHTML = `<div class="msg error">${e.message}</div>`; }
+}
+
+/* ============ BACKUP & EXPORT ============ */
+function toCSV(rows, headers){
+  const esc = v => '"'+String(v===null||v===undefined?'':v).replace(/"/g,'""')+'"';
+  const lines = [headers.map(esc).join(',')];
+  rows.forEach(r=>lines.push(headers.map(h=>esc(r[h])).join(',')));
+  return lines.join('\r\n');
+}
+function downloadCSV(filename, csv){
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+async function exportProductsCSV(){
+  try{
+    const {products} = await adminApi('/admin/products');
+    downloadCSV('products.csv', toCSV(products, ['id','name','name_en','cat','price','old','sku','stock','sold','f']));
+    showMsg('✅ এক্সপোর্ট হয়েছে','ok');
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function exportOrdersCSV(){
+  try{
+    const {orders} = await adminApi('/admin/orders');
+    downloadCSV('orders.csv', toCSV(orders, ['id','order_no','name','phone','address','district','payment','payment_status','status','courier','tracking_id','subtotal','delivery_fee','discount','total','created_at']));
+    showMsg('✅ এক্সপোর্ট হয়েছে','ok');
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function exportCustomersCSV(){
+  try{
+    const {customers} = await adminApi('/admin/customers');
+    downloadCSV('customers.csv', toCSV(customers, ['id','name','phone','email','total_orders','total_spent','blocked','created_at']));
+    showMsg('✅ এক্সপোর্ট হয়েছে','ok');
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+function renderBackup(){
+  const c = document.getElementById('tabContent');
+  c.innerHTML = `
+    <div class="card">
+      <h2>💾 CSV এক্সপোর্ট</h2>
+      <p style="color:#888;font-size:12.5px;margin-bottom:14px">নিচের বাটনগুলো দিয়ে পণ্য/অর্ডার/কাস্টমারের তালিকা CSV (Excel-এ খোলা যায়) ফাইল আকারে ডাউনলোড করতে পারবেন।</p>
+      <div class="row-actions" style="flex-wrap:wrap">
+        <button class="btn" onclick="exportProductsCSV()">📦 পণ্য এক্সপোর্ট</button>
+        <button class="btn" onclick="exportOrdersCSV()">🧾 অর্ডার এক্সপোর্ট</button>
+        <button class="btn" onclick="exportCustomersCSV()">👥 কাস্টমার এক্সপোর্ট</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🗄️ সম্পূর্ণ ডেটাবেজ ব্যাকআপ/রিস্টোর</h2>
+      <p style="color:#888;font-size:12.5px">সম্পূর্ণ ডেটাবেজের (সব টেবিল একসাথে) ব্যাকআপ ব্রাউজার থেকে নেওয়া নিরাপদ নয় — এর জন্য Cloudflare-এর নিজস্ব <b>wrangler CLI</b> ব্যবহার করাই সবচেয়ে নির্ভরযোগ্য। আপনার কম্পিউটারের টার্মিনালে এই কমান্ড চালান:</p>
+      <pre style="background:#f6f6f6;padding:10px 12px;border-radius:8px;font-size:12.5px;overflow-x:auto;margin-top:8px">npx wrangler d1 export nextgentechbd-db --remote --output=backup.sql</pre>
+      <p style="color:#888;font-size:12.5px;margin-top:8px">এটা পুরো ডেটাবেজের একটা <code>.sql</code> ফাইল আপনার কম্পিউটারে সেভ করবে, যা দরকার হলে <code>wrangler d1 execute</code> দিয়ে আবার রিস্টোর করা যাবে। বিস্তারিত DEPLOY-GUIDE.md-এ আছে।</p>
+    </div>`;
 }
 
 /* ============ BOOT ============ */

@@ -10,7 +10,7 @@ export async function onRequestGet(context) {
   if (denied) return denied;
   try {
     const res = await env.DB.prepare(
-      'SELECT id, cat, name, name_en, price, old, e, img, r, rv, sold, tag, f, colors, sizes FROM products ORDER BY id DESC'
+      'SELECT id, cat, name, name_en, price, old, e, img, r, rv, sold, tag, f, colors, sizes, sku, stock, low_stock_at FROM products ORDER BY id DESC'
     ).all();
     const products = (res.results || []).map((p) => ({
       ...p,
@@ -35,27 +35,31 @@ export async function onRequestPost(context) {
     const colors = Array.isArray(b.colors) && b.colors.length ? JSON.stringify(b.colors) : null;
     const sizes = Array.isArray(b.sizes) && b.sizes.length ? JSON.stringify(b.sizes) : null;
     const f = b.f ? 1 : 0;
+    const stock = b.stock !== undefined && b.stock !== '' ? Number(b.stock) : null;
+    const lowStockAt = b.low_stock_at !== undefined && b.low_stock_at !== '' ? Number(b.low_stock_at) : 5;
 
     if (b.id) {
       await env.DB.prepare(
-        `UPDATE products SET cat=?, name=?, name_en=?, price=?, old=?, e=?, img=?, r=?, rv=?, sold=?, tag=?, f=?, colors=?, sizes=? WHERE id=?`
+        `UPDATE products SET cat=?, name=?, name_en=?, price=?, old=?, e=?, img=?, r=?, rv=?, sold=?, tag=?, f=?, colors=?, sizes=?, sku=?, stock=?, low_stock_at=? WHERE id=?`
       )
         .bind(
           b.cat, b.name, b.name_en || null, Number(b.price), b.old ? Number(b.old) : null,
           b.e || null, b.img || null, b.r ? Number(b.r) : null, b.rv ? Number(b.rv) : null,
-          b.sold ? Number(b.sold) : null, b.tag || null, f, colors, sizes, Number(b.id)
+          b.sold ? Number(b.sold) : null, b.tag || null, f, colors, sizes,
+          b.sku || null, stock, lowStockAt, Number(b.id)
         )
         .run();
       return json({ ok: true, id: Number(b.id) });
     } else {
       const res = await env.DB.prepare(
-        `INSERT INTO products (cat, name, name_en, price, old, e, img, r, rv, sold, tag, f, colors, sizes)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO products (cat, name, name_en, price, old, e, img, r, rv, sold, tag, f, colors, sizes, sku, stock, low_stock_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
         .bind(
           b.cat, b.name, b.name_en || null, Number(b.price), b.old ? Number(b.old) : null,
           b.e || null, b.img || null, b.r ? Number(b.r) : null, b.rv ? Number(b.rv) : null,
-          b.sold ? Number(b.sold) : null, b.tag || null, f, colors, sizes
+          b.sold ? Number(b.sold) : null, b.tag || null, f, colors, sizes,
+          b.sku || null, stock, lowStockAt
         )
         .run();
       return json({ ok: true, id: res.meta.last_row_id });

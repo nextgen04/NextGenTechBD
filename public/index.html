@@ -1018,7 +1018,7 @@ function renderCart(){
   return;
  }
  const sub=cartSubtotal();
- const freeLeft=1999-sub;
+ const freeLeft=freeDeliveryThreshold()-sub;
  $('drawerItems').innerHTML=ids.map(id=>{const p=byId(+id),q=state.cart[id];if(!p)return'';
   return '<div class="ci"><div class="ciem'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+photoOrEmoji(p,'')+'</div>'+
   '<div class="cinfo"><div class="nm">'+nameOf(p)+'</div><div class="pr">'+money(p.price)+' '+(p.old?'<s style="color:#bbb;font-weight:400;font-size:11.5px">'+money(p.old)+'</s>':'')+'</div>'+
@@ -1028,7 +1028,7 @@ function renderCart(){
  $('drawerFoot').innerHTML=
   (freeLeft>0?'<div class="free-ship-note warn">'+t('add_more_free')+'<b>'+money(freeLeft)+'</b>'+t('add_more_free2')+'</div>':'<div class="free-ship-note">'+t('free_congrats')+'</div>')+
   '<div class="totals"><div class="row"><span>'+t('total_items_lbl')+cartCount()+t('total_items_lbl2')+'</span><span>'+money(sub)+'</span></div>'+
-  '<div class="row"><span>'+t('delivery_fee_lbl')+'</span><span>'+(sub>=1999?t('free_word'):(LANG==='en'?'Calculated at checkout':'চেকআউটে হিসাব'))+'</span></div>'+
+  '<div class="row"><span>'+t('delivery_fee_lbl')+'</span><span>'+(sub>=freeDeliveryThreshold()?t('free_word'):(LANG==='en'?'Calculated at checkout':'চেকআউটে হিসাব'))+'</span></div>'+
   '<div class="row grand"><span>'+t('subtotal_lbl')+'</span><span>'+money(sub)+'</span></div></div>'+
   '<button class="btn-block" onclick="openCheckout()">'+t('checkout_btn')+'</button>';
 }
@@ -1042,6 +1042,7 @@ function openCheckout(){
  const items=ckItems();
  if(!items.length){toast(t('cart_first_toast'));return}
  closeCart();
+ APPLIED_COUPON=null;
  const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
  $('checkoutBody').innerHTML=
   '<div class="ck-items">'+items.map(i=>'<div class="cki"><span>'+i.p.e+' '+nameOf(i.p).slice(0,30)+' × '+i.q+'</span><b>'+money(i.p.price*i.q)+'</b></div>').join('')+'</div>'+
@@ -1058,9 +1059,11 @@ function openCheckout(){
    '<label class="payopt" data-pay="নগদ" onclick="pickPay(this)"><span class="pe">📱</span><span>'+t('nagad')+'<br><small style="color:#888;font-weight:400">'+SETTINGS.payment.nagad+t('send_money_suffix')+'</small></span></label>'+
    '<label class="payopt" data-pay="রকেট" onclick="pickPay(this)"><span class="pe">📱</span><span>'+t('rocket')+'<br><small style="color:#888;font-weight:400">'+SETTINGS.payment.rocket+t('send_money_suffix')+'</small></span></label>'+
   '</div></div>'+
+  '<div class="fgroup"><label>🎟️ কুপন কোড (থাকলে)</label><div style="display:flex;gap:8px"><input id="ckCoupon" placeholder="যেমন: EID50" style="flex:1"><button type="button" class="btn gray" style="padding:9px 14px" onclick="applyCoupon()">প্রয়োগ করুন</button></div><div id="ckCouponMsg" style="font-size:12.5px;margin-top:6px"></div></div>'+
   '<div class="totals" style="background:#fafafa;border-radius:10px;padding:12px 14px;margin-bottom:14px">'+
    '<div class="row"><span>'+t('subtotal_lbl')+'</span><span>'+money(sub)+'</span></div>'+
-   '<div class="row"><span>'+t('delivery_fee_lbl')+'</span><span id="ckFee">'+(sub>=1999?t('free_word'):'—')+'</span></div>'+
+   '<div class="row"><span>'+t('delivery_fee_lbl')+'</span><span id="ckFee">'+(sub>=freeDeliveryThreshold()?t('free_word'):'—')+'</span></div>'+
+   '<div class="row" id="ckDiscRow" style="display:none"><span>🎟️ ছাড়</span><span id="ckDiscVal" style="color:#0a7a3d">-৳0</span></div>'+
    '<div class="row grand"><span>'+t('grand_total_lbl')+'</span><span id="ckGrand"></span></div>'+
   '</div>'+
   '<button class="btn-block" id="ckSubmit" type="submit">'+t('confirm_order_btn')+'</button>'+
@@ -1071,12 +1074,47 @@ function openCheckout(){
 const DISTRICTS=[['ঢাকা','Dhaka'],['চট্টগ্রাম','Chattogram'],['খুলনা','Khulna'],['রাজশাহী','Rajshahi'],['সিলেট','Sylhet'],['বরিশাল','Barishal'],['রংপুর','Rangpur'],['ময়মনসিংহ','Mymensingh'],['কুমিল্লা','Cumilla'],['নারায়ণগঞ্জ','Narayanganj']];
 const districtOptions=()=>DISTRICTS.map(d=>'<option value="'+d[0]+'">'+(LANG==='en'?d[1]:d[0])+'</option>').join('');
 function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel')}
-function ckFeeOf(){const items=ckItems();const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);if(sub>=1999)return 0;const d=$('ckDist');return d&&d.value==='ঢাকা'?60:120}
+function freeDeliveryThreshold(){return (SETTINGS.delivery&&SETTINGS.delivery.free_threshold)||1999}
+function deliveryDhakaFee(){return (SETTINGS.delivery&&SETTINGS.delivery.dhaka!==undefined)?SETTINGS.delivery.dhaka:60}
+function deliveryOutsideFee(){return (SETTINGS.delivery&&SETTINGS.delivery.outside!==undefined)?SETTINGS.delivery.outside:120}
+let APPLIED_COUPON=null;
+function ckFeeOf(){
+ const items=ckItems();const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
+ if(APPLIED_COUPON&&APPLIED_COUPON.free_shipping)return 0;
+ if(sub>=freeDeliveryThreshold())return 0;
+ const d=$('ckDist');return d&&d.value==='ঢাকা'?deliveryDhakaFee():deliveryOutsideFee();
+}
+async function applyCoupon(){
+ const code=$('ckCoupon').value.trim();
+ const msgEl=$('ckCouponMsg');
+ if(!code){msgEl.innerHTML='';return}
+ const items=ckItems();const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
+ const phone=$('ckPhone')?$('ckPhone').value.trim():'';
+ try{
+  const j=await apiSend('/api/coupons/validate','POST',{code,subtotal:sub,phone});
+  APPLIED_COUPON=j;
+  msgEl.innerHTML='<span style="color:#0a7a3d">✅ "'+j.code+'" প্রয়োগ হয়েছে — '+(j.type==='percent'?j.value+'% ছাড়':money(j.discount)+' ছাড়')+(j.free_shipping?' + ফ্রি ডেলিভারি':'')+'</span>';
+ }catch(e){
+  APPLIED_COUPON=null;
+  msgEl.innerHTML='<span style="color:#c22">❌ '+e.message+'</span>';
+ }
+ recalcCk();
+}
+function removeCoupon(){
+ APPLIED_COUPON=null;
+ $('ckCoupon').value='';
+ $('ckCouponMsg').innerHTML='';
+ recalcCk();
+}
 function recalcCk(){
  const items=ckItems();const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
  const fee=ckFeeOf();
+ const discount=APPLIED_COUPON?Math.min(APPLIED_COUPON.discount,sub):0;
  $('ckFee').innerHTML=fee===0?t('free_word'):money(fee);
- $('ckGrand').textContent=money(sub+fee);
+ const discRow=$('ckDiscRow');
+ if(discRow) discRow.style.display=discount>0?'flex':'none';
+ const discVal=$('ckDiscVal'); if(discVal) discVal.textContent='-'+money(discount);
+ $('ckGrand').textContent=money(Math.max(0,sub+fee-discount));
 }
 function closeCheckout(){$('checkoutModal').classList.remove('on');directBuy=null;document.body.style.overflow=''}
 async function placeOrder(){
@@ -1095,16 +1133,19 @@ async function placeOrder(){
 
  const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
  const fee=ckFeeOf();
- const total=sub+fee;
+ const discount=APPLIED_COUPON?Math.min(APPLIED_COUPON.discount,sub):0;
+ const couponCode=APPLIED_COUPON?APPLIED_COUPON.code:undefined;
+ const total=Math.max(0,sub+fee-discount);
  const orderNo='SB'+Date.now().toString().slice(-8);
  const eta=new Date(Date.now()+3*24*3600*1000).toISOString();
  const itemLines=items.map(i=>i.p.e+' '+nameOf(i.p)+' × '+i.q+' — '+money(i.p.price*i.q));
  const waMsg='🛍️ নতুন অর্ডার — '+orderNo+'\n\n👤 নাম: '+name+'\n📱 মোবাইল: '+phone+'\n📍 ঠিকানা: '+addr+' ('+dist+')\n💳 পেমেন্ট: '+pay+
-  (note?'\n📝 নোট: '+note:'')+'\n\n🧾 পণ্যসমূহ:\n'+itemLines.join('\n')+'\n\nসাব-টোটাল: '+money(sub)+'\nডেলিভারি ফি: '+(fee===0?'ফ্রি':money(fee))+'\nসর্বমোট: '+money(total);
+  (note?'\n📝 নোট: '+note:'')+'\n\n🧾 পণ্যসমূহ:\n'+itemLines.join('\n')+'\n\nসাব-টোটাল: '+money(sub)+'\nডেলিভারি ফি: '+(fee===0?'ফ্রি':money(fee))+
+  (discount>0?'\nছাড় ('+couponCode+'): -'+money(discount):'')+'\nসর্বমোট: '+money(total);
 
  // D1 ডেটাবেজে ব্যাকআপ রেকর্ড হিসেবে জমা হবে (অ্যাডমিন প্যানেল → অর্ডারসমূহ)
  try{
-  await apiSend('/api/orders','POST',{orderNo,name,phone,address:addr,district:dist,payment:pay,note,items:itemLines,subtotal:sub,deliveryFee:fee,total});
+  await apiSend('/api/orders','POST',{orderNo,name,phone,address:addr,district:dist,payment:pay,note,items:itemLines,subtotal:sub,deliveryFee:fee,discount,couponCode,total});
  }catch(e){/* ডেটাবেজে সেভ ব্যর্থ হলেও নিচে হোয়াটসঅ্যাপে অর্ডারটি পাঠানো হবে */}
 
  lastPhone=phone;
@@ -1167,8 +1208,11 @@ async function boot(){
  applyLang();
  syncCustomerFromOrdersPage();
  try{
-  await Promise.all([fetchProducts(), fetchSiteText()]);
-  fetchSettings();
+  await Promise.all([fetchProducts(), fetchSiteText(), fetchSettings()]);
+  if(SETTINGS.maintenance_mode){
+   document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:sans-serif"><div><div style="font-size:60px;margin-bottom:14px">🚧</div><h1 style="color:#F85606;margin-bottom:8px">শীঘ্রই আসছি!</h1><p style="color:#666;max-width:360px">আমরা সাইটে কিছু উন্নয়নের কাজ করছি। একটু পরে আবার আসুন।</p></div></div>';
+   return;
+  }
   render();
  }catch(e){
   app().innerHTML='<div class="container"><div class="section"><div class="empty-state"><div class="ee">🔌</div><h3>'+t('load_fail_h')+'</h3><p>'+t('load_fail_p')+'</p><button class="load-more" onclick="boot()">'+t('retry_btn')+'</button></div></div></div>';

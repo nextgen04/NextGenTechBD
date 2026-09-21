@@ -108,3 +108,16 @@ export function requireCustomer(customer) {
   if (!customer) return err('লগইন করা প্রয়োজন', 401);
   return null;
 }
+
+/* ============ শেয়ার্ড কনস্ট্যান্ট ============ */
+export const ORDER_STATUSES = ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returned'];
+
+export async function logAdminLogin(env, success, request) {
+  try {
+    await env.DB.prepare('INSERT INTO admin_login_log (success, ip, user_agent) VALUES (?, ?, ?)')
+      .bind(success ? 1 : 0, request.headers.get('CF-Connecting-IP') || '', request.headers.get('User-Agent') || '')
+      .run();
+  } catch (e) {
+    // লগ ব্যর্থ হলেও লগইন প্রসেস আটকানো ঠিক না
+  }
+}

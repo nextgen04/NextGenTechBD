@@ -8,12 +8,13 @@ export async function onRequestPost(context) {
     if (!phone || !password) return err('মোবাইল নম্বর ও পাসওয়ার্ড দিন', 400);
 
     const row = await env.DB.prepare(
-      'SELECT id, name, phone, email, password_hash, password_salt FROM customers WHERE phone = ?'
+      'SELECT id, name, phone, email, password_hash, password_salt, blocked FROM customers WHERE phone = ?'
     )
       .bind(phone.trim())
       .first();
 
     if (!row) return err('এই নম্বরে কোনো অ্যাকাউন্ট পাওয়া যায়নি', 401);
+    if (row.blocked) return err('এই অ্যাকাউন্টটি সাময়িকভাবে ব্লক করা আছে — বিস্তারিত জানতে দোকানের সাথে যোগাযোগ করুন', 403);
 
     const ok = await verifyPassword(password, row.password_salt, row.password_hash);
     if (!ok) return err('ভুল পাসওয়ার্ড', 401);
