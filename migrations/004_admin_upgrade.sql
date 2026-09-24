@@ -97,6 +97,7 @@ ALTER TABLE settings ADD COLUMN invoice_prefix TEXT DEFAULT 'INV';
 ALTER TABLE settings ADD COLUMN delivery_charge_dhaka INTEGER DEFAULT 60;
 ALTER TABLE settings ADD COLUMN delivery_charge_outside INTEGER DEFAULT 120;
 ALTER TABLE settings ADD COLUMN free_delivery_threshold INTEGER DEFAULT 1999;
+ALTER TABLE settings ADD COLUMN courier_services TEXT;
 ALTER TABLE settings ADD COLUMN maintenance_mode INTEGER DEFAULT 0;
 
 -- ================= অ্যাডমিন লগইন লগ (নিরাপত্তা) =================
