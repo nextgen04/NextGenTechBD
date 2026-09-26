@@ -1025,6 +1025,13 @@ async function renderBanners(){
             <div class="field"><label>সাবটাইটেল</label><input id="bn_subtitle" /></div>
           </div>
           <div class="field">
+            <label>অবস্থান — এটা কোথায় দেখাবে?</label>
+            <select id="bn_position">
+              <option value="hero">🖼️ বড় Hero স্লাইডার (উপরে, বড় ঘুরন্ত ব্যানার)</option>
+              <option value="side">📌 সাইড ব্যানার (Hero-র পাশে ছোট কার্ড, সর্বোচ্চ ২টা দেখাবে)</option>
+            </select>
+          </div>
+          <div class="field">
             <label>ব্যানার ছবি</label>
             <input type="file" id="bn_img_file" accept="image/*" onchange="uploadBannerImage(this)" />
             <input type="hidden" id="bn_img" />
@@ -1033,7 +1040,7 @@ async function renderBanners(){
           </div>
           <div class="grid2">
             <div class="field"><label>বাটন টেক্সট</label><input id="bn_btn_text" placeholder="এখনই কিনুন" /></div>
-            <div class="field"><label>বাটন লিংক</label><input id="bn_btn_url" placeholder="/#category=electronics" /></div>
+            <div class="field"><label>বাটন লিংক (ঐচ্ছিক — খালি রাখলে "সব পণ্য" পেজে যাবে)</label><input id="bn_btn_url" placeholder="https://... (বাইরের লিংক, যেমন Facebook পেজ)" /></div>
           </div>
           <div class="grid3">
             <div class="field"><label>শুরুর তারিখ</label><input id="bn_start" type="date" /></div>
@@ -1052,12 +1059,13 @@ async function renderBanners(){
       <div class="card">
         <h2>🖼️ সব ব্যানার (${banners.length})</h2>
         <table>
-          <thead><tr><th>ছবি</th><th>শিরোনাম</th><th>মেয়াদ</th><th>স্ট্যাটাস</th><th></th></tr></thead>
+          <thead><tr><th>ছবি</th><th>শিরোনাম</th><th>অবস্থান</th><th>মেয়াদ</th><th>স্ট্যাটাস</th><th></th></tr></thead>
           <tbody>
             ${banners.map(b=>`
               <tr>
                 <td>${b.img?`<img src="${b.img}" style="width:60px;height:36px;object-fit:cover;border-radius:6px">`:'—'}</td>
                 <td>${b.title}<br><small style="color:#888">${b.subtitle||''}</small></td>
+                <td>${b.position==='side'?'📌 সাইড':'🖼️ Hero'}</td>
                 <td><small>${b.start_date||'—'} → ${b.end_date||'অসীম'}</small></td>
                 <td>${b.active?'<span class="badge ok">সক্রিয়</span>':'<span class="badge danger">বন্ধ</span>'}</td>
                 <td class="row-actions">
@@ -1090,6 +1098,7 @@ async function uploadBannerImage(input){
 function resetBannerForm(){
   ['bn_id','bn_title','bn_subtitle','bn_img','bn_btn_text','bn_btn_url','bn_start','bn_end'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('bn_sort').value='0';
+  document.getElementById('bn_position').value='hero';
   document.getElementById('bn_active').checked=true;
   document.getElementById('bn_img_file').value='';
   document.getElementById('bn_img_status').textContent='';
@@ -1102,6 +1111,7 @@ function editBanner(b){
   document.getElementById('bn_img').value=b.img||'';
   document.getElementById('bn_btn_text').value=b.button_text||'';
   document.getElementById('bn_btn_url').value=b.button_url||'';
+  document.getElementById('bn_position').value=b.position==='side'?'side':'hero';
   document.getElementById('bn_start').value=b.start_date||'';
   document.getElementById('bn_end').value=b.end_date||'';
   document.getElementById('bn_sort').value=b.sort_order||0;
@@ -1115,7 +1125,8 @@ async function saveBanner(ev){
   const val = id => document.getElementById(id).value.trim();
   const body = {
     id: val('bn_id')||undefined, title: val('bn_title'), subtitle: val('bn_subtitle'), img: val('bn_img'),
-    button_text: val('bn_btn_text'), button_url: val('bn_btn_url'), start_date: val('bn_start')||undefined, end_date: val('bn_end')||undefined,
+    button_text: val('bn_btn_text'), button_url: val('bn_btn_url'), position: val('bn_position')||'hero',
+    start_date: val('bn_start')||undefined, end_date: val('bn_end')||undefined,
     sort_order: Number(val('bn_sort'))||0, active: document.getElementById('bn_active').checked
   };
   try{

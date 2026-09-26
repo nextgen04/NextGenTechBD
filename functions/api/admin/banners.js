@@ -10,7 +10,7 @@ export async function onRequestGet(context) {
   if (denied) return denied;
   try {
     const res = await env.DB.prepare(
-      'SELECT id, title, subtitle, img, button_text, button_url, start_date, end_date, active, sort_order FROM banners ORDER BY sort_order ASC, id DESC'
+      'SELECT id, title, subtitle, img, button_text, button_url, position, start_date, end_date, active, sort_order FROM banners ORDER BY position ASC, sort_order ASC, id DESC'
     ).all();
     return json({ banners: res.results || [] });
   } catch (e) {
@@ -27,17 +27,18 @@ export async function onRequestPost(context) {
     if (!b.title) return err('শিরোনাম আবশ্যক', 400);
     const fields = [
       b.title, b.subtitle || null, b.img || null, b.button_text || null, b.button_url || null,
+      (b.position === 'side' ? 'side' : 'hero'),
       b.start_date || null, b.end_date || null, toBool(b.active) ? 1 : 0, Number(b.sort_order) || 0,
     ];
     if (b.id) {
       await env.DB.prepare(
-        `UPDATE banners SET title=?, subtitle=?, img=?, button_text=?, button_url=?, start_date=?, end_date=?, active=?, sort_order=? WHERE id=?`
+        `UPDATE banners SET title=?, subtitle=?, img=?, button_text=?, button_url=?, position=?, start_date=?, end_date=?, active=?, sort_order=? WHERE id=?`
       ).bind(...fields, Number(b.id)).run();
       return json({ ok: true, id: Number(b.id) });
     } else {
       const res = await env.DB.prepare(
-        `INSERT INTO banners (title, subtitle, img, button_text, button_url, start_date, end_date, active, sort_order)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO banners (title, subtitle, img, button_text, button_url, position, start_date, end_date, active, sort_order)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(...fields).run();
       return json({ ok: true, id: res.meta.last_row_id });
     }

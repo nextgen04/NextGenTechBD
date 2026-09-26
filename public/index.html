@@ -665,7 +665,7 @@ async function apiGet(u){const r=await fetch(u,{headers:sessionHeaders()});const
 async function apiSend(u,m,b){const r=await fetch(u,{method:m,headers:sessionHeaders(),body:JSON.stringify(b||{})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'সমস্যা হয়েছে');return j}
 
 /* ================= DATA (স্ট্যাটিক JSON ফাইল থেকে — অ্যাডমিন প্যানেল দিয়ে GitHub-এ আপডেট হয়) ================= */
-let CATS=[],PRODUCTS=[];
+let CATS=[],PRODUCTS=[],BANNERS=[];
 let SETTINGS={contact:{phone:'01717877955',whatsapp:'8801717877955',telegram:'8801717877955',facebook:'https://www.facebook.com/share/19KVN4rZkS/',email:'tnextgen04@gmail.com'},payment:{bkash:'01717877955',nagad:'01717877955',rocket:'01717877955',cod:true}};
 let SITE_TEXT={};
 const STATUS_L={pending:'🕐 অপেক্ষমান',confirmed:'✔ নিশ্চিত',shipped:'🚚 পাঠানো হয়েছে',delivered:'✅ ডেলিভার্ড',cancelled:'✖ বাতিল'};
@@ -676,6 +676,9 @@ async function fetchProducts(){
   PRODUCTS.forEach(p=>{
     p.off = (p.old && p.old > p.price) ? Math.round((p.old-p.price)/p.old*100) : 0;
   });
+}
+async function fetchBanners(){
+  try{ const j=await apiGet('/api/banners'); BANNERS = j.banners || []; }catch(e){ BANNERS = []; }
 }
 async function fetchSettings(){
   try{const j=await apiGet('/api/settings');SETTINGS=Object.assign({},SETTINGS,j)}catch(e){}
@@ -783,12 +786,34 @@ function cardHTML(p){
 const gridHTML=list=>'<div class="grid">'+list.map(cardHTML).join('')+'</div>';
 
 /* ================= VIEWS ================= */
-const SLIDES=()=>[
+const DEFAULT_SLIDES=()=>[
  {g:'linear-gradient(135deg,#ff512f,#dd2476)',e:'🎉',h:t('mega_sale_h'),p:t('mega_sale_p'),cta:t('buy_now_cta'),act:"goCat('all')"},
  {g:'linear-gradient(135deg,#f83600,#f9d423)',e:'⚡',h:t('flash_daily_h'),p:t('flash_daily_p'),cta:t('flash_deals_cta'),act:'showFlash()'},
  {g:'linear-gradient(135deg,#4776e6,#8e54e9)',e:'🚚',h:t('free_delivery_h'),p:t('free_delivery_p'),cta:t('start_shopping_cta'),act:"goCat('all')"},
  {g:'linear-gradient(135deg,#11998e,#38ef7d)',e:'🛒',h:t('grocery_h'),p:t('grocery_p'),cta:t('shop_now_cta'),act:"goCat('g')"}
 ];
+const SIDE_GRADS=['linear-gradient(135deg,#1f4037,#99f2c8)','linear-gradient(135deg,#ec6f66,#f3a183)'];
+/* অ্যাডমিন প্যানেলে ব্যানার যোগ করা থাকলে সেটাই দেখায়, নাহলে ডিফল্ট স্লাইড/কার্ড দেখায় */
+const bannerAct=b=>b.button_url?('location.href=\''+b.button_url.replace(/'/g,"\\'")+'\''):"goCat('all')";
+const SLIDES=()=>{
+  const hero=BANNERS.filter(b=>(b.position||'hero')==='hero');
+  if(!hero.length) return DEFAULT_SLIDES();
+  return hero.map((b,i)=>({
+    g:b.img?('url(\''+b.img+'\') center/cover no-repeat'):'linear-gradient(135deg,#11998e,#38ef7d)',
+    e:'', h:b.title||'', p:b.subtitle||'', cta:b.button_text||t('shop_now_cta'), act:bannerAct(b)
+  }));
+};
+const SIDE_BANNERS=()=>{
+  const side=BANNERS.filter(b=>b.position==='side').slice(0,2);
+  if(!side.length) return [
+    {g:SIDE_GRADS[0],e:'🏠',h:t('home_living'),p:t('discount40'),act:"goCat('h')"},
+    {g:SIDE_GRADS[1],e:'💄',h:t('beauty_care'),p:t('original_product'),act:"goCat('b')"}
+  ];
+  return side.map((b,i)=>({
+    g:b.img?('url(\''+b.img+'\') center/cover no-repeat'):SIDE_GRADS[i%2],
+    e:'', h:b.title||'', p:b.subtitle||'', act:bannerAct(b)
+  }));
+};
 
 function renderNavbar(){
  const items=[{id:'all',name:t('all_products'),e:'🗂️'}].concat(CATS.map(c=>({id:c.id,name:nameOf(c),e:c.e})));
@@ -807,14 +832,12 @@ function renderHome(){
  app().innerHTML='<div class="fade">'+
  /* hero */
  '<div class="container"><div class="hero-row">'+
-  '<div class="carousel" id="carousel">'+SL.map((s,i)=>'<div class="slide'+(i===state.slide?' on':'')+'" style="background:'+s.g+'"><span class="big">'+s.e+'</span><h2>'+s.h+'</h2><p>'+s.p+'</p><button class="cta" onclick="'+s.act+'">'+s.cta+'</button></div>').join('')+
+  '<div class="carousel" id="carousel">'+SL.map((s,i)=>'<div class="slide'+(i===state.slide?' on':'')+'" style="background:'+s.g+'">'+(s.e?'<span class="big">'+s.e+'</span>':'')+'<h2>'+s.h+'</h2><p>'+s.p+'</p><button class="cta" onclick="'+s.act+'">'+s.cta+'</button></div>').join('')+
   '<button class="caro-arrow l" onclick="slide('+(state.slide-1+SL.length)%SL.length+')">‹</button>'+
   '<button class="caro-arrow r" onclick="slide('+(state.slide+1)%SL.length+')">›</button>'+
   '<div class="dots">'+SL.map((s,i)=>'<span class="dot'+(i===state.slide?' on':'')+'" onclick="slide('+i+')"></span>').join('')+'</div>'+
   '</div>'+
-  '<div class="side-banners">'+
-   '<div class="side-banner" style="background:linear-gradient(135deg,#1f4037,#99f2c8)" onclick="goCat(\'h\')"><span class="be">🏠</span><h3>'+t('home_living')+'</h3><p>'+t('discount40')+'</p></div>'+
-   '<div class="side-banner" style="background:linear-gradient(135deg,#ec6f66,#f3a183)" onclick="goCat(\'b\')"><span class="be">💄</span><h3>'+t('beauty_care')+'</h3><p>'+t('original_product')+'</p></div>'+
+  '<div class="side-banners">'+SIDE_BANNERS().map(s=>'<div class="side-banner" style="background:'+s.g+'" onclick="'+s.act+'">'+(s.e?'<span class="be">'+s.e+'</span>':'')+'<h3>'+s.h+'</h3><p>'+s.p+'</p></div>').join('')+
   '</div>'+
  '</div></div>'+
  /* categories */
@@ -1219,7 +1242,7 @@ async function boot(){
  applyLang();
  syncCustomerFromOrdersPage();
  try{
-  await Promise.all([fetchProducts(), fetchSiteText(), fetchSettings()]);
+  await Promise.all([fetchProducts(), fetchSiteText(), fetchSettings(), fetchBanners()]);
   if(SETTINGS.maintenance_mode){
    document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:sans-serif"><div><div style="font-size:60px;margin-bottom:14px">🚧</div><h1 style="color:#F85606;margin-bottom:8px">শীঘ্রই আসছি!</h1><p style="color:#666;max-width:360px">আমরা সাইটে কিছু উন্নয়নের কাজ করছি। একটু পরে আবার আসুন।</p></div></div>';
    return;
