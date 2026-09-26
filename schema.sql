@@ -159,6 +159,7 @@ CREATE TABLE IF NOT EXISTS banners (
   img         TEXT,
   button_text TEXT,
   button_url  TEXT,
+  position    TEXT DEFAULT 'hero',
   start_date  TEXT,
   end_date    TEXT,
   active      INTEGER DEFAULT 1,
