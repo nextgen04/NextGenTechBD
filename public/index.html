@@ -710,7 +710,7 @@ function applySettings(){
   }
 }
 const catName=id=>{const c=CATS.find(c=>c.id===id);return c?nameOf(c):(LANG==='en'?'Other':'অন্যান্য')};
-const catEmoji=id=>{const c=CATS.find(c=>c.id===id);return c?c.e:'📦'};
+const catEmoji=id=>{const c=CATS.find(c=>c.id===id);return c?(c.e||'📦'):'📦'};
 /* Returns bilingual name: uses name_en if present & site is in English, otherwise the original (বাংলা) name */
 const nameOf=item=>(LANG==='en'&&item.name_en)?item.name_en:item.name;
 /* Renders a product/category visual: photo if uploaded via admin panel, else the emoji icon */
@@ -1085,7 +1085,7 @@ function openCheckout(){
  APPLIED_COUPON=null;
  const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
  $('checkoutBody').innerHTML=
-  '<div class="ck-items">'+items.map(i=>'<div class="cki"><span>'+i.p.e+' '+nameOf(i.p).slice(0,30)+' × '+i.q+'</span><b>'+money(i.p.price*i.q)+'</b></div>').join('')+'</div>'+
+  '<div class="ck-items">'+items.map(i=>'<div class="cki"><span>'+(i.p.e||'📦')+' '+nameOf(i.p).slice(0,30)+' × '+i.q+'</span><b>'+money(i.p.price*i.q)+'</b></div>').join('')+'</div>'+
   '<form onsubmit="event.preventDefault();placeOrder()">'+
   '<div class="fgroup"><label>'+t('name_label')+'</label><input id="ckName" value="'+(state.user?state.user.name.replace(/"/g,'&quot;'):'')+'" placeholder="'+t('name_ph')+'"><div class="ferr" id="ckErrName">'+t('name_err')+'</div></div>'+
   '<div class="fgroup"><label>'+t('phone_label')+'</label><input id="ckPhone" value="'+(state.user?state.user.phone:'')+'" placeholder="01XXXXXXXXX" maxlength="11" inputmode="numeric"><div class="ferr" id="ckErrPhone">'+t('phone_err')+'</div></div>'+
@@ -1178,7 +1178,7 @@ async function placeOrder(){
  const total=Math.max(0,sub+fee-discount);
  const orderNo='SB'+Date.now().toString().slice(-8);
  const eta=new Date(Date.now()+3*24*3600*1000).toISOString();
- const itemLines=items.map(i=>i.p.e+' '+nameOf(i.p)+' × '+i.q+' — '+money(i.p.price*i.q));
+ const itemLines=items.map(i=>(i.p.e||'📦')+' '+nameOf(i.p)+' × '+i.q+' — '+money(i.p.price*i.q));
  const waMsg='🛍️ নতুন অর্ডার — '+orderNo+'\n\n👤 নাম: '+name+'\n📱 মোবাইল: '+phone+'\n📍 ঠিকানা: '+addr+' ('+dist+')\n💳 পেমেন্ট: '+pay+
   (note?'\n📝 নোট: '+note:'')+'\n\n🧾 পণ্যসমূহ:\n'+itemLines.join('\n')+'\n\nসাব-টোটাল: '+money(sub)+'\nডেলিভারি ফি: '+(fee===0?'ফ্রি':money(fee))+
   (discount>0?'\nছাড় ('+couponCode+'): -'+money(discount):'')+'\nসর্বমোট: '+money(total);
