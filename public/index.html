@@ -794,7 +794,13 @@ const DEFAULT_SLIDES=()=>[
 ];
 const SIDE_GRADS=['linear-gradient(135deg,#1f4037,#99f2c8)','linear-gradient(135deg,#ec6f66,#f3a183)'];
 /* অ্যাডমিন প্যানেলে ব্যানার যোগ করা থাকলে সেটাই দেখায়, নাহলে ডিফল্ট স্লাইড/কার্ড দেখায় */
-const bannerAct=b=>b.button_url?('location.href=\''+b.button_url.replace(/'/g,"\\'")+'\''):"goCat('all')";
+/* বাটন লিংকে #cat:আইডি লিখলে (যেমন #cat:h) সেটা সাইটের ভেতরের ওই ক্যাটাগরিতে নিয়ে যাবে,
+   নাহলে সাধারণ বাইরের URL হিসেবে নতুন পেজে যাবে */
+const bannerAct=b=>{
+  const u=b.button_url||'';
+  if(u.startsWith('#cat:')) return "goCat('"+u.slice(5).replace(/'/g,"\\'")+"')";
+  return u?("location.href='"+u.replace(/'/g,"\\'")+"'"):"goCat('all')";
+};
 const SLIDES=()=>{
   const hero=BANNERS.filter(b=>(b.position||'hero')==='hero');
   if(!hero.length) return DEFAULT_SLIDES();
