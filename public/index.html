@@ -661,7 +661,7 @@ function setLang(l){
 
 /* ================= API ================= */
 function sessionHeaders(){const t=localStorage.getItem('ngtbd_session_token');const h={'Content-Type':'application/json'};if(t)h['X-Session-Token']=t;return h}
-async function apiGet(u){const r=await fetch(u,{headers:sessionHeaders()});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'সমস্যা হয়েছে');return j}
+async function apiGet(u){const r=await fetch(u,{headers:sessionHeaders()});const j=await r.json().catch(()=>({}));if(!r.ok){const er=new Error(j.error||'সমস্যা হয়েছে');er.status=r.status;throw er}return j}
 async function apiSend(u,m,b){const r=await fetch(u,{method:m,headers:sessionHeaders(),body:JSON.stringify(b||{})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'সমস্যা হয়েছে');return j}
 
 /* ================= DATA (স্ট্যাটিক JSON ফাইল থেকে — অ্যাডমিন প্যানেল দিয়ে GitHub-এ আপডেট হয়) ================= */
@@ -1169,41 +1169,55 @@ async function placeOrder(){
  const dist=$('ckDist').value;
  const pay=document.querySelector('.payopt.sel').dataset.pay||'ক্যাশ অন ডেলিভারি';
  const note=($('ckNote')?$('ckNote').value.trim():'').slice(0,200);
- const btn=$('ckSubmit');btn.disabled=true;btn.textContent=t('processing');
+ const btn=$('ckSubmit');const btnLabel=btn.textContent;btn.disabled=true;btn.textContent=t('processing');
 
- const sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
- const fee=ckFeeOf();
- const discount=APPLIED_COUPON?Math.min(APPLIED_COUPON.discount,sub):0;
- const couponCode=APPLIED_COUPON?APPLIED_COUPON.code:undefined;
- const total=Math.max(0,sub+fee-discount);
- const orderNo='SB'+Date.now().toString().slice(-8);
+ // এই মানগুলো শুধু সার্ভার না পাওয়া গেলে (নেটওয়ার্ক সমস্যা) ফলব্যাক — আসল দাম/মোট সার্ভার হিসাব করে ফেরত দেয়
+ let sub=items.reduce((a,i)=>a+i.p.price*i.q,0);
+ let fee=ckFeeOf();
+ let discount=APPLIED_COUPON?Math.min(APPLIED_COUPON.discount,sub):0;
+ let couponCode=APPLIED_COUPON?APPLIED_COUPON.code:undefined;
+ let total=Math.max(0,sub+fee-discount);
+ let orderNo='SB'+Date.now().toString().slice(-8);
  const eta=new Date(Date.now()+3*24*3600*1000).toISOString();
- const itemLines=items.map(i=>(i.p.e||'📦')+' '+nameOf(i.p)+' × '+i.q+' — '+money(i.p.price*i.q));
+ let itemLines=items.map(i=>(i.p.e||'📦')+' '+nameOf(i.p)+' × '+i.q+' — '+money(i.p.price*i.q));
+
+ // D1 ডেটাবেজে জমা — সার্ভার নিজে দাম হিসাব করে; ফেরত আসা মোট দিয়েই হোয়াটসঅ্যাপ মেসেজ বানানো হয়
+ try{
+  const res=await apiSend('/api/orders','POST',{orderNo,name,phone,address:addr,district:dist,payment:pay,note,cart:items.map(i=>({id:i.p.id,qty:i.q})),couponCode});
+  orderNo=res.orderNo||orderNo;sub=res.subtotal;fee=res.deliveryFee;discount=res.discount;total=res.total;
+  couponCode=res.couponCode||undefined;
+  if(Array.isArray(res.items)&&res.items.length)itemLines=res.items;
+ }catch(e){
+  // সার্ভার অর্ডারটা বাতিল করলে (স্টক নেই / কুপন শেষ / ভুল তথ্য ইত্যাদি) এগোনো হবে না; শুধু নেটওয়ার্ক/সার্ভার সমস্যা হলে আগের মতো হোয়াটসঅ্যাপে পাঠানো হবে
+  if(e.status&&e.status>=400&&e.status<500){btn.disabled=false;btn.textContent=btnLabel;alert(e.message);return}
+ }
  const waMsg='🛍️ নতুন অর্ডার — '+orderNo+'\n\n👤 নাম: '+name+'\n📱 মোবাইল: '+phone+'\n📍 ঠিকানা: '+addr+' ('+dist+')\n💳 পেমেন্ট: '+pay+
   (note?'\n📝 নোট: '+note:'')+'\n\n🧾 পণ্যসমূহ:\n'+itemLines.join('\n')+'\n\nসাব-টোটাল: '+money(sub)+'\nডেলিভারি ফি: '+(fee===0?'ফ্রি':money(fee))+
   (discount>0?'\nছাড় ('+couponCode+'): -'+money(discount):'')+'\nসর্বমোট: '+money(total);
-
- // D1 ডেটাবেজে ব্যাকআপ রেকর্ড হিসেবে জমা হবে (অ্যাডমিন প্যানেল → অর্ডারসমূহ)
- try{
-  await apiSend('/api/orders','POST',{orderNo,name,phone,address:addr,district:dist,payment:pay,note,items:itemLines,subtotal:sub,deliveryFee:fee,discount,couponCode,total});
- }catch(e){/* ডেটাবেজে সেভ ব্যর্থ হলেও নিচে হোয়াটসঅ্যাপে অর্ডারটি পাঠানো হবে */}
 
  lastPhone=phone;
  if(!directBuy){state.cart={};persist();updateBadges()}
  directBuy=null;
  showSuccess({no:orderNo,total:total,pay:pay,eta:eta},name,waMsg);
 }
+function esc(v){
+  return String(v===null||v===undefined?'':v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
+}
+window.LAST_WA_MSG='';
 function showSuccess(order,name,waMsg){
  let eta='';
  try{eta=new Date(order.eta).toLocaleDateString(LANG==='en'?'en-US':'bn-BD',{day:'numeric',month:'long'})}catch(e){eta=LANG==='en'?'within 3 days':'৩ দিনের মধ্যে'}
  window.open(waLink(waMsg),'_blank');
+ window.LAST_WA_MSG=waMsg;
  $('checkoutBody').innerHTML='<div class="success-pane"><div class="se">🎉</div><h2>'+t('order_saved_h')+'</h2>'+
- '<p>'+t('thanks_prefix')+'<b>'+name+'</b>'+t('thanks_suffix')+'</p>'+
- '<div class="ono">'+t('order_no_lbl')+order.no+'</div>'+
- '<p>'+t('paid_amount_lbl')+'<b>'+money(order.total)+'</b> ('+order.pay+')'+t('pay_on_delivery_note')+'</p>'+
+ '<p>'+t('thanks_prefix')+'<b>'+esc(name)+'</b>'+t('thanks_suffix')+'</p>'+
+ '<div class="ono">'+t('order_no_lbl')+esc(order.no)+'</div>'+
+ '<p>'+t('paid_amount_lbl')+'<b>'+money(order.total)+'</b> ('+esc(order.pay)+')'+t('pay_on_delivery_note')+'</p>'+
  '<p>'+t('wa_resend_note')+'</p>'+
  '<p style="font-size:12.5px;margin-top:6px">'+t('eta_note')+'<b>'+eta+'</b>'+t('eta_note2')+'</p>'+
- '<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn-block" style="min-width:170px" onclick="window.open(waLink('+JSON.stringify(waMsg)+'),\'_blank\')">'+t('resend_wa_btn')+'</button>'+
+ '<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn-block" style="min-width:170px" onclick="window.open(waLink(window.LAST_WA_MSG),\'_blank\')">'+t('resend_wa_btn')+'</button>'+
  '<button class="btn btn-cart" style="min-width:150px" onclick="closeCheckout();goHome()">'+t('continue_shopping_btn')+'</button></div></div>';
 }
 

@@ -1,2 +1,18 @@
+# সব পেজ ও API-র জন্য নিরাপত্তা হেডার
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+
+# অ্যাডমিন প্যানেল: সার্চ ইঞ্জিনে আসবে না, রেফারার পাঠাবে না (URL-এ রিসেট টোকেন থাকতে পারে)
 /admin/*
-  X-Robots-Tag: noindex
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+
+# অর্ডার/অ্যাকাউন্ট পেজ: রিসেট লিংকের টোকেন যেন বাইরে না যায়
+/orders/*
+  Referrer-Policy: no-referrer

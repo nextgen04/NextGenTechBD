@@ -6,7 +6,7 @@ import { json, err, requireAdmin, toBool } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const res = await env.DB.prepare(
@@ -15,13 +15,14 @@ export async function onRequestGet(context) {
     ).all();
     return json({ coupons: res.results || [] });
   } catch (e) {
-    return err('কুপন লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/coupons failed:', e && e.message);
+    return err('কুপন লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const b = await request.json();
@@ -51,14 +52,15 @@ export async function onRequestPost(context) {
       return json({ ok: true, id: res.meta.last_row_id });
     }
   } catch (e) {
-    const msg = e.message && e.message.includes('UNIQUE') ? 'এই কোডের একটা কুপন আগে থেকেই আছে' : e.message;
-    return err('কুপন সংরক্ষণ করা যায়নি: ' + msg, 500);
+    if (e && e.message && e.message.includes('UNIQUE')) return err('এই কোডের একটা কুপন আগে থেকেই আছে', 400);
+    console.error('admin/coupons save failed:', e && e.message);
+    return err('কুপন সংরক্ষণ করা যায়নি', 500);
   }
 }
 
 export async function onRequestDelete(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const id = new URL(request.url).searchParams.get('id');
@@ -66,6 +68,7 @@ export async function onRequestDelete(context) {
     await env.DB.prepare('DELETE FROM coupons WHERE id = ?').bind(Number(id)).run();
     return json({ ok: true });
   } catch (e) {
-    return err('কুপন মুছা যায়নি: ' + e.message, 500);
+    console.error('admin/coupons failed:', e && e.message);
+    return err('কুপন মুছা যায়নি', 500);
   }
 }

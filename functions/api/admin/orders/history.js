@@ -3,7 +3,7 @@ import { json, err, requireAdmin } from '../../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const id = new URL(request.url).searchParams.get('id');
@@ -13,6 +13,7 @@ export async function onRequestGet(context) {
     ).bind(Number(id)).all();
     return json({ history: res.results || [] });
   } catch (e) {
-    return err('ইতিহাস লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/orders/history failed:', e && e.message);
+    return err('ইতিহাস লোড করা যায়নি', 500);
   }
 }

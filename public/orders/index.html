@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="no-referrer" />
 <meta name="description" content="NextGenTechBD — আপনার অর্ডার ট্র্যাক করুন, অ্যাকাউন্টে লগইন করুন ও অর্ডার হিস্টোরি দেখুন" />
 <title>আমার অর্ডার — NextGenTechBD</title>
 <link rel="icon" href="/assets/logo-icon.png">
@@ -119,22 +120,23 @@ header .container{display:flex;align-items:center;justify-content:space-between}
     <form id="registerForm" class="hidden" onsubmit="doCustomerRegister(event)">
       <div class="field"><label>পূর্ণ নাম</label><input id="rg_name" placeholder="আপনার নাম" required /></div>
       <div class="field"><label>মোবাইল নম্বর</label><input id="rg_phone" maxlength="11" inputmode="numeric" placeholder="01XXXXXXXXX" required /></div>
-      <div class="field"><label>ইমেইল (ঐচ্ছিক)</label><input id="rg_email" type="email" placeholder="you@example.com" /></div>
-      <div class="field"><label>পাসওয়ার্ড (কমপক্ষে ৬ ক্যারেক্টার)</label><input id="rg_password" type="password" placeholder="একটি পাসওয়ার্ড দিন" required /></div>
+      <div class="field"><label>ইমেইল (পাসওয়ার্ড ভুলে গেলে এখানে রিসেট লিংক যাবে)</label><input id="rg_email" type="email" placeholder="you@example.com" required /></div>
+      <div class="field"><label>পাসওয়ার্ড (কমপক্ষে ৮ ক্যারেক্টার)</label><input id="rg_password" type="password" placeholder="একটি পাসওয়ার্ড দিন" required /></div>
       <button type="submit" class="btn">অ্যাকাউন্ট তৈরি করুন</button>
     </form>
 
-    <form id="forgotForm" class="hidden" onsubmit="doForgotPasswordStep1(event)">
+    <form id="forgotForm" class="hidden" onsubmit="doForgotPassword(event)">
       <span class="back-link" onclick="showLoginForm()">← লগইনে ফিরুন</span>
-      <div class="sub" style="margin-top:0">আপনার অ্যাকাউন্টের মোবাইল নম্বর দিন</div>
-      <div class="field"><label>মোবাইল নম্বর</label><input id="fp_phone" maxlength="11" inputmode="numeric" placeholder="01XXXXXXXXX" required /></div>
-      <button type="submit" class="btn">পরবর্তী ধাপ →</button>
+      <div class="sub" style="margin-top:0">অ্যাকাউন্ট খোলার সময় দেওয়া ইমেইল লিখুন — আমরা সেখানে পাসওয়ার্ড রিসেটের লিংক পাঠাব</div>
+      <div class="field"><label>ইমেইল</label><input id="fp_email" type="email" placeholder="you@example.com" required /></div>
+      <button type="submit" class="btn" id="fp_btn">রিসেট লিংক পাঠান</button>
+      <div class="sub" style="margin-top:12px;font-size:12px">অ্যাকাউন্টে ইমেইল দেওয়া না থাকলে দোকানের সাথে যোগাযোগ করুন।</div>
     </form>
 
     <form id="newPasswordForm" class="hidden" onsubmit="doSetNewPassword(event)">
-      <span class="back-link" onclick="showForgotForm()">← নম্বর পরিবর্তন করুন</span>
+      <span class="back-link" onclick="showLoginForm()">← লগইনে ফিরুন</span>
       <div class="sub" style="margin-top:0">নতুন পাসওয়ার্ড দিন</div>
-      <div class="field"><label>নতুন পাসওয়ার্ড (কমপক্ষে ৬ ক্যারেক্টার)</label><input id="np_password" type="password" placeholder="নতুন পাসওয়ার্ড" required /></div>
+      <div class="field"><label>নতুন পাসওয়ার্ড (কমপক্ষে ৮ ক্যারেক্টার)</label><input id="np_password" type="password" placeholder="নতুন পাসওয়ার্ড" required /></div>
       <div class="field"><label>নতুন পাসওয়ার্ড আবার লিখুন</label><input id="np_password2" type="password" placeholder="পাসওয়ার্ড আবার লিখুন" required /></div>
       <button type="submit" class="btn">পাসওয়ার্ড সেট করুন</button>
     </form>
@@ -158,10 +160,17 @@ const STATUS_L = {pending:'🕐 অপেক্ষমান', confirmed:'✔ ন
 const STATUS_ORDER = ['pending','confirmed','shipped','delivered'];
 
 function $(id){ return document.getElementById(id); }
+/* XSS সুরক্ষা: সার্ভার/ইউজারের দেওয়া টেক্সট innerHTML-এ বসানোর আগে esc() */
+function esc(v){
+  return String(v===null||v===undefined?'':v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
+}
+
 function qs(name){ return new URL(location.href).searchParams.get(name); }
 
 /* ============ AUTH TABS ============ */
-let FORGOT_PHONE = '';
+let RESET_TOKEN = '';
 function switchAuthTab(t){
   document.querySelectorAll('.tab2').forEach(el=>el.classList.toggle('on', el.dataset.t===t));
   $('loginForm').classList.toggle('hidden', t!=='login');
@@ -176,14 +185,14 @@ function showForgotForm(){
   $('registerForm').classList.add('hidden');
   $('newPasswordForm').classList.add('hidden');
   $('forgotForm').classList.remove('hidden');
-  $('fp_phone').value='';
+  $('fp_email').value='';
   $('authMsg').innerHTML='';
 }
 function showLoginForm(){
   switchAuthTab('login');
 }
-function showAuthMsg(text,type){ $('authMsg').innerHTML = '<div class="msg '+type+'">'+text+'</div>'; }
-function showTrackMsg(text,type){ $('trackMsg').innerHTML = text ? '<div class="msg '+type+'">'+text+'</div>' : ''; }
+function showAuthMsg(text,type){ $('authMsg').innerHTML = '<div class="msg '+esc(type)+'">'+esc(text)+'</div>'; }
+function showTrackMsg(text,type){ $('trackMsg').innerHTML = text ? '<div class="msg '+esc(type)+'">'+esc(text)+'</div>' : ''; }
 
 /* ============ CUSTOMER API HELPER ============ */
 async function customerApi(path, method='GET', body){
@@ -224,31 +233,37 @@ async function doCustomerLogout(){
   $('loggedOutCard').classList.remove('hidden');
 }
 
-/* ============ FORGOT / RESET PASSWORD (দুই ধাপ: নম্বর যাচাই → নতুন পাসওয়ার্ড সেট) ============ */
-async function doForgotPasswordStep1(ev){
+/* ============ FORGOT / RESET PASSWORD (ইমেইলে লিংক → লিংকে ক্লিক করে নতুন পাসওয়ার্ড) ============ */
+async function doForgotPassword(ev){
   ev.preventDefault();
-  const phone = $('fp_phone').value.trim();
-  if(!/^01[3-9]\d{8}$/.test(phone)){ showAuthMsg('❌ সঠিক মোবাইল নম্বর দিন','error'); return; }
+  const email = $('fp_email').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ showAuthMsg('❌ সঠিক ইমেইল ঠিকানা দিন','error'); return; }
+  $('fp_btn').disabled = true;
   try{
-    await customerApi('/customer/forgot-password','POST',{phone});
-    FORGOT_PHONE = phone;
-    $('forgotForm').classList.add('hidden');
-    $('newPasswordForm').classList.remove('hidden');
-    $('np_password').value='';
-    $('np_password2').value='';
-    $('authMsg').innerHTML='';
+    const j = await customerApi('/customer/forgot-password','POST',{email});
+    showAuthMsg('✅ '+j.message,'ok');
   }catch(e){ showAuthMsg('❌ '+e.message,'error'); }
+  $('fp_btn').disabled = false;
+}
+function showResetForm(){
+  document.querySelectorAll('.tab2').forEach(el=>el.classList.remove('on'));
+  $('loginForm').classList.add('hidden');
+  $('registerForm').classList.add('hidden');
+  $('forgotForm').classList.add('hidden');
+  $('newPasswordForm').classList.remove('hidden');
+  $('np_password').value=''; $('np_password2').value='';
+  $('authMsg').innerHTML='';
 }
 async function doSetNewPassword(ev){
   ev.preventDefault();
   const p1 = $('np_password').value, p2 = $('np_password2').value;
   $('authMsg').innerHTML='';
-  if(p1.length<6){ showAuthMsg('পাসওয়ার্ড কমপক্ষে ৬ ক্যারেক্টার হতে হবে','error'); return; }
+  if(p1.length<8){ showAuthMsg('পাসওয়ার্ড কমপক্ষে ৮ ক্যারেক্টার হতে হবে','error'); return; }
   if(p1!==p2){ showAuthMsg('দুটো পাসওয়ার্ড মিলছে না','error'); return; }
   try{
-    await customerApi('/customer/reset-password','POST',{phone:FORGOT_PHONE, password:p1});
+    await customerApi('/customer/reset-password','POST',{token:RESET_TOKEN, password:p1});
+    RESET_TOKEN = '';
     switchAuthTab('login');
-    $('li_phone').value = FORGOT_PHONE;
     showAuthMsg('✅ পাসওয়ার্ড বদলানো হয়েছে — এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন','ok');
   }catch(e){ showAuthMsg('❌ '+e.message,'error'); }
 }
@@ -259,7 +274,7 @@ async function showApp(){
     const {customer} = await customerApi('/customer/me');
     $('loggedOutCard').classList.add('hidden');
     $('loggedInCard').classList.remove('hidden');
-    $('greetBox').innerHTML = '👋 শুভেচ্ছা, '+customer.name+'!<small>'+customer.phone+'</small>';
+    $('greetBox').innerHTML = '👋 শুভেচ্ছা, '+esc(customer.name)+'!<small>'+esc(customer.phone)+'</small>';
     loadHistory();
   }catch(e){
     localStorage.removeItem('ngtbd_session_token');
@@ -272,13 +287,13 @@ async function showApp(){
 function orderCardHtml(o, withTimeline){
   let items = o.items;
   if(typeof items==='string'){ try{ items = JSON.parse(items); }catch(e){ items=[]; } }
-  const itemLines = Array.isArray(items) ? items.map(i => typeof i==='string' ? '<div>'+i+'</div>' : '').join('') : '';
-  const dt = (o.created_at||'').slice(0,16).replace('T',' ');
+  const itemLines = Array.isArray(items) ? items.map(i => typeof i==='string' ? '<div>'+esc(i)+'</div>' : '').join('') : '';
+  const dt = esc((o.created_at||'').slice(0,16).replace('T',' '));
   const tl = withTimeline ? '<div class="tl">'+STATUS_ORDER.map(s=>'<span class="'+(s===o.status||STATUS_ORDER.indexOf(s)<=STATUS_ORDER.indexOf(o.status)?'active':'')+'">'+STATUS_L[s]+'</span>').join('')+(o.status==='cancelled'?'<span class="active" style="background:#fde0e6;color:#d92646">✖ বাতিল</span>':'')+'</div>' : '';
   return '<div class="order-item">'+
     '<div class="oi-top">'+
-      '<div><div class="order-no">'+o.order_no+'</div><div class="order-date">'+dt+'</div></div>'+
-      '<div style="text-align:right"><div class="order-total">৳'+o.total+'</div><span class="badge '+o.status+'">'+STATUS_L[o.status]+'</span></div>'+
+      '<div><div class="order-no">'+esc(o.order_no)+'</div><div class="order-date">'+dt+'</div></div>'+
+      '<div style="text-align:right"><div class="order-total">৳'+esc(o.total)+'</div><span class="badge '+esc(o.status)+'">'+esc(STATUS_L[o.status]||o.status)+'</span></div>'+
     '</div>'+
     (itemLines ? '<div class="oi-items">'+itemLines+'</div>' : '')+
     tl+
@@ -296,7 +311,7 @@ async function loadHistory(){
     }
     box.innerHTML = orders.map(o=>orderCardHtml(o,false)).join('');
   }catch(e){
-    box.innerHTML = '<div class="msg error">'+e.message+'</div>';
+    box.innerHTML = '<div class="msg error">'+esc(e.message)+'</div>';
   }
 }
 
@@ -328,6 +343,17 @@ async function trackOrder(){
   if(qPhone) $('trackPhone').value = qPhone;
   if(qOrderNo && qPhone) trackOrder();
 
+  const rt = qs('reset');
+  if(rt){
+    history.replaceState(null,'',location.pathname);   // টোকেন URL থেকে সরিয়ে ফেলা
+    if(/^[0-9a-f]{64}$/.test(rt)){
+      RESET_TOKEN = rt;
+      localStorage.removeItem('ngtbd_session_token'); SESSION_TOKEN='';
+      showResetForm();
+      return;
+    }
+    showAuthMsg('❌ রিসেট লিংকটি সঠিক নয় — আবার "পাসওয়ার্ড ভুলে গেছেন?" থেকে নতুন লিংক নিন','error');
+  }
   if(SESSION_TOKEN) showApp();
 })();
 </script>

@@ -5,7 +5,7 @@ import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const res = await env.DB.prepare('SELECT key, value FROM site_text').all();
@@ -13,13 +13,14 @@ export async function onRequestGet(context) {
     (res.results || []).forEach((row) => { out[row.key] = row.value; });
     return json(out);
   } catch (e) {
-    return err('টেক্সট লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/site-text failed:', e && e.message);
+    return err('টেক্সট লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPut(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const body = await request.json();
@@ -36,6 +37,7 @@ export async function onRequestPut(context) {
 
     return json({ ok: true });
   } catch (e) {
-    return err('টেক্সট সংরক্ষণ করা যায়নি: ' + e.message, 500);
+    console.error('admin/site-text failed:', e && e.message);
+    return err('টেক্সট সংরক্ষণ করা যায়নি', 500);
   }
 }

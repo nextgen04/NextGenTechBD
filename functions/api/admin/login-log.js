@@ -3,7 +3,7 @@ import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const res = await env.DB.prepare(
@@ -11,6 +11,7 @@ export async function onRequestGet(context) {
     ).all();
     return json({ logs: res.results || [] });
   } catch (e) {
-    return err('লগ লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/login-log failed:', e && e.message);
+    return err('লগ লোড করা যায়নি', 500);
   }
 }

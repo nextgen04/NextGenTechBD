@@ -5,7 +5,7 @@ import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const productId = new URL(request.url).searchParams.get('product_id');
@@ -15,13 +15,14 @@ export async function onRequestGet(context) {
     ).bind(Number(productId)).all();
     return json({ history: res.results || [] });
   } catch (e) {
-    return err('স্টক ইতিহাস লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/stock failed:', e && e.message);
+    return err('স্টক ইতিহাস লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const b = await request.json();
@@ -40,6 +41,7 @@ export async function onRequestPost(context) {
 
     return json({ ok: true, stock: newStock });
   } catch (e) {
-    return err('স্টক আপডেট করা যায়নি: ' + e.message, 500);
+    console.error('admin/stock failed:', e && e.message);
+    return err('স্টক আপডেট করা যায়নি', 500);
   }
 }

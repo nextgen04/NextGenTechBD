@@ -3,7 +3,7 @@ import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
 
   try {
@@ -54,6 +54,7 @@ export async function onRequestGet(context) {
       low_stock: lowStock.results || [],
     });
   } catch (e) {
-    return err('ড্যাশবোর্ড লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/dashboard failed:', e && e.message);
+    return err('ড্যাশবোর্ড লোড করা যায়নি', 500);
   }
 }

@@ -5,7 +5,7 @@ import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const q = (new URL(request.url).searchParams.get('q') || '').trim();
@@ -29,13 +29,14 @@ export async function onRequestGet(context) {
     const res = await env.DB.prepare(sql).bind(...binds).all();
     return json({ customers: res.results || [] });
   } catch (e) {
-    return err('কাস্টমার লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/customers failed:', e && e.message);
+    return err('কাস্টমার লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPatch(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const b = await request.json();
@@ -49,6 +50,7 @@ export async function onRequestPatch(context) {
     await env.DB.prepare(`UPDATE customers SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
     return json({ ok: true });
   } catch (e) {
-    return err('আপডেট করা যায়নি: ' + e.message, 500);
+    console.error('admin/customers failed:', e && e.message);
+    return err('আপডেট করা যায়নি', 500);
   }
 }

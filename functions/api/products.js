@@ -33,6 +33,7 @@ export async function onRequestGet(context) {
 
     return json({ categories, products });
   } catch (e) {
-    return err('ডেটাবেজ থেকে পণ্য লোড করা যায়নি: ' + e.message, 500);
+    console.error('products failed:', e && e.message);
+    return err('ডেটাবেজ থেকে পণ্য লোড করা যায়নি', 500);
   }
 }

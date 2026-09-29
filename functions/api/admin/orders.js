@@ -6,7 +6,7 @@ import { json, err, requireAdmin, ORDER_STATUSES } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const url = new URL(request.url);
@@ -35,13 +35,14 @@ export async function onRequestGet(context) {
     });
     return json({ orders });
   } catch (e) {
-    return err('অর্ডার লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/orders failed:', e && e.message);
+    return err('অর্ডার লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPatch(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const b = await request.json();
@@ -73,6 +74,7 @@ export async function onRequestPatch(context) {
 
     return json({ ok: true });
   } catch (e) {
-    return err('আপডেট করা যায়নি: ' + e.message, 500);
+    console.error('admin/orders failed:', e && e.message);
+    return err('আপডেট করা যায়নি', 500);
   }
 }

@@ -32,8 +32,8 @@ nextgentechbd/
 │       │   ├── logout.js         ← POST /api/customer/logout
 │       │   ├── me.js             ← GET /api/customer/me (সেশন টোকেন দিয়ে যাচাই)
 │       │   ├── orders.js         ← GET /api/customer/orders (লগইন করা গ্রাহকের অর্ডার হিস্টোরি)
-│       │   ├── forgot-password.js ← POST /api/customer/forgot-password (মোবাইল নম্বর যাচাই)
-│       │   └── reset-password.js  ← POST /api/customer/reset-password (নম্বর + নতুন পাসওয়ার্ড দিয়ে সরাসরি সেট)
+│       │   ├── forgot-password.js ← POST /api/customer/forgot-password (ইমেইলে রিসেট লিংক পাঠায়)
+│       │   └── reset-password.js  ← POST /api/customer/reset-password (ইমেইলের টোকেন + নতুন পাসওয়ার্ড)
 │       └── admin/
 │           ├── login.js      ← POST /api/admin/login
 │           ├── products.js   ← GET/POST/DELETE — পণ্য CRUD (X-Admin-Key লাগবে)
@@ -151,3 +151,31 @@ npm run dev
 - অর্ডার পেমেন্ট এখনো ম্যানুয়াল (বিকাশ/নগদ/রকেট সেন্ড মানি + COD) — সরাসরি পেমেন্ট গেটওয়ে (SSLCommerz/bKash Merchant) নেই
 - Cloudflare Pages/D1-এর ফ্রি টিয়ারেই এই সাইট চালানো যাবে; ট্রাফিক অনেক বেড়ে গেলে Cloudflare-এর প্ল্যান দেখে নিন
 - ADMIN_KEY-কে পাসওয়ার্ডের মতোই গোপন রাখুন — এটাই এখন অ্যাডমিন প্যানেলের একমাত্র সুরক্ষা
+
+---
+
+## 🔒 সিকিউরিটি সেটআপ (নতুন)
+
+**Environment variables (Cloudflare Pages → Settings → Environment variables → Production):**
+
+| নাম | মান | Secret? |
+|---|---|---|
+| `ADMIN_KEY` | প্রথমবার লগইনের পাসওয়ার্ড (ইমেইলে রিসেট করার পর DB-র নতুন পাসওয়ার্ড কাজ করে) | ✅ |
+| `BREVO_API_KEY` (অথবা `RESEND_API_KEY`) | ইমেইল সার্ভিসের API key | ✅ |
+| `EMAIL_FROM` | Brevo-তে ভেরিফাই করা প্রেরকের ইমেইল | না |
+| `SITE_URL` | `https://nextgentechbd.pages.dev` (রিসেট লিংকে ব্যবহার হয়) | না |
+| `ADMIN_EMAIL` | (ঐচ্ছিক) অ্যাডমিন রিসেট ইমেইল যেখানে যাবে; ডিফল্ট `tnextgen04@gmail.com` | না |
+
+**ডেটাবেজ মাইগ্রেশন (ডিপ্লয়ের আগে, একবার):**
+```
+npm run db:migrate:passwordreset
+npm run db:migrate:ratelimits
+```
+
+**কী কী সুরক্ষা আছে:**
+- ইমেইলের মাধ্যমে পাসওয়ার্ড রিসেট (৩০ মিনিটের একবার-ব্যবহারযোগ্য লিংক, ডেটাবেজে শুধু হ্যাশ)
+- অ্যাডমিন লগইনে মেয়াদি সেশন (১২ ঘণ্টা), ভুল চেষ্টায় লকআউট
+- অর্ডারের দাম/ডেলিভারি/কুপন সবকিছু সার্ভারে ডেটাবেজের আসল দাম দিয়ে হিসাব হয় (ব্রাউজারের পাঠানো দাম উপেক্ষিত)
+- লগইন, রেজিস্টার, অর্ডার, ট্র্যাকিং, কুপন, রিভিউ ও রিসেটে rate limit
+- কাস্টমার/অ্যাডমিন সেশন টোকেন ডেটাবেজে হ্যাশ করে রাখা হয়
+- সব পেজে XSS সুরক্ষা (esc()), CSP ও অন্যান্য সিকিউরিটি হেডার (`public/_headers`)

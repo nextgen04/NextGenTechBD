@@ -17,7 +17,7 @@ async function sha1Hex(str) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
 
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_UPLOAD_PRESET } = env;
@@ -69,6 +69,7 @@ export async function onRequestPost(context) {
 
     return json({ ok: true, url: data.secure_url });
   } catch (e) {
-    return err('ছবি আপলোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/upload failed:', e && e.message);
+    return err('ছবি আপলোড করা যায়নি', 500);
   }
 }

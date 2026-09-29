@@ -13,6 +13,7 @@ export async function onRequestGet(context) {
     ).all();
     return json({ banners: res.results || [] });
   } catch (e) {
-    return err('ব্যানার লোড করা যায়নি: ' + e.message, 500);
+    console.error('banners failed:', e && e.message);
+    return err('ব্যানার লোড করা যায়নি', 500);
   }
 }

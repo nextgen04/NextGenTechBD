@@ -6,7 +6,7 @@ import { json, err, requireAdmin, toBool } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const status = (new URL(request.url).searchParams.get('status') || '').trim();
@@ -22,13 +22,14 @@ export async function onRequestGet(context) {
     const res = await env.DB.prepare(sql).bind(...binds).all();
     return json({ reviews: res.results || [] });
   } catch (e) {
-    return err('রিভিউ লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/reviews failed:', e && e.message);
+    return err('রিভিউ লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPatch(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const b = await request.json();
@@ -46,13 +47,14 @@ export async function onRequestPatch(context) {
     await env.DB.prepare(`UPDATE reviews SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
     return json({ ok: true });
   } catch (e) {
-    return err('আপডেট করা যায়নি: ' + e.message, 500);
+    console.error('admin/reviews failed:', e && e.message);
+    return err('আপডেট করা যায়নি', 500);
   }
 }
 
 export async function onRequestDelete(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const id = new URL(request.url).searchParams.get('id');
@@ -60,6 +62,7 @@ export async function onRequestDelete(context) {
     await env.DB.prepare('DELETE FROM reviews WHERE id = ?').bind(Number(id)).run();
     return json({ ok: true });
   } catch (e) {
-    return err('রিভিউ মুছা যায়নি: ' + e.message, 500);
+    console.error('admin/reviews failed:', e && e.message);
+    return err('রিভিউ মুছা যায়নি', 500);
   }
 }

@@ -5,7 +5,7 @@ import { json, err, requireAdmin, toBool } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const row = await env.DB.prepare(
@@ -17,13 +17,14 @@ export async function onRequestGet(context) {
     ).first();
     return json(row || {});
   } catch (e) {
-    return err('সেটিংস লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/settings failed:', e && e.message);
+    return err('সেটিংস লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPut(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const b = await request.json();
@@ -65,6 +66,7 @@ export async function onRequestPut(context) {
       .run();
     return json({ ok: true });
   } catch (e) {
-    return err('সেটিংস সংরক্ষণ করা যায়নি: ' + e.message, 500);
+    console.error('admin/settings failed:', e && e.message);
+    return err('সেটিংস সংরক্ষণ করা যায়নি', 500);
   }
 }

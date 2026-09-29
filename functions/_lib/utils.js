@@ -14,17 +14,22 @@ export function err(message, status = 400) {
   return json({ error: message }, status);
 }
 
-// অ্যাডমিন প্যানেলের প্রতিটি রিকোয়েস্টে 'X-Admin-Key' হেডারে সিক্রেট কী থাকতে হবে।
-// এই কী Cloudflare Pages প্রজেক্টের Environment Variable/Secret হিসেবে ADMIN_KEY নামে সেট করতে হবে।
-export function requireAdmin(request, env) {
-  const key = request.headers.get('X-Admin-Key') || '';
-  if (!env.ADMIN_KEY) {
-    return err('সার্ভারে ADMIN_KEY সেট করা হয়নি — Cloudflare Pages → Settings → Environment variables এ যোগ করুন', 500);
+// অ্যাডমিন প্যানেলের প্রতিটি রিকোয়েস্টে 'X-Admin-Key' হেডারে লগইনের সময় পাওয়া মেয়াদি সেশন টোকেন থাকতে হবে।
+// (আসল ADMIN_KEY/পাসওয়ার্ড শুধু /api/admin/login এ যায়; বাকি সব রিকোয়েস্টে টোকেন যায় — DB-তে টোকেনের শুধু হ্যাশ থাকে)
+export async function requireAdmin(request, env) {
+  const token = request.headers.get('X-Admin-Key') || '';
+  if (!token) return err('অননুমোদিত — লগইন করুন', 401);
+  try {
+    const hash = await sha256Hex(token);
+    const row = await env.DB.prepare('SELECT expires_at FROM admin_sessions WHERE token_hash = ?').bind(hash).first();
+    if (!row || new Date(row.expires_at).getTime() < Date.now()) {
+      return err('অননুমোদিত — সেশন শেষ, আবার লগইন করুন', 401);
+    }
+    return null; // null মানে অনুমোদিত, আটকানোর দরকার নেই
+  } catch (e) {
+    console.error('requireAdmin failed:', e && e.message);
+    return err('সার্ভারে সমস্যা হয়েছে', 500);
   }
-  if (!key || key !== env.ADMIN_KEY) {
-    return err('অননুমোদিত — সঠিক অ্যাডমিন কী দিয়ে লগইন করুন', 401);
-  }
-  return null; // null মানে অনুমোদিত, আটকানোর দরকার নেই
 }
 
 export function parseListField(v) {
@@ -68,7 +73,7 @@ export async function createPasswordRecord(password) {
 
 export async function verifyPassword(password, salt, expectedHash) {
   const hash = await hashPassword(password, salt);
-  return hash === expectedHash;
+  return safeEqual(hash, expectedHash);
 }
 
 /* ============ গ্রাহক সেশন টোকেন ============ */
@@ -89,12 +94,13 @@ export async function getCustomerFromRequest(request, env) {
   const token = request.headers.get('X-Session-Token');
   if (!token) return null;
   try {
+    const tokenHash = await sha256Hex(token); // DB-তে টোকেনের শুধু হ্যাশ থাকে
     const row = await env.DB.prepare(
       `SELECT s.customer_id as customer_id, s.expires_at as expires_at, c.name as name, c.phone as phone, c.email as email
        FROM customer_sessions s JOIN customers c ON c.id = s.customer_id
        WHERE s.token = ?`
     )
-      .bind(token)
+      .bind(tokenHash)
       .first();
     if (!row) return null;
     if (new Date(row.expires_at).getTime() < Date.now()) return null;
@@ -121,3 +127,53 @@ export async function logAdminLogin(env, success, request) {
     // লগ ব্যর্থ হলেও লগইন প্রসেস আটকানো ঠিক না
   }
 }
+
+
+/* ============ রিসেট/সেশন হেল্পার (ইমেইলের মাধ্যমে পাসওয়ার্ড রিসেটের জন্য) ============ */
+
+export const DEFAULT_ADMIN_EMAIL = 'tnextgen04@gmail.com';
+export const RESET_TOKEN_MINUTES = 30;
+export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+export function adminEmail(env) {
+  return String(env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL).trim();
+}
+
+export function normalizeEmail(v) {
+  return String(v || '').trim().toLowerCase();
+}
+
+export async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(str)));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// constant-time তুলনা (দুটোকেই আগে SHA-256 করে নেওয়া হয় যাতে দৈর্ঘ্য/সময় থেকে কিছু বোঝা না যায়)
+export async function safeEqual(a, b) {
+  const [ha, hb] = await Promise.all([sha256Hex(a), sha256Hex(b)]);
+  let diff = 0;
+  for (let i = 0; i < ha.length; i++) diff |= ha.charCodeAt(i) ^ hb.charCodeAt(i);
+  return diff === 0;
+}
+
+// ৬৪ অক্ষরের র‍্যান্ডম হেক্স টোকেন (২৫৬ বিট)
+export function newSecretToken() {
+  return randomHex(32);
+}
+
+export function futureIso(minutes) {
+  return new Date(Date.now() + minutes * 60 * 1000).toISOString();
+}
+
+// রিসেট লিংকে ব্যবহারের জন্য সাইটের বেস URL — SITE_URL env সেট থাকলে সেটা, নাহলে রিকোয়েস্টের origin
+export function siteUrl(request, env) {
+  return String(env.SITE_URL || new URL(request.url).origin).replace(/\/+$/, '');
+}
+
+export function escapeHtml(v) {
+  return String(v === null || v === undefined ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+export const TOKEN_RE = /^[0-9a-f]{64}$/;

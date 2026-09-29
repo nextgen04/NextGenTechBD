@@ -6,7 +6,7 @@ import { json, err, requireAdmin } from '../../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const res = await env.DB.prepare(
@@ -14,13 +14,14 @@ export async function onRequestGet(context) {
     ).all();
     return json({ count: (res.results || []).length, orders: res.results || [] });
   } catch (e) {
-    return err('নোটিফিকেশন লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/orders/unseen failed:', e && e.message);
+    return err('নোটিফিকেশন লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const denied = requireAdmin(request, env);
+  const denied = await requireAdmin(request, env);
   if (denied) return denied;
   try {
     const b = await request.json().catch(() => ({}));
@@ -32,6 +33,7 @@ export async function onRequestPost(context) {
     }
     return json({ ok: true });
   } catch (e) {
-    return err('আপডেট করা যায়নি: ' + e.message, 500);
+    console.error('admin/orders/unseen failed:', e && e.message);
+    return err('আপডেট করা যায়নি', 500);
   }
 }

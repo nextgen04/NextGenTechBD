@@ -2,6 +2,7 @@
 // GET  → ?product_id=123 দিয়ে সেই পণ্যের অনুমোদিত (approved) রিভিউ
 // POST → নতুন রিভিউ জমা দেওয়া (অ্যাডমিন অনুমোদনের আগ পর্যন্ত সাইটে দেখা যাবে না)
 import { json, err } from '../_lib/utils.js';
+import { rateLimit } from '../_lib/ratelimit.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -14,12 +15,15 @@ export async function onRequestGet(context) {
     ).bind(Number(productId)).all();
     return json({ reviews: res.results || [] });
   } catch (e) {
-    return err('রিভিউ লোড করা যায়নি: ' + e.message, 500);
+    console.error('reviews failed:', e && e.message);
+    return err('রিভিউ লোড করা যায়নি', 500);
   }
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const limited = await rateLimit(env, request, 'review', 5, 60 * 60);
+  if (limited) return limited;
   try {
     const b = await request.json();
     const productId = Number(b.product_id);
@@ -39,6 +43,7 @@ export async function onRequestPost(context) {
 
     return json({ ok: true, message: 'রিভিউ জমা হয়েছে — অ্যাডমিন অনুমোদনের পর এটা পণ্যের পাতায় দেখা যাবে' });
   } catch (e) {
-    return err('রিভিউ জমা করা যায়নি: ' + e.message, 500);
+    console.error('reviews failed:', e && e.message);
+    return err('রিভিউ জমা করা যায়নি', 500);
   }
 }
