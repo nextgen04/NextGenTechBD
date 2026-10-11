@@ -1,8 +1,7 @@
 // /api/admin/site-text — অ্যাডমিন প্যানেল থেকে হোমপেজের সেকশন-শিরোনাম বদলানো (X-Admin-Key হেডার লাগবে)
 // GET → বর্তমান সব টেক্সট (key-value)
 // PUT → { flash_sale_title, categories_title, just_for_you_title, ... } দিয়ে একসাথে আপডেট
-import { json, err } from '../../_lib/utils.js';
-import { requireAdmin } from '../../_lib/auth.js';
+import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -14,7 +13,8 @@ export async function onRequestGet(context) {
     (res.results || []).forEach((row) => { out[row.key] = row.value; });
     return json(out);
   } catch (e) {
-    return err('টেক্সট লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/site-text failed:', e && e.message);
+    return err('টেক্সট লোড করা যায়নি', 500);
   }
 }
 
@@ -37,6 +37,7 @@ export async function onRequestPut(context) {
 
     return json({ ok: true });
   } catch (e) {
-    return err('টেক্সট সংরক্ষণ করা যায়নি: ' + e.message, 500);
+    console.error('admin/site-text failed:', e && e.message);
+    return err('টেক্সট সংরক্ষণ করা যায়নি', 500);
   }
 }

@@ -1,8 +1,7 @@
 // /api/admin/customers — অ্যাডমিন প্যানেলে কাস্টমার ম্যানেজমেন্ট (X-Admin-Key হেডার লাগবে)
 // GET   → ?q=সার্চ দিয়ে সব কাস্টমারের তালিকা, প্রতিটার সাথে অর্ডার সংখ্যা ও মোট কেনাকাটার পরিমাণ
 // PATCH → { id, blocked?, notes? } দিয়ে ব্লক/আনব্লক অথবা নোট আপডেট
-import { json, err } from '../../_lib/utils.js';
-import { requireAdmin } from '../../_lib/auth.js';
+import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -30,7 +29,8 @@ export async function onRequestGet(context) {
     const res = await env.DB.prepare(sql).bind(...binds).all();
     return json({ customers: res.results || [] });
   } catch (e) {
-    return err('কাস্টমার লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/customers failed:', e && e.message);
+    return err('কাস্টমার লোড করা যায়নি', 500);
   }
 }
 
@@ -50,6 +50,7 @@ export async function onRequestPatch(context) {
     await env.DB.prepare(`UPDATE customers SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
     return json({ ok: true });
   } catch (e) {
-    return err('আপডেট করা যায়নি: ' + e.message, 500);
+    console.error('admin/customers failed:', e && e.message);
+    return err('আপডেট করা যায়নি', 500);
   }
 }

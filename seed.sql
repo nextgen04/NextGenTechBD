@@ -67,6 +67,3 @@ INSERT INTO products (id, cat, name, name_en, price, old, e, img, r, rv, sold, t
 
 DELETE FROM settings;
 INSERT INTO settings (id, phone, whatsapp, telegram, facebook, email, bkash, nagad, rocket, cod) VALUES (1, '01717877955', '8801717877955', '8801717877955', 'https://www.facebook.com/share/19KVN4rZkS/', 'tnextgen04@gmail.com', '01717877955', '01717877955', '01717877955', 1);
-
--- মার্কেটপ্লেস: seed করা সব পণ্য ডিফল্ট সেলার "NextGenTechBD Official"-এর অধীনে (schema.sql চালানোর পর seed.sql চালাতে হবে)
-UPDATE products SET seller_id = (SELECT id FROM sellers WHERE seller_code = 'SYS-OFFICIAL') WHERE seller_id IS NULL;

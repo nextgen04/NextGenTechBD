@@ -1,6 +1,5 @@
 // GET /api/admin/login-log — সাম্প্রতিক অ্যাডমিন লগইন চেষ্টার লগ (X-Admin-Key লাগবে)
-import { json, err } from '../../_lib/utils.js';
-import { requireAdmin } from '../../_lib/auth.js';
+import { json, err, requireAdmin } from '../../_lib/utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -12,6 +11,7 @@ export async function onRequestGet(context) {
     ).all();
     return json({ logs: res.results || [] });
   } catch (e) {
-    return err('লগ লোড করা যায়নি: ' + e.message, 500);
+    console.error('admin/login-log failed:', e && e.message);
+    return err('লগ লোড করা যায়নি', 500);
   }
 }

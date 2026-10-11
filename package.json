@@ -3,10 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "description": "NextGenTechBD — Cloudflare Pages + D1 ব্যাকএন্ড সহ ই-কমার্স সাইট",
-  "devDependencies": {
-    "wrangler": "^3.90.0"
-  },
-  "type": "module",
   "scripts": {
     "dev": "wrangler pages dev public --d1=DB",
     "db:init": "wrangler d1 execute nextgentechbd-db --remote --file=./schema.sql",
@@ -18,11 +14,10 @@
     "db:migrate:sitetext": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/003_add_site_text.sql",
     "db:migrate:adminupgrade": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/004_admin_upgrade.sql",
     "db:migrate:orderseen": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/005_add_order_seen.sql",
-    "db:migrate:sellers": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/007_add_seller_system.sql",
-    "db:migrate:orderitems": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/008_add_order_items.sql",
-    "db:migrate:subscriptions": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/009_add_subscriptions.sql",
-    "test": "node --test --no-warnings tests/*.test.mjs",
-    "test:ui": "python3 tests/run-ui-smoke.py",
-    "db:migrate:productfields": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/010_add_product_fields.sql"
+    "db:migrate:passwordreset": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/007_password_reset.sql",
+    "db:migrate:ratelimits": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/008_rate_limits.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
   }
 }
