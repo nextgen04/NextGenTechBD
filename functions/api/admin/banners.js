@@ -2,7 +2,8 @@
 // GET    → সব ব্যানারের তালিকা
 // POST   → নতুন ব্যানার তৈরি অথবা (body.id দিলে) বিদ্যমান ব্যানার আপডেট
 // DELETE → ?id=123 দিয়ে ব্যানার মুছে ফেলা
-import { json, err, requireAdmin, toBool } from '../../_lib/utils.js';
+import { json, err, toBool } from '../../_lib/utils.js';
+import { requireAdmin } from '../../_lib/auth.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -14,8 +15,7 @@ export async function onRequestGet(context) {
     ).all();
     return json({ banners: res.results || [] });
   } catch (e) {
-    console.error('admin/banners failed:', e && e.message);
-    return err('ব্যানার লোড করা যায়নি', 500);
+    return err('ব্যানার লোড করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -44,8 +44,7 @@ export async function onRequestPost(context) {
       return json({ ok: true, id: res.meta.last_row_id });
     }
   } catch (e) {
-    console.error('admin/banners failed:', e && e.message);
-    return err('ব্যানার সংরক্ষণ করা যায়নি', 500);
+    return err('ব্যানার সংরক্ষণ করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -59,7 +58,6 @@ export async function onRequestDelete(context) {
     await env.DB.prepare('DELETE FROM banners WHERE id = ?').bind(Number(id)).run();
     return json({ ok: true });
   } catch (e) {
-    console.error('admin/banners failed:', e && e.message);
-    return err('ব্যানার মুছা যায়নি', 500);
+    return err('ব্যানার মুছা যায়নি: ' + e.message, 500);
   }
 }

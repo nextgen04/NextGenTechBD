@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>স্টোর — NextGenTechBD</title>
+<meta name="description" content="NextGenTechBD মার্কেটপ্লেসের সেলার স্টোর">
+<style>
+:root{--orange:#F85606;--orange-dark:#e04a04;--bg:#f4f4f4;--text:#222;--muted:#8a8a8a;--border:#ececec}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14.5px;line-height:1.5}
+button,select,input{font:inherit}button{cursor:pointer;border:0;background:none}
+header{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.07);position:sticky;top:0;z-index:20}
+.top{max-width:1180px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.brand{font-weight:800;color:var(--orange-dark);font-size:17px;text-decoration:none;flex:1}
+.cartbtn{position:relative;background:var(--orange);color:#fff;border-radius:8px;padding:8px 14px;font-weight:700;text-decoration:none;font-size:13.5px}
+.cartbtn b{position:absolute;top:-7px;right:-7px;background:#d0021b;color:#fff;border-radius:10px;font-size:11px;padding:0 6px;min-width:18px;text-align:center}
+main{max-width:1180px;margin:0 auto;padding:14px}
+.hero{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.logo{width:84px;height:84px;border-radius:50%;object-fit:cover;background:#fff1e8;color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;flex:none;border:3px solid #fff1e8}
+.hero h1{font-size:22px;line-height:1.25}.badge{display:inline-block;background:#e6f6ec;color:#1a9f4b;font-size:12px;font-weight:700;padding:2px 9px;border-radius:12px;margin-left:6px;vertical-align:middle}
+.hero p{color:#666;margin-top:4px;max-width:640px;white-space:pre-line}
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:#555}.stats b{color:var(--text)}.rate{color:#e08a00;font-weight:800}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.bar input,.bar select{padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:#fff}.bar input{flex:1;min-width:170px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:thin}
+.chip{white-space:nowrap;background:#fff;border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px}.chip.on{background:#fff1e8;border-color:var(--orange);color:var(--orange-dark);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
+@media(max-width:420px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}}
+.card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);display:flex;flex-direction:column;cursor:pointer;position:relative}
+.img{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:54px;position:relative;overflow:hidden}.img img{width:100%;height:100%;object-fit:cover}
+.off{position:absolute;top:8px;left:8px;background:var(--orange);color:#fff;font-size:11.5px;font-weight:800;border-radius:6px;padding:1px 7px}
+.body{padding:9px 10px 10px;display:flex;flex-direction:column;gap:4px;flex:1}
+.name{font-weight:600;font-size:13.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:36px}
+.price{font-weight:800;color:var(--orange-dark);font-size:15px}.price s{color:#aaa;font-weight:400;font-size:12px;margin-left:5px}
+.meta{font-size:12px;color:#888}.add{margin-top:auto;background:var(--orange);color:#fff;border-radius:8px;padding:8px;font-weight:700;font-size:13px}.add:active{transform:scale(.98)}
+.card.oos .img img,.card.oos .img span{opacity:.45}.oosb{position:absolute;left:8px;bottom:8px;background:rgba(34,34,34,.85);color:#fff;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:12px}.add[disabled]{background:#bbb;cursor:not-allowed}
+.empty{text-align:center;color:var(--muted);padding:40px 12px;background:#fff;border-radius:12px}.empty .big{font-size:48px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(30px);background:#222;color:#fff;padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;z-index:99;pointer-events:none;max-width:92vw}#toast.on{opacity:1;transform:translateX(-50%)}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:18px 10px 28px}footer a{color:var(--orange-dark)}
+</style>
+</head>
+<body>
+<header><div class="top"><a class="brand" href="/">🛍️ NextGenTechBD</a><a class="cartbtn" id="cartLink" href="/#cart">🛒 <span id="cartTxt">কার্ট</span><b id="cartN" style="display:none">0</b></a></div></header>
+<main id="app"><div class="empty"><div class="big">⏳</div>লোড হচ্ছে…</div></main>
+<footer>© NextGenTechBD মার্কেটপ্লেস · <a href="/">সব পণ্য দেখুন</a></footer>
+<div id="toast" role="status"></div>
+<script>
+/* স্টোর পেজ — URL: /store/<slug>। ডেটা: /api/store/<slug> (শুধু সক্রিয় সেলারের সক্রিয় পণ্য)। সব ডেটা esc() করে বসানো হয়। */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = (n) => '৳' + Number(n).toLocaleString('en-US');
+const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const EN = load('sb_lang', 'bn') === 'en';
+const L2 = (bn, en) => (EN ? en : bn);
+const GRADS = [['#FFF3E0', '#FFE0B2'], ['#E3F2FD', '#BBDEFB'], ['#F3E5F5', '#E1BEE7'], ['#E8F5E9', '#C8E6C9'], ['#FCE4EC', '#F8BBD0'], ['#FFFDE7', '#FFF9C4'], ['#E0F7FA', '#B2EBF2'], ['#FBE9E7', '#FFCCBC']];
+const grad = (id) => 'linear-gradient(135deg,' + GRADS[id % 8][0] + ',' + GRADS[id % 8][1] + ')';
+const nameOf = (p) => (EN && p.name_en) || p.name;
+const slug = decodeURIComponent((location.pathname.replace(/\/+$/, '').split('/').pop() || '')).toLowerCase();
+let DATA = null, cat = '', q = '', sort = 'pop';
+
+function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2200); }
+function cartCount() { return Object.values(load('sb_cart', {})).reduce((a, b) => a + (Number(b) || 0), 0); }
+function badge() { const n = cartCount(); $('cartN').style.display = n ? '' : 'none'; $('cartN').textContent = n; $('cartTxt').textContent = L2('কার্ট', 'Cart'); }
+function addToCart(id, ev) {
+  ev.stopPropagation();
+  const pp = DATA.products.find((x) => x.id === id); if (pp && pp.oos) { toast(L2('😕 এই পণ্যের স্টক শেষ', '😕 Sold out')); return; }
+  const cart = load('sb_cart', {}); cart[id] = Math.min(20, (Number(cart[id]) || 0) + 1); save('sb_cart', cart); badge();
+  const p = DATA.products.find((x) => x.id === id); toast('✅ ' + L2('কার্টে যোগ হয়েছে: ', 'Added: ') + (p ? nameOf(p).slice(0, 26) : ''));
+}
+function openProduct(id) { location.href = '/#p=' + id; }
+
+function visible() {
+  const t = q.trim().toLowerCase();
+  let list = DATA.products.filter((p) => (!cat || p.cat === cat) && (!t || nameOf(p).toLowerCase().includes(t) || p.name.toLowerCase().includes(t)));
+  const off = (p) => (p.old && p.old > p.price ? (p.old - p.price) / p.old : 0);
+  if (sort === 'plow') list.sort((a, b) => a.price - b.price);
+  else if (sort === 'phigh') list.sort((a, b) => b.price - a.price);
+  else if (sort === 'off') list.sort((a, b) => off(b) - off(a));
+  else if (sort === 'new') list.sort((a, b) => b.id - a.id);
+  else list.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.sold || 0) - (a.sold || 0) || b.id - a.id);   // ফিচার্ড আগে
+  return list;
+}
+function cardHTML(p) {
+  const off = p.old && p.old > p.price ? Math.round((p.old - p.price) / p.old * 100) : 0;
+  return '<div class="card' + (p.oos ? ' oos' : '') + '" onclick="openProduct(' + Number(p.id) + ')"><div class="img" style="background:' + grad(p.id) + '">' + (off ? '<span class="off">-' + off + '%</span>' : '') + (p.oos ? '<span class="oosb">' + L2('স্টক শেষ', 'Sold out') + '</span>' : '') + (p.featured ? '<span class="off" style="left:auto;right:8px;background:#e08a00">⭐</span>' : '') +
+    (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(nameOf(p)) + '" loading="lazy">' : '<span>' + esc(p.e || '📦') + '</span>') + '</div>' +
+    '<div class="body"><div class="name">' + esc(nameOf(p)) + '</div><div class="price">' + money(p.price) + (p.old ? '<s>' + money(p.old) + '</s>' : '') + '</div>' +
+    (p.rv ? '<div class="meta">★ ' + Number(p.r).toFixed(1) + ' (' + Number(p.rv) + ')</div>' : '') +
+    '<button class="add"' + (p.oos ? ' disabled' : '') + ' onclick="addToCart(' + Number(p.id) + ',event)">' + (p.oos ? L2('স্টক শেষ', 'Sold out') : '🛒 ' + L2('কার্টে যোগ করুন', 'Add to cart')) + '</button></div></div>';
+}
+function renderGrid() {
+  const list = visible();
+  $('cnt').textContent = list.length + L2('টি পণ্য', ' products');
+  $('grid').innerHTML = list.length ? list.map(cardHTML).join('') : '<div class="empty" style="grid-column:1/-1"><div class="big">😕</div>' + L2('কোনো পণ্য পাওয়া যায়নি', 'No products found') + '</div>';
+}
+function renderChips() {
+  const all = [{ id: '', label: L2('সব', 'All') }].concat(DATA.categories.map((c) => ({ id: c.id, label: (c.e || '') + ' ' + ((EN && c.name_en) || c.name) })));
+  $('chips').innerHTML = all.map((c) => '<button class="chip' + (c.id === cat ? ' on' : '') + '" data-c="' + esc(c.id) + '">' + esc(c.label) + '</button>').join('');
+  $('chips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { cat = b.dataset.c; renderChips(); renderGrid(); });
+}
+function render() {
+  const s = DATA.store;
+  document.title = s.name + ' — NextGenTechBD';
+  const md = document.querySelector('meta[name=description]'); if (md) md.content = (s.description || s.name).slice(0, 150);
+  const logo = s.logo ? '<img class="logo" src="' + esc(s.logo) + '" alt="">' : '<div class="logo">' + esc(s.name.trim().charAt(0).toUpperCase()) + '</div>';
+  const since = s.since ? new Date(String(s.since).replace(' ', 'T') + 'Z') : null;
+  $('app').innerHTML = '<div class="hero">' + logo + '<div style="flex:1;min-width:220px"><h1>' + esc(s.name) + (s.official ? '<span class="badge">✔ Official</span>' : '') + '</h1>' +
+    (s.description ? '<p>' + esc(s.description) + '</p>' : '') +
+    '<div class="stats"><span>' + (s.rating ? '<span class="rate">★ ' + Number(s.rating).toFixed(1) + '</span> (' + Number(s.rating_count) + ' ' + L2('রিভিউ', 'reviews') + ')' : L2('এখনো রেটিং নেই', 'No ratings yet')) + '</span>' +
+    '<span>📦 <b>' + Number(s.product_count) + '</b> ' + L2('টি পণ্য', 'products') + '</span>' +
+    (since && !isNaN(since) ? '<span>🗓️ ' + L2('যোগ দিয়েছেন: ', 'Joined: ') + since.toLocaleDateString(EN ? 'en-US' : 'bn-BD', { year: 'numeric', month: 'long' }) + '</span>' : '') + '</div></div></div>' +
+    '<div class="bar"><input id="q" type="search" placeholder="🔎 ' + L2('এই স্টোরে খুঁজুন', 'Search this store') + '"><select id="sort"><option value="pop">' + L2('জনপ্রিয়', 'Popular') + '</option><option value="new">' + L2('নতুন', 'Newest') + '</option><option value="plow">' + L2('দাম: কম → বেশি', 'Price: low → high') + '</option><option value="phigh">' + L2('দাম: বেশি → কম', 'Price: high → low') + '</option><option value="off">' + L2('বেশি ছাড়', 'Biggest discount') + '</option></select><span id="cnt" style="align-self:center;color:#888;font-size:13px"></span></div>' +
+    '<div class="chips" id="chips"></div><div class="grid" id="grid"></div>';
+  const lg = document.querySelector('img.logo');   // লোগো লোড না হলে নামের প্রথম অক্ষর
+  if (lg) lg.onerror = () => { const d = document.createElement('div'); d.className = 'logo'; d.textContent = s.name.trim().charAt(0).toUpperCase(); lg.replaceWith(d); };
+  $('q').oninput = (e) => { q = e.target.value; renderGrid(); };
+  $('sort').onchange = (e) => { sort = e.target.value; renderGrid(); };
+  renderChips(); renderGrid();
+}
+(async () => {
+  badge();
+  if (!/^[a-z0-9][a-z0-9-]{0,59}$/.test(slug)) return notFound();
+  try {
+    const r = await fetch('/api/store/' + encodeURIComponent(slug));
+    if (r.status === 404) return notFound();
+    if (!r.ok) throw new Error('x');
+    DATA = await r.json(); render();
+  } catch (e) { $('app').innerHTML = '<div class="empty"><div class="big">🔌</div><p>' + L2('স্টোর লোড করা যায়নি।', 'Could not load the store.') + '</p><p style="margin-top:10px"><button class="add" style="padding:8px 18px" onclick="location.reload()">' + L2('আবার চেষ্টা করুন', 'Retry') + '</button></p></div>'; }
+})();
+function notFound() {
+  document.title = L2('স্টোর পাওয়া যায়নি', 'Store not found') + ' — NextGenTechBD';
+  $('app').innerHTML = '<div class="empty"><div class="big">🏪</div><h2 style="margin:6px 0">' + L2('স্টোরটি পাওয়া যায়নি', 'Store not found') + '</h2><p>' + L2('এই স্টোরটি বন্ধ আছে অথবা লিংকটি ভুল।', 'This store is unavailable or the link is wrong.') + '</p><p style="margin-top:12px"><a class="cartbtn" href="/">' + L2('সব পণ্য দেখুন', 'Browse all products') + '</a></p></div>';
+}
+</script>
+</body>
+</html>

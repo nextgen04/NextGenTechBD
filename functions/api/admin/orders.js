@@ -2,7 +2,9 @@
 // GET   → ?q=সার্চ-টার্ম&status=pending দিয়ে সার্চ/ফিল্টার সহ অর্ডার তালিকা
 // PATCH → { id, status?, courier?, tracking_id?, payment_status?, note? } দিয়ে অর্ডার আপডেট
 //         status বদলালে order_status_history-তে স্বয়ংক্রিয়ভাবে এন্ট্রি হয়
-import { json, err, requireAdmin, ORDER_STATUSES } from '../../_lib/utils.js';
+import { json, err, ORDER_STATUSES } from '../../_lib/utils.js';
+import { requireAdmin } from '../../_lib/auth.js';
+import { adminSetItemsStatus } from '../../_lib/order-status.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -28,15 +30,26 @@ export async function onRequestGet(context) {
     sql += ' ORDER BY id DESC LIMIT 300';
 
     const res = await env.DB.prepare(sql).bind(...binds).all();
-    const orders = (res.results || []).map((o) => {
+    const rows = res.results || [];
+    // মাল্টি-সেলার: প্রতিটি অর্ডারের আইটেম সেলারসহ (পুরনো অর্ডারে order_items নেই → খালি তালিকা)
+    const byOrder = new Map();
+    if (rows.length) {
+      const ids = rows.map((o) => o.id);
+      const its = await env.DB.prepare(
+        `SELECT oi.id, oi.order_id, oi.seller_id, s.store_name AS seller_name, oi.product_id, oi.product_name_snapshot AS name, oi.price_snapshot AS price,
+                oi.quantity, oi.subtotal, oi.seller_status AS status, oi.courier, oi.tracking_id
+         FROM order_items oi LEFT JOIN sellers s ON s.id = oi.seller_id WHERE oi.order_id IN (${ids.map(() => '?').join(',')}) ORDER BY oi.id`
+      ).bind(...ids).all();
+      for (const it of its.results || []) { if (!byOrder.has(it.order_id)) byOrder.set(it.order_id, []); byOrder.get(it.order_id).push(it); }
+    }
+    const orders = rows.map((o) => {
       let items = [];
       try { items = JSON.parse(o.items); } catch (e) { items = o.items; }
-      return { ...o, items };
+      return { ...o, items, order_items: byOrder.get(o.id) || [] };
     });
     return json({ orders });
   } catch (e) {
-    console.error('admin/orders failed:', e && e.message);
-    return err('অর্ডার লোড করা যায়নি', 500);
+    return err('অর্ডার লোড করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -64,6 +77,11 @@ export async function onRequestPatch(context) {
     if (!sets.length) return err('আপডেট করার মতো কোনো তথ্য দেওয়া হয়নি', 400);
 
     binds.push(id);
+    // Super Admin override: অর্ডারে সেলার-আইটেম থাকলে নতুন স্ট্যাটাস সব আইটেমে বসে (বাতিল হলে স্টক ফেরত)। নির্দিষ্ট সেলারের আইটেম আলাদা করতে /api/admin/order-items।
+    if (b.status !== undefined) {
+      const its = await env.DB.prepare('SELECT id, product_id, quantity, seller_id, seller_status FROM order_items WHERE order_id = ?').bind(id).all();
+      if ((its.results || []).length) await adminSetItemsStatus(env, its.results, b.status, b.note || null);
+    }
     await env.DB.prepare(`UPDATE orders SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
 
     if (b.status !== undefined) {
@@ -74,7 +92,6 @@ export async function onRequestPatch(context) {
 
     return json({ ok: true });
   } catch (e) {
-    console.error('admin/orders failed:', e && e.message);
-    return err('আপডেট করা যায়নি', 500);
+    return err('আপডেট করা যায়নি: ' + e.message, 500);
   }
 }

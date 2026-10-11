@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>সেলার ড্যাশবোর্ড — NextGenTechBD</title>
+<style>
+:root{--orange:#F85606;--orange-dark:#e04a04;--bg:#f4f4f4;--card:#fff;--text:#222;--muted:#8a8a8a;--border:#ececec;--green:#1a9f4b;--red:#d0021b;--blue:#1565c0;--radius:10px;--shadow:0 2px 10px rgba(0,0,0,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14.5px;line-height:1.5}
+button{font:inherit;cursor:pointer;border:0;background:none}
+header{background:#fff;box-shadow:var(--shadow);position:sticky;top:0;z-index:20;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.brand{font-weight:800;color:var(--orange-dark);font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bell{position:relative;font-size:20px;padding:4px 8px}
+.bell b{position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;border-radius:10px;font-size:11px;padding:0 5px;min-width:17px;text-align:center}
+.btn{background:var(--orange);color:#fff;padding:9px 16px;border-radius:8px;font-weight:700;font-size:13.5px}
+.btn.sec{background:#fff;color:var(--text);border:1px solid var(--border)}
+.btn.red{background:var(--red)}.btn.sm{padding:6px 10px;font-size:12.5px}
+nav{display:flex;gap:4px;overflow-x:auto;background:#fff;padding:0 8px;border-top:1px solid var(--border);position:sticky;top:53px;z-index:19;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{padding:11px 13px;white-space:nowrap;font-weight:600;color:var(--muted);border-bottom:3px solid transparent}
+nav button.on{color:var(--orange-dark);border-color:var(--orange)}
+main{max-width:1100px;margin:0 auto;padding:14px}
+.banner{padding:11px 14px;border-radius:var(--radius);margin-bottom:12px;font-weight:600;font-size:13.5px}
+.banner.trial{background:#fff4e5;color:#8a4b00}.banner.exp{background:#fde8ea;color:var(--red)}.banner.ok{background:#e6f6ec;color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px}
+.stat small{color:var(--muted);display:block;font-size:12.5px}.stat b{font-size:21px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:12px}
+.card h3{font-size:15px;margin-bottom:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit;background:#fff}
+.row input,.row select{width:auto;flex:1;min-width:110px}
+label{font-size:12.5px;font-weight:600;display:block;margin:8px 0 3px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.form .full{grid-column:1/-1}
+@media(max-width:560px){.form{grid-template-columns:1fr}}
+.plist{display:grid;gap:10px}
+.prod{display:flex;gap:10px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px}
+.prod .im{width:64px;height:64px;border-radius:8px;background:#f1f1f1;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex:none}
+.prod .im img{width:100%;height:100%;object-fit:cover}
+.prod .info{flex:1;min-width:0}.prod .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:10px;background:#eee;margin-right:4px}
+.tag.g{background:#e6f6ec;color:var(--green)}.tag.r{background:#fde8ea;color:var(--red)}.tag.o{background:#fff4e5;color:#8a4b00}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ord{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-bottom:10px}
+.ord.new{border-left:4px solid var(--orange)}
+.ord .it{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px dashed var(--border)}
+.muted{color:var(--muted);font-size:12.5px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:14px}
+.modal.on{display:flex}.modal>div{background:#fff;border-radius:12px;padding:16px;width:100%;max-width:640px;margin:auto}
+#toasts{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:99;display:grid;gap:8px;width:min(92vw,380px)}
+.toast{background:#222;color:#fff;padding:11px 14px;border-radius:10px;font-size:13.5px;box-shadow:0 4px 16px rgba(0,0,0,.25)}.toast.err{background:var(--red)}.toast.ok{background:var(--green)}
+.empty{text-align:center;color:var(--muted);padding:26px 10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" id="brand">🏪 সেলার প্যানেল</div>
+  <button class="bell" id="bell" title="নতুন অর্ডার" aria-label="নতুন অর্ডার">🔔<b id="bellN" style="display:none">0</b></button>
+  <button class="btn sec sm" id="logout">লগআউট</button>
+</header>
+<nav id="tabs">
+  <button data-t="dash" class="on">📊 ড্যাশবোর্ড</button><button data-t="products">📦 পণ্য</button><button data-t="orders">🧾 অর্ডার</button><button data-t="reviews">⭐ রিভিউ</button><button data-t="profile">⚙️ প্রোফাইল</button>
+</nav>
+<main><div id="banner"></div><div id="view"></div></main>
+<div class="modal" id="modal"><div id="modalBody"></div></div>
+<div id="toasts"></div>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = (n) => '৳' + Number(n || 0).toLocaleString('en-IN');
+const STATUS = { pending: 'পেন্ডিং', processing: 'প্রসেসিং', confirmed: 'কনফার্মড', shipped: 'শিপড', delivered: 'ডেলিভারড', cancelled: 'বাতিল', returned: 'ফেরত' };
+const NEXT = { pending: ['processing', 'confirmed', 'shipped', 'delivered', 'cancelled'], processing: ['confirmed', 'shipped', 'delivered', 'cancelled'], confirmed: ['processing', 'shipped', 'delivered', 'cancelled'], shipped: ['delivered', 'returned', 'cancelled'], delivered: ['returned'], cancelled: [], returned: [] };
+let me = null, sub = null, cats = [], tab = 'dash', lastNew = null;
+
+function toast(msg, kind) { const t = document.createElement('div'); t.className = 'toast ' + (kind || ''); t.textContent = msg; $('#toasts').appendChild(t); setTimeout(() => t.remove(), 3800); }
+function beep() { try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 880; g.gain.value = .08; o.start(); setTimeout(() => { o.stop(); c.close(); }, 220); } catch (e) {} }
+async function api(path, opt = {}) {
+  const r = await fetch('/api/seller/' + path, { credentials: 'same-origin', ...opt, headers: { ...(opt.body && !(opt.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}), ...(opt.headers || {}) },
+    body: opt.body && !(opt.body instanceof FormData) ? JSON.stringify(opt.body) : opt.body });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { location.href = '/seller/login'; throw new Error('401'); }
+  if (!r.ok) { const e = new Error(j.error || 'ত্রুটি হয়েছে'); e.code = j.code; throw e; }
+  return j;
+}
+const guard = (fn) => async (...a) => { try { await fn(...a); } catch (e) { if (e.message !== '401') toast(e.message, 'err'); } };
+
+function setSub(s) {
+  sub = s; const b = $('#banner');
+  if (!s) { b.innerHTML = ''; return; }
+  const d = s.days_left;
+  if (s.state === 'trial') b.innerHTML = `<div class="banner trial">🎁 ফ্রি ট্রায়াল চলছে — আর ${esc(d)} দিন বাকি। এরপর সাবস্ক্রিপশন লাগবে (Super Admin-এর সাথে যোগাযোগ করুন)।</div>`;
+  else if (s.state === 'active') b.innerHTML = `<div class="banner ok">✅ সাবস্ক্রিপশন সচল — আর ${esc(d)} দিন।</div>`;
+  else if (s.state === 'grace') b.innerHTML = `<div class="banner trial">⏳ মেয়াদ শেষ — গ্রেস পিরিয়ড চলছে। দ্রুত নবায়ন করুন।</div>`;
+  else if (!s.can_sell) b.innerHTML = `<div class="banner exp">⛔ আপনার ট্রায়াল/সাবস্ক্রিপশনের মেয়াদ শেষ। নতুন পণ্য যোগ/এডিট বন্ধ ও পণ্য দোকানে নাও দেখা যেতে পারে। চালু করতে Super Admin-এর সাথে যোগাযোগ করুন। (অর্ডার সামলাতে পারবেন।)</div>`;
+  else b.innerHTML = '';
+}
+
+/* ---------- ড্যাশবোর্ড ---------- */
+async function viewDash() {
+  const d = await api('dashboard'); setSub(d.subscription);
+  const S = (l, v) => `<div class="stat"><small>${l}</small><b>${v}</b></div>`;
+  $('#view').innerHTML = `
+    <div class="grid">${S('মোট পণ্য', d.products.total)}${S('সক্রিয় পণ্য', d.products.active)}${S('লো-স্টক', d.products.low_stock + d.products.out_of_stock)}${S('মোট অর্ডার', d.orders.total)}${S('পেন্ডিং অর্ডার', d.orders.pending)}${S('সম্পন্ন অর্ডার', d.orders.completed)}</div>
+    <div class="grid">${S('আজকের বিক্রি', money(d.sales.today))}${S('এই সপ্তাহ', money(d.sales.week))}${S('এই মাস', money(d.sales.month))}${S('মোট বিক্রি', money(d.sales.total))}</div>
+    <div class="card"><h3>🔔 নতুন অর্ডার</h3>${d.new_orders.items.length ? d.new_orders.items.map((i) => `<div class="it row" style="justify-content:space-between"><span>#${esc(i.order_no)} — ${esc(i.product)} ×${esc(i.quantity)}</span><b>${money(i.subtotal)}</b></div>`).join('') + '<button class="btn sm" id="goOrders" style="margin-top:8px">অর্ডার দেখুন</button>' : '<div class="muted">কোনো নতুন অর্ডার নেই</div>'}</div>
+    <div class="card"><h3>⚠️ লো-স্টক পণ্য</h3>${d.low_stock_products.length ? d.low_stock_products.map((p) => `<div class="row" style="justify-content:space-between;margin:4px 0"><span>${esc(p.name)}</span><span class="tag ${p.stock <= 0 ? 'r' : 'o'}">স্টক: ${esc(p.stock)}</span></div>`).join('') : '<div class="muted">সব পণ্যের স্টক ঠিক আছে</div>'}</div>`;
+  const g = $('#goOrders'); if (g) g.onclick = () => go('orders');
+  setBell(d.new_orders.count, true);
+}
+function setBell(n, quiet) {
+  const el = $('#bellN'); el.textContent = n; el.style.display = n ? '' : 'none';
+  if (lastNew !== null && n > lastNew && !quiet) { toast(`🔔 ${n - lastNew}টি নতুন অর্ডার এসেছে!`, 'ok'); beep(); }
+  lastNew = n;
+}
+async function poll() { try { const d = await api('dashboard'); setSub(d.subscription); setBell(d.new_orders.count); } catch (e) {} }
+
+/* ---------- পণ্য ---------- */
+let pq = '', ps = '';
+async function viewProducts() {
+  if (!cats.length) cats = (await api('categories')).categories;
+  $('#view').innerHTML = `<div class="row"><input id="pq" placeholder="নাম / SKU খুঁজুন" value="${esc(pq)}"><select id="ps"><option value="">সব স্ট্যাটাস</option><option value="active">সক্রিয়</option><option value="inactive">নিষ্ক্রিয়</option><option value="draft">ড্রাফট</option></select><button class="btn" id="addP">+ নতুন পণ্য</button></div><div class="plist" id="pl"><div class="empty">লোড হচ্ছে…</div></div>`;
+  $('#ps').value = ps; $('#pq').oninput = (e) => { pq = e.target.value; clearTimeout(viewProducts.t); viewProducts.t = setTimeout(loadP, 300); }; $('#ps').onchange = (e) => { ps = e.target.value; loadP(); };
+  $('#addP').onclick = () => productForm(); await loadP();
+}
+const loadP = guard(async () => {
+  const d = await api('products?' + new URLSearchParams({ q: pq, status: ps })); setSub(d.subscription);
+  const stClass = { active: 'g', inactive: 'r', draft: 'o' }, stName = { active: 'সক্রিয়', inactive: 'নিষ্ক্রিয়', draft: 'ড্রাফট' };
+  $('#pl').innerHTML = d.products.length ? d.products.map((p) => `<div class="prod"><div class="im">${p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy">` : esc(p.e || '📦')}</div>
+    <div class="info"><div class="nm">${esc(p.name)}</div><div><b>${money(p.price)}</b> ${p.old ? `<s class="muted">${money(p.old)}</s>` : ''}</div>
+    <div><span class="tag ${stClass[p.status]}">${stName[p.status] || esc(p.status)}</span><span class="tag ${p.stock != null && p.stock <= p.low_stock_at ? 'r' : ''}">স্টক: ${p.stock == null ? '—' : esc(p.stock)}</span>${p.sku ? `<span class="tag">${esc(p.sku)}</span>` : ''}</div>
+    <div class="acts"><button class="btn sec sm" data-e="${p.id}">✏️ এডিট</button><button class="btn sec sm" data-s="${p.id}">📥 স্টক</button><button class="btn red sm" data-d="${p.id}">🗑️</button></div></div></div>`).join('') : '<div class="empty">কোনো পণ্য নেই — "+ নতুন পণ্য" চাপুন</div>';
+  const map = new Map(d.products.map((p) => [p.id, p]));
+  $('#pl').querySelectorAll('[data-e]').forEach((b) => b.onclick = () => productForm(map.get(+b.dataset.e)));
+  $('#pl').querySelectorAll('[data-s]').forEach((b) => b.onclick = () => stockForm(map.get(+b.dataset.s)));
+  $('#pl').querySelectorAll('[data-d]').forEach((b) => b.onclick = guard(async () => {
+    if (!confirm('এই পণ্য মুছে ফেলবেন?')) return;
+    const r = await api('products/' + b.dataset.d, { method: 'DELETE' }); toast(r.message || 'পণ্য মুছে ফেলা হয়েছে', 'ok'); loadP();
+  }));
+});
+function openModal(html) { $('#modalBody').innerHTML = html; $('#modal').classList.add('on'); }
+function closeModal() { $('#modal').classList.remove('on'); }
+$('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+
+function productForm(p) {
+  const e = !!p; p = p || { status: 'active', low_stock_at: 5, f: 0 };
+  openModal(`<h3>${e ? 'পণ্য এডিট' : 'নতুন পণ্য'}</h3><form id="pf" class="form">
+    <div class="full"><label>পণ্যের নাম *</label><input name="name" value="${esc(p.name)}" required maxlength="200"></div>
+    <div><label>ইংরেজি নাম</label><input name="name_en" value="${esc(p.name_en)}"></div>
+    <div><label>ক্যাটাগরি *</label><select name="cat" required><option value="">— বাছাই করুন —</option>${cats.map((c) => `<option value="${esc(c.id)}" ${c.id === p.cat ? 'selected' : ''}>${esc(c.e || '')} ${esc(c.name)}</option>`).join('')}</select></div>
+    <div><label>মূল্য (৳) *</label><input name="price" type="number" min="1" step="1" value="${esc(p.price)}" required></div>
+    <div><label>পুরনো মূল্য (৳)</label><input name="old" type="number" min="1" step="1" value="${esc(p.old)}"></div>
+    <div><label>স্টক</label><input name="stock" type="number" min="0" step="1" value="${esc(p.stock)}"></div>
+    <div><label>লো-স্টক সীমা</label><input name="low_stock_at" type="number" min="0" step="1" value="${esc(p.low_stock_at)}"></div>
+    <div><label>SKU</label><input name="sku" value="${esc(p.sku)}"></div>
+    <div><label>ইমোজি (ছবি না থাকলে)</label><input name="e" value="${esc(p.e)}" maxlength="8"></div>
+    <div><label>ট্যাগ (হট/নতুন/ফ্রি ডেলিভারি)</label><input name="tag" value="${esc(p.tag)}"></div>
+    <div><label>স্ট্যাটাস</label><select name="status"><option value="active">সক্রিয়</option><option value="inactive">নিষ্ক্রিয়</option><option value="draft">ড্রাফট</option></select></div>
+    <div><label>রং (কমা দিয়ে)</label><input name="colors" value="${esc((p.colors || []).join(', '))}"></div>
+    <div><label>সাইজ (কমা দিয়ে)</label><input name="sizes" value="${esc((p.sizes || []).join(', '))}"></div>
+    <div class="full"><label>ছবি</label><div class="row"><input name="img" id="imgUrl" value="${esc(p.img)}" placeholder="https://… অথবা আপলোড করুন"><input type="file" id="imgFile" accept="image/jpeg,image/png,image/webp,image/gif" style="max-width:210px"></div><div class="muted" id="upMsg"></div></div>
+    <div class="full"><label>পণ্যের বিবরণ</label><textarea name="description" rows="4" maxlength="2000" placeholder="পণ্যের বৈশিষ্ট্য, ওয়ারেন্টি, মাপ ইত্যাদি">${esc(p.description)}</textarea></div>
+    <div class="full row"><label style="margin:0"><input type="checkbox" name="f" ${p.f ? 'checked' : ''} style="width:auto"> ⚡ ফ্ল্যাশ সেলে দেখান</label><label style="margin:0"><input type="checkbox" name="featured" ${p.featured ? 'checked' : ''} style="width:auto"> ⭐ ফিচার্ড পণ্য (আগে দেখাবে)</label></div>
+    <div class="full row" style="margin-top:10px"><button class="btn" type="submit">সংরক্ষণ করুন</button><button class="btn sec" type="button" id="cx">বাতিল</button></div></form>`);
+  $('#pf [name=status]').value = p.status || 'active'; $('#cx').onclick = closeModal;
+  $('#imgFile').onchange = guard(async (ev) => {
+    const f = ev.target.files[0]; if (!f) return; $('#upMsg').textContent = 'আপলোড হচ্ছে…';
+    const fd = new FormData(); fd.append('file', f);
+    try { const r = await api('upload', { method: 'POST', body: fd }); $('#imgUrl').value = r.url; $('#upMsg').textContent = '✅ আপলোড সম্পন্ন'; } catch (er) { $('#upMsg').textContent = ''; throw er; }
+  });
+  $('#pf').onsubmit = guard(async (ev) => {
+    ev.preventDefault(); const f = new FormData(ev.target); const num = (k) => (f.get(k) === '' ? null : Number(f.get(k)));
+    const list = (k) => String(f.get(k) || '').split(',').map((s) => s.trim()).filter(Boolean);
+    const body = { name: f.get('name'), name_en: f.get('name_en'), cat: f.get('cat'), price: num('price'), old: num('old'), stock: num('stock'), low_stock_at: num('low_stock_at') ?? 5,
+      sku: f.get('sku'), e: f.get('e'), tag: f.get('tag'), status: f.get('status'), colors: list('colors'), sizes: list('sizes'), img: f.get('img'), f: f.get('f') ? 1 : 0, featured: f.get('featured') ? 1 : 0, description: f.get('description') };
+    if (e) await api('products/' + p.id, { method: 'PUT', body }); else await api('products', { method: 'POST', body });
+    closeModal(); toast('পণ্য সংরক্ষণ হয়েছে', 'ok'); loadP();
+  });
+}
+function stockForm(p) {
+  openModal(`<h3>📥 স্টক — ${esc(p.name)}</h3><p class="muted">বর্তমান স্টক: <b>${p.stock == null ? '—' : esc(p.stock)}</b></p><form id="sf"><label>পরিবর্তন (+ বাড়াতে, − কমাতে)</label><input name="change" type="number" step="1" required placeholder="যেমন 10 বা -3"><label>কারণ</label><input name="reason" maxlength="200">
+    <div class="row" style="margin-top:12px"><button class="btn" type="submit">আপডেট</button><button class="btn sec" type="button" id="cx">বাতিল</button></div></form><h3 style="margin-top:14px">ইতিহাস</h3><div id="sh" class="muted">লোড হচ্ছে…</div>`);
+  $('#cx').onclick = closeModal;
+  api(`products/${p.id}/stock`).then((d) => { $('#sh').innerHTML = d.history.length ? d.history.map((h) => `<div class="row" style="justify-content:space-between;margin:3px 0"><span>${h.change > 0 ? '＋' : ''}${esc(h.change)} ${esc(h.reason || '')}</span><span>${esc(h.created_at)}</span></div>`).join('') : 'কোনো ইতিহাস নেই'; }).catch(() => {});
+  $('#sf').onsubmit = guard(async (ev) => { ev.preventDefault(); const f = new FormData(ev.target); await api(`products/${p.id}/stock`, { method: 'POST', body: { change: Number(f.get('change')), reason: f.get('reason') } }); closeModal(); toast('স্টক আপডেট হয়েছে', 'ok'); loadP(); });
+}
+
+/* ---------- অর্ডার ---------- */
+let os = '';
+async function viewOrders() {
+  $('#view').innerHTML = `<div class="row"><select id="os"><option value="">সব স্ট্যাটাস</option>${Object.entries(STATUS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select><input id="oq" placeholder="অর্ডার নম্বর"></div><div id="ol"><div class="empty">লোড হচ্ছে…</div></div>`;
+  $('#os').value = os; $('#os').onchange = (e) => { os = e.target.value; loadO(); }; $('#oq').oninput = () => { clearTimeout(viewOrders.t); viewOrders.t = setTimeout(loadO, 300); };
+  await loadO(); await api('orders', { method: 'PATCH', body: { action: 'mark_seen' } }).catch(() => {}); setBell(0, true);
+}
+const loadO = guard(async () => {
+  const d = await api('orders?' + new URLSearchParams({ status: os, q: $('#oq') ? $('#oq').value : '' }));
+  $('#ol').innerHTML = d.orders.length ? d.orders.map((o) => {
+    const st = o.items.every((i) => i.status === o.items[0].status) ? o.items[0].status : null;
+    const opts = st ? NEXT[st] : [];
+    return `<div class="ord ${o.is_new ? 'new' : ''}"><div class="row" style="justify-content:space-between;margin-bottom:4px"><b>#${esc(o.order_no)}</b><span class="muted">${esc(o.created_at)}</span></div>
+      <div class="muted">👤 ${esc(o.customer.name)} · 📞 <a href="tel:${esc(o.customer.phone)}">${esc(o.customer.phone)}</a><br>📍 ${esc(o.customer.address)}${o.customer.district ? ', ' + esc(o.customer.district) : ''}<br>💳 ${esc(o.payment || '—')}${o.note ? ' · 📝 ' + esc(o.note) : ''}</div>
+      ${o.items.map((i) => `<div class="it"><span>${esc(i.product)}${i.color ? ' · ' + esc(i.color) : ''}${i.size ? ' · ' + esc(i.size) : ''} ×${esc(i.quantity)} <span class="tag">${esc(STATUS[i.status] || i.status)}</span></span><b>${money(i.subtotal)}</b></div>`).join('')}
+      <div class="row" style="justify-content:space-between;margin:8px 0 0"><b>আপনার অংশ: ${money(o.subtotal)}</b></div>
+      ${opts.length ? `<div class="row" style="margin-top:8px"><select data-st="${o.order_id}"><option value="">স্ট্যাটাস বদলান…</option>${opts.map((k) => `<option value="${k}">${STATUS[k]}</option>`).join('')}</select><input data-co="${o.order_id}" placeholder="কুরিয়ার" value="${esc(o.items[0].courier)}"><input data-tr="${o.order_id}" placeholder="ট্র্যাকিং আইডি" value="${esc(o.items[0].tracking_id)}"><button class="btn sm" data-up="${o.order_id}">আপডেট</button></div>` : '<div class="muted" style="margin-top:6px">চূড়ান্ত অবস্থা — বদলাতে Super Admin-এর সাথে যোগাযোগ করুন</div>'}</div>`;
+  }).join('') : '<div class="empty">কোনো অর্ডার নেই</div>';
+  $('#ol').querySelectorAll('[data-up]').forEach((b) => b.onclick = guard(async () => {
+    const id = b.dataset.up, status = $(`[data-st="${id}"]`).value;
+    await api('orders/' + id, { method: 'PATCH', body: { ...(status ? { status } : {}), courier: $(`[data-co="${id}"]`).value, tracking_id: $(`[data-tr="${id}"]`).value } });
+    toast('অর্ডার আপডেট হয়েছে', 'ok'); loadO();
+  }));
+});
+
+/* ---------- রিভিউ ---------- */
+async function viewReviews() {
+  const d = await api('reviews');
+  $('#view').innerHTML = `<div class="card"><b>গড় রেটিং: ${d.summary.average ? esc(d.summary.average) + ' ⭐' : '—'}</b> <span class="muted">(${esc(d.summary.count)}টি রিভিউ)</span></div>` +
+    (d.reviews.length ? d.reviews.map((r) => `<div class="card"><div class="row" style="justify-content:space-between;margin:0"><b>${esc(r.customer_name)}</b><span>${'⭐'.repeat(Math.max(0, Math.min(5, r.rating)))}</span></div><div class="muted">${esc(r.product || '')} · ${esc(r.created_at)}</div>${r.comment ? `<p style="margin-top:6px">${esc(r.comment)}</p>` : ''}</div>`).join('') : '<div class="empty">এখনো কোনো রিভিউ নেই</div>');
+}
+
+/* ---------- প্রোফাইল ---------- */
+async function viewProfile() {
+  const d = await api('profile'); const s = d.seller; setSub(d.subscription);
+  $('#view').innerHTML = `<div class="card"><h3>স্টোরের তথ্য</h3><div class="muted" style="margin-bottom:8px">সেলার আইডি: <b>${esc(s.username)}</b> · কোড: ${esc(s.seller_code)} · স্টোর লিংক: /store/${esc(s.slug)}</div>
+    <form id="prf" class="form"><div><label>সেলারের নাম</label><input name="name" value="${esc(s.name)}" required></div><div><label>স্টোরের নাম</label><input name="store_name" value="${esc(s.store_name)}" required></div>
+    <div><label>মোবাইল</label><input name="phone" value="${esc(s.phone)}"></div><div><label>ইমেইল</label><input name="email" type="email" value="${esc(s.email)}"></div>
+    <div class="full"><label>ঠিকানা</label><input name="address" value="${esc(s.address)}"></div><div class="full"><label>স্টোর বিবরণ</label><textarea name="description" rows="3">${esc(s.description)}</textarea></div>
+    <div class="full"><label>লোগো</label><div class="row"><input name="logo" id="logoUrl" value="${esc(s.logo)}" placeholder="https://… অথবা আপলোড"><input type="file" id="logoFile" accept="image/*" style="max-width:210px"></div></div>
+    <div class="full"><button class="btn" type="submit">সংরক্ষণ করুন</button></div></form></div>
+    <div class="card"><h3>🔒 পাসওয়ার্ড বদল</h3><form id="pwf" class="form"><div><label>বর্তমান পাসওয়ার্ড</label><input name="c" type="password" autocomplete="current-password" required></div><div><label>নতুন পাসওয়ার্ড (৮+ অক্ষর, অক্ষর+সংখ্যা)</label><input name="n" type="password" autocomplete="new-password" required></div><div class="full"><button class="btn" type="submit">পাসওয়ার্ড বদলান</button></div></form></div>`;
+  $('#logoFile').onchange = guard(async (ev) => { const f = ev.target.files[0]; if (!f) return; const fd = new FormData(); fd.append('file', f); const r = await api('upload', { method: 'POST', body: fd }); $('#logoUrl').value = r.url; toast('লোগো আপলোড হয়েছে — সংরক্ষণ করুন', 'ok'); });
+  $('#prf').onsubmit = guard(async (ev) => { ev.preventDefault(); const f = Object.fromEntries(new FormData(ev.target)); const r = await api('profile', { method: 'PUT', body: f }); me = r.seller; $('#brand').textContent = '🏪 ' + me.store_name; toast('প্রোফাইল সংরক্ষণ হয়েছে', 'ok'); });
+  $('#pwf').onsubmit = guard(async (ev) => { ev.preventDefault(); const f = new FormData(ev.target); await api('password', { method: 'POST', body: { current_password: f.get('c'), new_password: f.get('n') } }); ev.target.reset(); toast('পাসওয়ার্ড বদলানো হয়েছে', 'ok'); });
+}
+
+/* ---------- রাউটিং ---------- */
+const VIEWS = { dash: viewDash, products: viewProducts, orders: viewOrders, reviews: viewReviews, profile: viewProfile };
+function go(t) { tab = t; document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.t === t)); $('#view').innerHTML = '<div class="empty">লোড হচ্ছে…</div>'; guard(VIEWS[t])(); window.scrollTo(0, 0); }
+$('#tabs').onclick = (e) => { const b = e.target.closest('button'); if (b) go(b.dataset.t); };
+$('#bell').onclick = () => go('orders');
+$('#logout').onclick = async () => { try { await fetch('/api/seller/logout', { method: 'POST', credentials: 'same-origin' }); } catch (e) {} location.href = '/seller/login'; };
+(async () => {
+  try { const d = await api('me'); me = d.seller; $('#brand').textContent = '🏪 ' + me.store_name; setSub(d.subscription); go('dash'); setInterval(poll, 30000); } catch (e) {}
+})();
+</script>
+</body>
+</html>

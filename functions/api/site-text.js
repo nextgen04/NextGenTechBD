@@ -9,7 +9,6 @@ export async function onRequestGet(context) {
     (res.results || []).forEach((row) => { out[row.key] = row.value; });
     return json(out);
   } catch (e) {
-    console.error('site-text failed:', e && e.message);
-    return err('টেক্সট লোড করা যায়নি', 500);
+    return err('টেক্সট লোড করা যায়নি: ' + e.message, 500);
   }
 }

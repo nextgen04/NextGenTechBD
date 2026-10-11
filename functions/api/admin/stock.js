@@ -1,7 +1,8 @@
 // /api/admin/stock — অ্যাডমিন প্যানেল থেকে স্টক ইন/আউট/অ্যাডজাস্টমেন্ট (X-Admin-Key হেডার লাগবে)
 // POST → { product_id, change, reason } — change ধনাত্মক হলে স্টক বাড়ে (Stock In), ঋণাত্মক হলে কমে (Stock Out)
 // GET  → ?product_id=123 দিয়ে সেই পণ্যের স্টক পরিবর্তনের ইতিহাস
-import { json, err, requireAdmin } from '../../_lib/utils.js';
+import { json, err } from '../../_lib/utils.js';
+import { requireAdmin } from '../../_lib/auth.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -15,8 +16,7 @@ export async function onRequestGet(context) {
     ).bind(Number(productId)).all();
     return json({ history: res.results || [] });
   } catch (e) {
-    console.error('admin/stock failed:', e && e.message);
-    return err('স্টক ইতিহাস লোড করা যায়নি', 500);
+    return err('স্টক ইতিহাস লোড করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -30,18 +30,17 @@ export async function onRequestPost(context) {
     const change = Number(b.change);
     if (!productId || !change) return err('product_id ও change (শূন্য ছাড়া) আবশ্যক', 400);
 
-    const product = await env.DB.prepare('SELECT stock FROM products WHERE id = ?').bind(productId).first();
+    const product = await env.DB.prepare('SELECT stock, seller_id FROM products WHERE id = ?').bind(productId).first();
     if (!product) return err('পণ্য পাওয়া যায়নি', 404);
 
     const newStock = (product.stock || 0) + change;
     await env.DB.batch([
       env.DB.prepare('UPDATE products SET stock = ? WHERE id = ?').bind(newStock, productId),
-      env.DB.prepare('INSERT INTO stock_history (product_id, change, reason) VALUES (?, ?, ?)').bind(productId, change, b.reason || null),
+      env.DB.prepare('INSERT INTO stock_history (product_id, change, reason, seller_id, changed_by) VALUES (?, ?, ?, ?, ?)').bind(productId, change, b.reason || null, product.seller_id, 'super_admin'),
     ]);
 
     return json({ ok: true, stock: newStock });
   } catch (e) {
-    console.error('admin/stock failed:', e && e.message);
-    return err('স্টক আপডেট করা যায়নি', 500);
+    return err('স্টক আপডেট করা যায়নি: ' + e.message, 500);
   }
 }

@@ -22,7 +22,6 @@ export async function onRequestGet(context) {
 
     return json({ orders });
   } catch (e) {
-    console.error('customer/orders failed:', e && e.message);
-    return err('অর্ডার হিস্টোরি লোড করা যায়নি', 500);
+    return err('অর্ডার হিস্টোরি লোড করা যায়নি: ' + e.message, 500);
   }
 }

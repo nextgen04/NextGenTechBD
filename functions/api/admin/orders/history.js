@@ -1,5 +1,6 @@
 // GET /api/admin/orders/history?id=123 — অর্ডারের স্ট্যাটাস পরিবর্তনের ইতিহাস (X-Admin-Key লাগবে)
-import { json, err, requireAdmin } from '../../../_lib/utils.js';
+import { json, err } from '../../../_lib/utils.js';
+import { requireAdmin } from '../../../_lib/auth.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -13,7 +14,6 @@ export async function onRequestGet(context) {
     ).bind(Number(id)).all();
     return json({ history: res.results || [] });
   } catch (e) {
-    console.error('admin/orders/history failed:', e && e.message);
-    return err('ইতিহাস লোড করা যায়নি', 500);
+    return err('ইতিহাস লোড করা যায়নি: ' + e.message, 500);
   }
 }

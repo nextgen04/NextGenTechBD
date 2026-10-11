@@ -1,7 +1,8 @@
 // /api/admin/settings — অ্যাডমিন প্যানেল থেকে দোকানের সব সেটিংস বদলানো (X-Admin-Key হেডার লাগবে)
 // GET → বর্তমান সেটিংস
 // PUT → সেটিংস আপডেট
-import { json, err, requireAdmin, toBool } from '../../_lib/utils.js';
+import { json, err, toBool } from '../../_lib/utils.js';
+import { requireAdmin } from '../../_lib/auth.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -17,8 +18,7 @@ export async function onRequestGet(context) {
     ).first();
     return json(row || {});
   } catch (e) {
-    console.error('admin/settings failed:', e && e.message);
-    return err('সেটিংস লোড করা যায়নি', 500);
+    return err('সেটিংস লোড করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -66,7 +66,6 @@ export async function onRequestPut(context) {
       .run();
     return json({ ok: true });
   } catch (e) {
-    console.error('admin/settings failed:', e && e.message);
-    return err('সেটিংস সংরক্ষণ করা যায়নি', 500);
+    return err('সেটিংস সংরক্ষণ করা যায়নি: ' + e.message, 500);
   }
 }

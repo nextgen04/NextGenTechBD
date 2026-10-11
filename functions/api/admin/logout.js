@@ -1,13 +1,10 @@
-// POST /api/admin/logout — বর্তমান অ্যাডমিন সেশন বাতিল করে
-import { json, sha256Hex } from '../../_lib/utils.js';
+// POST /api/admin/logout — admin cookie সেশন মুছে ফেলে
+import { json, err } from '../../_lib/utils.js';
+import { checkSameOrigin, destroyAdminSession, clearCookie, withCookies, ADMIN_COOKIE } from '../../_lib/auth.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const token = request.headers.get('X-Admin-Key');
-  if (token) {
-    try {
-      await env.DB.prepare('DELETE FROM admin_sessions WHERE token_hash = ?').bind(await sha256Hex(token)).run();
-    } catch (e) { /* ক্লায়েন্ট এমনিতেই লগআউট হয়ে যাবে */ }
-  }
-  return json({ ok: true });
+  if (!checkSameOrigin(request)) return err('অনুমোদিত নয় (cross-site রিকোয়েস্ট)', 403);
+  await destroyAdminSession(request, env);
+  return withCookies(json({ ok: true }), [clearCookie(request, ADMIN_COOKIE)]);
 }

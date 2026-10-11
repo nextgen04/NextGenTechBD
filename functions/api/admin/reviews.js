@@ -2,7 +2,8 @@
 // GET    → ?status=pending দিয়ে ফিল্টার করে সব রিভিউ (পণ্যের নামসহ)
 // PATCH  → { id, status?, featured? } দিয়ে অনুমোদন/বাতিল/ফিচার্ড টগল
 // DELETE → ?id=123 দিয়ে রিভিউ মুছে ফেলা
-import { json, err, requireAdmin, toBool } from '../../_lib/utils.js';
+import { json, err, toBool } from '../../_lib/utils.js';
+import { requireAdmin } from '../../_lib/auth.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -11,19 +12,18 @@ export async function onRequestGet(context) {
   try {
     const status = (new URL(request.url).searchParams.get('status') || '').trim();
     let sql = `SELECT r.id, r.product_id, r.customer_name, r.rating, r.comment, r.status, r.featured, r.created_at,
-                      p.name as product_name
-               FROM reviews r LEFT JOIN products p ON p.id = r.product_id`;
-    const binds = [];
-    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
-      sql += ' WHERE r.status = ?';
-      binds.push(status);
-    }
+                      p.name as product_name, r.seller_id, s.store_name AS seller_name
+               FROM reviews r LEFT JOIN products p ON p.id = r.product_id LEFT JOIN sellers s ON s.id = r.seller_id`;
+    const binds = []; const where = [];
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) { where.push('r.status = ?'); binds.push(status); }
+    const sid = Number(new URL(request.url).searchParams.get('seller_id'));
+    if (Number.isInteger(sid) && sid > 0) { where.push('r.seller_id = ?'); binds.push(sid); }
+    if (where.length) sql += ' WHERE ' + where.join(' AND ');
     sql += ' ORDER BY r.id DESC LIMIT 300';
     const res = await env.DB.prepare(sql).bind(...binds).all();
     return json({ reviews: res.results || [] });
   } catch (e) {
-    console.error('admin/reviews failed:', e && e.message);
-    return err('রিভিউ লোড করা যায়নি', 500);
+    return err('রিভিউ লোড করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -47,8 +47,7 @@ export async function onRequestPatch(context) {
     await env.DB.prepare(`UPDATE reviews SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
     return json({ ok: true });
   } catch (e) {
-    console.error('admin/reviews failed:', e && e.message);
-    return err('আপডেট করা যায়নি', 500);
+    return err('আপডেট করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -62,7 +61,6 @@ export async function onRequestDelete(context) {
     await env.DB.prepare('DELETE FROM reviews WHERE id = ?').bind(Number(id)).run();
     return json({ ok: true });
   } catch (e) {
-    console.error('admin/reviews failed:', e && e.message);
-    return err('রিভিউ মুছা যায়নি', 500);
+    return err('রিভিউ মুছা যায়নি: ' + e.message, 500);
   }
 }

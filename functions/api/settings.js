@@ -43,7 +43,6 @@ export async function onRequestGet(context) {
       maintenance_mode: toBool(row.maintenance_mode),
     });
   } catch (e) {
-    console.error('settings failed:', e && e.message);
-    return err('সেটিংস লোড করা যায়নি', 500);
+    return err('সেটিংস লোড করা যায়নি: ' + e.message, 500);
   }
 }

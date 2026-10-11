@@ -2,7 +2,8 @@
 // GET  → নতুন (seen=0) অর্ডারের সংখ্যা ও সংক্ষিপ্ত তালিকা — অ্যাডমিন প্যানেল প্রতি কিছুক্ষণ পরপর এটা চেক করে
 //        নোটিফিকেশন ব্যাজ/সাউন্ড দেখানোর জন্য
 // POST → সব (অথবা নির্দিষ্ট আইডির) অর্ডার "দেখা হয়েছে" হিসেবে চিহ্নিত করে (অ্যাডমিন অর্ডার ট্যাব খুললে কল হয়)
-import { json, err, requireAdmin } from '../../../_lib/utils.js';
+import { json, err } from '../../../_lib/utils.js';
+import { requireAdmin } from '../../../_lib/auth.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -14,8 +15,7 @@ export async function onRequestGet(context) {
     ).all();
     return json({ count: (res.results || []).length, orders: res.results || [] });
   } catch (e) {
-    console.error('admin/orders/unseen failed:', e && e.message);
-    return err('নোটিফিকেশন লোড করা যায়নি', 500);
+    return err('নোটিফিকেশন লোড করা যায়নি: ' + e.message, 500);
   }
 }
 
@@ -33,7 +33,6 @@ export async function onRequestPost(context) {
     }
     return json({ ok: true });
   } catch (e) {
-    console.error('admin/orders/unseen failed:', e && e.message);
-    return err('আপডেট করা যায়নি', 500);
+    return err('আপডেট করা যায়নি: ' + e.message, 500);
   }
 }
