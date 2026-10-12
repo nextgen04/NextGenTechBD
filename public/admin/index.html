@@ -117,6 +117,7 @@ th{color:var(--muted);font-size:11.5px;text-transform:uppercase}
       <div class="tab" data-tab="orders" onclick="switchTab('orders')">📦 অর্ডারসমূহ<span id="orderNotifyBadge" class="notify-badge hidden">0</span></div>
       <div class="tab" data-tab="customers" onclick="switchTab('customers')">👥 কাস্টমার</div>
       <div class="tab" data-tab="products" onclick="switchTab('products')">🛍️ পণ্যসমূহ</div>
+      <div class="tab" data-tab="sellers" onclick="switchTab('sellers')">🏪 বিক্রেতা (Seller)</div>
       <div class="tab" data-tab="categories" onclick="switchTab('categories')">🗂️ ক্যাটাগরি</div>
       <div class="tab" data-tab="coupons" onclick="switchTab('coupons')">🎟️ কুপন ও অফার</div>
       <div class="tab" data-tab="banners" onclick="switchTab('banners')">🖼️ ব্যানার/স্লাইডার</div>
@@ -313,6 +314,7 @@ function switchTab(name){
   const c = document.getElementById('tabContent');
   c.innerHTML = '<div class="spinner">লোড হচ্ছে…</div>';
   if(name==='products') renderProducts();
+  else if(name==='sellers') renderSellers();
   else if(name==='categories') renderCategories();
   else if(name==='settings') renderSettings();
   else if(name==='hometext') renderHomeText();
@@ -326,12 +328,110 @@ function switchTab(name){
   else if(name==='backup') renderBackup();
 }
 
+/* ============ SELLERS (Multi-Vendor: Super Admin নিয়ন্ত্রণ) ============ */
+let SELLERS_OK = false;
+const PERM_LABELS = {
+  can_product_create:'➕ পণ্য তৈরি', can_product_edit:'✏️ পণ্য এডিট', can_product_delete:'🗑️ পণ্য মুছা',
+  can_order_manage:'📦 অর্ডার ম্যানেজমেন্ট', can_stock_manage:'📊 স্টক ম্যানেজমেন্ট', can_sales_report:'💹 সেলস রিপোর্ট'
+};
+function subItemsHTML(o){
+  if(!o.sub_items || !o.sub_items.length) return '';
+  const byShop = {};
+  o.sub_items.forEach(x=>{ (byShop[x.shop] = byShop[x.shop] || []).push(x); });
+  return '<div style="margin-top:4px;font-size:11px;color:#666">'+Object.keys(byShop).map(shop=>{
+    const l = byShop[shop];
+    return '🏪 <b>'+esc(shop)+'</b> ('+esc(STATUS_L[l[0].status]||l[0].status)+')'+(l[0].courier?' · '+esc(l[0].courier):'')+(l[0].tracking_id?' #'+esc(l[0].tracking_id):'')+'<br>'+l.map(x=>'• '+esc(x.name)+' × '+esc(x.qty)).join('<br>');
+  }).join('<hr style="border:0;border-top:1px dashed #ddd;margin:4px 0">')+'</div>';
+}
+async function renderSellers(){
+  const c = document.getElementById('tabContent');
+  try{
+    const {sellers} = await adminApi('/admin/sellers');
+    c.innerHTML = `
+      <div class="note-box">🏪 এখানে আপনি (Super Admin) Seller তৈরি করেন ও প্রত্যেকের কাজের অনুমতি (Permission) আলাদাভাবে চালু/বন্ধ করেন। Seller-রা <b>${esc(location.origin)}/seller/</b> লিংকে ইমেইল ও পাসওয়ার্ড দিয়ে ঢোকেন। অনুমতি বদলালে সাথে সাথে কার্যকর হয়। একজন Seller অন্য Seller-এর পণ্য বা অর্ডার কখনো দেখতে পান না।</div>
+      <div class="card">
+        <h2>➕ নতুন Seller তৈরি করুন</h2>
+        <form onsubmit="createSeller(event)" autocomplete="off">
+          <div class="grid3">
+            <div class="field"><label>দোকানের নাম *</label><input id="sl_shop" required maxlength="80" /></div>
+            <div class="field"><label>মালিকের নাম</label><input id="sl_owner" maxlength="80" /></div>
+            <div class="field"><label>মোবাইল</label><input id="sl_phone" placeholder="01XXXXXXXXX" maxlength="11" inputmode="numeric" /></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>ইমেইল (লগইন আইডি) *</label><input id="sl_email" type="email" required autocomplete="off" /></div>
+            <div class="field"><label>পাসওয়ার্ড * (কমপক্ষে ১০ ক্যারেক্টার)</label><input id="sl_pw" type="password" minlength="10" required autocomplete="new-password" /></div>
+          </div>
+          <label>শুরুর অনুমতি</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px">
+            ${Object.keys(PERM_LABELS).map(k=>`<label style="display:flex;align-items:center;gap:6px;font-weight:600;margin:0"><input type="checkbox" id="sl_${k}" style="width:auto" /> ${PERM_LABELS[k]}</label>`).join('')}
+          </div>
+          <button type="submit" class="btn">✅ Seller তৈরি করুন</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>🏪 সব Seller (${sellers.length})</h2>
+        ${sellers.length?`<div style="overflow-x:auto"><table>
+          <thead><tr><th>দোকান</th><th>যোগাযোগ</th><th>পণ্য/অর্ডার</th><th>অনুমতি (টিক দিলেই সাথে সাথে সেভ)</th><th>অবস্থা</th><th></th></tr></thead>
+          <tbody>${sellers.map(s=>`<tr>
+            <td><b>${esc(s.shop_name)}</b><br><small style="color:#888">${esc(s.owner_name||'')}</small></td>
+            <td><small>${esc(s.email)}<br>${esc(s.phone||'')}</small></td>
+            <td><small>${esc(s.product_count)} পণ্য<br>${esc(s.order_count)} অর্ডার</small></td>
+            <td>${Object.keys(PERM_LABELS).map(k=>`<label style="display:flex;align-items:center;gap:6px;font-weight:500;margin:0 0 3px;font-size:12.5px"><input type="checkbox" style="width:auto" ${s.permissions[k]?'checked':''} onchange="setSellerPerm(${Number(s.id)},'${k}',this.checked)" /> ${PERM_LABELS[k]}</label>`).join('')}</td>
+            <td>${s.status==='active'?'<span class="badge ok">সক্রিয়</span>':'<span class="badge danger">বন্ধ</span>'}</td>
+            <td><div class="row-actions" style="flex-wrap:wrap">
+              <button class="btn gray small" onclick="setSellerStatus(${Number(s.id)},'${s.status==='active'?'suspended':'active'}')">${s.status==='active'?'⏸ বন্ধ করুন':'▶ চালু করুন'}</button>
+              <button class="btn gray small" onclick="resetSellerPassword(${Number(s.id)})">🔑 পাসওয়ার্ড</button>
+              <button class="btn gray small" onclick="renameSeller(${Number(s.id)})">✏️ তথ্য</button>
+              <button class="btn red small" onclick="deleteSeller(${Number(s.id)})">🗑️</button>
+            </div></td></tr>`).join('')}</tbody></table></div>`:'<p style="color:#888">এখনো কোনো Seller নেই।</p>'}
+      </div>`;
+  }catch(e){ c.innerHTML = `<div class="msg error">${esc(e.message)}</div>`; }
+}
+async function createSeller(ev){
+  ev.preventDefault();
+  const v = id => document.getElementById(id).value.trim();
+  const permissions = {}; Object.keys(PERM_LABELS).forEach(k=>{ permissions[k] = document.getElementById('sl_'+k).checked; });
+  try{
+    await adminApi('/admin/sellers','POST',{shop_name:v('sl_shop'), owner_name:v('sl_owner'), phone:v('sl_phone'), email:v('sl_email'), password:document.getElementById('sl_pw').value, permissions});
+    showMsg('✅ Seller তৈরি হয়েছে','ok'); renderSellers();
+  }catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function setSellerPerm(id,key,on){
+  try{ await adminApi('/admin/sellers','PATCH',{id, permissions:{[key]:!!on}}); showMsg('✅ অনুমতি আপডেট হয়েছে','ok'); }
+  catch(e){ showMsg('❌ '+e.message,'error'); renderSellers(); }
+}
+async function setSellerStatus(id,status){
+  if(status==='suspended' && !confirm('Seller বন্ধ করলে তাঁর সব পণ্য দোকান থেকে লুকিয়ে যাবে এবং লগইন বাতিল হবে। (কোনো ডেটা মুছবে না) নিশ্চিত?')) return;
+  try{ await adminApi('/admin/sellers','PATCH',{id,status}); showMsg('✅ আপডেট হয়েছে','ok'); renderSellers(); }
+  catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function resetSellerPassword(id){
+  const pw = prompt('নতুন পাসওয়ার্ড দিন (কমপক্ষে ১০ ক্যারেক্টার)। Seller-এর চলমান লগইন বাতিল হবে:');
+  if(!pw) return;
+  try{ await adminApi('/admin/sellers','PATCH',{id,password:pw}); showMsg('✅ পাসওয়ার্ড বদলানো হয়েছে','ok'); }
+  catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function renameSeller(id){
+  const shop = prompt('দোকানের নতুন নাম (বাতিল করতে খালি রাখুন):'); if(!shop) return;
+  const phone = prompt('মোবাইল নম্বর (01XXXXXXXXX, না বদলাতে খালি রাখুন):');
+  const body = {id, shop_name:shop}; if(phone) body.phone = phone;
+  try{ await adminApi('/admin/sellers','PATCH',body); showMsg('✅ আপডেট হয়েছে','ok'); renderSellers(); }
+  catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+async function deleteSeller(id){
+  if(!confirm('এই Seller মুছে ফেলবেন? (পণ্য/অর্ডার থাকলে মুছবে না — তখন "বন্ধ করুন" ব্যবহার করুন)')) return;
+  try{ await adminApi('/admin/sellers?id='+id,'DELETE'); showMsg('✅ মুছে ফেলা হয়েছে','ok'); renderSellers(); }
+  catch(e){ showMsg('❌ '+e.message,'error'); }
+}
+
 /* ============ PRODUCTS ============ */
 async function renderProducts(){
   const c = document.getElementById('tabContent');
   try{
-    const [{products}, {categories}] = await Promise.all([adminApi('/admin/products'), adminApi('/admin/categories')]);
+    const [{products}, {categories}, sellersRes] = await Promise.all([adminApi('/admin/products'), adminApi('/admin/categories'), adminApi('/admin/sellers').catch(()=>null)]);
     CATS_CACHE = categories;
+    SELLERS_OK = !!sellersRes; // migrations/009 না চালানো থাকলে Seller-সংক্রান্ত অংশ নিঃশব্দে বাদ যায়
+    const sellerList = sellersRes ? sellersRes.sellers : [];
     const catName = id => { const x=categories.find(x=>x.id===id); return x ? (x.e+' '+x.name) : id; };
     c.innerHTML = `
       <div class="card">
@@ -375,6 +475,8 @@ async function renderProducts(){
           <div class="field" style="display:flex;align-items:center;gap:8px">
             <input type="checkbox" id="p_f" style="width:auto" /> <label style="margin:0">ফ্ল্যাশ সেলে দেখাবে?</label>
           </div>
+          ${SELLERS_OK?`<div class="field" style="max-width:340px"><label>বিক্রেতা (এই পণ্যটি কার?)</label>
+            <select id="p_seller"><option value="">🏬 প্ল্যাটফর্ম (নিজের পণ্য)</option>${sellerList.map(x=>`<option value="${esc(x.id)}">🏪 ${esc(x.shop_name)}</option>`).join('')}</select></div>`:''}
           <div class="row-actions">
             <button type="submit" class="btn">💾 সংরক্ষণ করুন</button>
             <button type="button" class="btn gray" onclick="resetProductForm()">✖ ফর্ম খালি করুন</button>
@@ -386,13 +488,14 @@ async function renderProducts(){
         <div class="field" style="max-width:320px"><input id="prodSearchBox" placeholder="🔍 নাম/SKU দিয়ে খুঁজুন" oninput="filterProductRows(this.value)" /></div>
         <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>নাম</th><th>SKU</th><th>ক্যাটাগরি</th><th>মূল্য</th><th>স্টক</th><th>ফ্ল্যাশ</th><th></th></tr></thead>
+          <thead><tr><th>নাম</th><th>SKU</th><th>ক্যাটাগরি</th>${SELLERS_OK?'<th>বিক্রেতা</th>':''}<th>মূল্য</th><th>স্টক</th><th>ফ্ল্যাশ</th><th></th></tr></thead>
           <tbody id="prodTableBody">
             ${products.map(p=>`
               <tr data-search="${esc((p.name+' '+(p.sku||'')).toLowerCase())}">
                 <td>${p.img?`<img src="${esc(p.img)}" style="width:30px;height:30px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:6px">`:''}${esc(p.e||'')} ${esc(p.name)}</td>
                 <td><small>${esc(p.sku||'—')}</small></td>
                 <td>${esc(catName(p.cat))}</td>
+                ${SELLERS_OK?`<td><small>${p.shop?'🏪 '+esc(p.shop):'🏬 প্ল্যাটফর্ম'}</small></td>`:''}
                 <td>৳${esc(p.price)}${p.old?` <s style="color:#aaa">৳${esc(p.old)}</s>`:''}</td>
                 <td>${stockBadge(p)}</td>
                 <td>${p.f?'✅':'—'}</td>
@@ -452,7 +555,7 @@ async function submitStockAdjust(){
   }catch(e){ showMsg('❌ '+e.message,'error'); }
 }
 function resetProductForm(){
-  ['p_id','p_name','p_name_en','p_price','p_old','p_e','p_r','p_rv','p_sold','p_tag','p_colors','p_sizes','p_img','p_sku','p_stock','p_low_stock'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  ['p_id','p_name','p_name_en','p_price','p_old','p_e','p_r','p_rv','p_sold','p_tag','p_colors','p_sizes','p_img','p_sku','p_stock','p_low_stock','p_seller'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
   document.getElementById('p_f').checked=false;
   document.getElementById('p_img_file').value='';
   document.getElementById('p_img_status').textContent='';
@@ -497,6 +600,7 @@ function editProduct(p){
   document.getElementById('p_sku').value=p.sku||'';
   document.getElementById('p_stock').value=(p.stock===null||p.stock===undefined)?'':p.stock;
   document.getElementById('p_low_stock').value=p.low_stock_at||'';
+  const sel=document.getElementById('p_seller'); if(sel) sel.value=p.seller_id||'';
   document.getElementById('p_img_file').value='';
   document.getElementById('p_img_status').textContent='';
   const prev=document.getElementById('p_img_preview');
@@ -516,7 +620,8 @@ async function saveProduct(ev){
     sold: val('p_sold')?Number(val('p_sold')):undefined, tag: val('p_tag'),
     colors: splitList(val('p_colors')), sizes: splitList(val('p_sizes')),
     sku: val('p_sku'), stock: val('p_stock'), low_stock_at: val('p_low_stock'),
-    f: document.getElementById('p_f').checked
+    f: document.getElementById('p_f').checked,
+    seller_id: SELLERS_OK ? (val('p_seller') || null) : undefined
   };
   try{
     await adminApi('/admin/products','POST',body);
@@ -784,7 +889,7 @@ async function loadOrdersList(){
           <tbody>
             ${orders.map(o=>`
               <tr>
-                <td>${esc(o.order_no)}</td>
+                <td>${esc(o.order_no)}${subItemsHTML(o)}</td>
                 <td>${esc(o.name)}<br><small style="color:#888">${esc(o.phone)}</small></td>
                 <td>৳${esc(o.total)}${o.discount?`<br><small style="color:#0a7a3d">-৳${esc(o.discount)} (${esc(o.coupon_code||'কুপন')})</small>`:''}</td>
                 <td>${esc(o.payment||'-')}</td>

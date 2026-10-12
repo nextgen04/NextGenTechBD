@@ -1,4 +1,4 @@
-// GET /api/products — পাবলিক এন্ডপয়েন্ট, দোকানের পণ্য ও ক্যাটাগরি ফেরত দেয়
+// GET /api/products — পাবলিক এন্ডপয়েন্ট, দোকানের (সব Seller-এর) পণ্য ও ক্যাটাগরি ফেরত দেয়
 import { json, err, parseListField } from '../_lib/utils.js';
 
 export async function onRequestGet(context) {
@@ -8,9 +8,20 @@ export async function onRequestGet(context) {
       'SELECT id, name, name_en, e, img FROM categories ORDER BY sort_order ASC, rowid ASC'
     ).all();
 
-    const prodRes = await env.DB.prepare(
-      'SELECT id, cat, name, name_en, price, old, e, img, r, rv, sold, tag, f, colors, sizes FROM products ORDER BY id ASC'
-    ).all();
+    // Multi-Vendor: Seller-এর পণ্যে seller_id ও দোকানের নাম (shop) যোগ হয়; বন্ধ (suspended) Seller-এর পণ্য দেখানো হয় না।
+    // migrations/009 চালানোর আগে কোড ডিপ্লয় হলেও সাইট আগের মতোই চলে (নিচের fallback)।
+    let prodRes;
+    try {
+      prodRes = await env.DB.prepare(
+        `SELECT p.id, p.cat, p.name, p.name_en, p.price, p.old, p.e, p.img, p.r, p.rv, p.sold, p.tag, p.f, p.colors, p.sizes, p.seller_id, s.shop_name AS shop
+         FROM products p LEFT JOIN sellers s ON s.id = p.seller_id
+         WHERE p.seller_id IS NULL OR s.status = 'active' ORDER BY p.id ASC`
+      ).all();
+    } catch (e) {
+      prodRes = await env.DB.prepare(
+        'SELECT id, cat, name, name_en, price, old, e, img, r, rv, sold, tag, f, colors, sizes FROM products ORDER BY id ASC'
+      ).all();
+    }
 
     const categories = (catRes.results || []).map((c) => {
       const o = { ...c };

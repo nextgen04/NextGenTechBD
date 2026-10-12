@@ -957,6 +957,7 @@ function renderProduct(){
  '<div class="section"><div class="section-head"><h2>'+t('description_h')+'</h2></div>'+
   '<ul style="padding-left:20px;line-height:2;color:#555;font-size:14px">'+
    '<li><b>'+t('category_label')+'</b> '+catName(p.cat)+'</li>'+
+   (p.shop?'<li><b>'+(LANG==='en'?'Sold by:':'বিক্রেতা:')+'</b> 🏪 '+esc(p.shop)+'</li>':'')+
    '<li><b>'+t('brand_label')+'</b> '+t('brand_value')+'</li>'+
    '<li><b>'+t('condition_label')+'</b> '+t('condition_value')+'</li>'+
    '<li><b>'+t('delivery_label')+'</b> '+t('delivery_value')+'</li>'+
@@ -1061,7 +1062,7 @@ function renderCart(){
  const freeLeft=freeDeliveryThreshold()-sub;
  $('drawerItems').innerHTML=ids.map(id=>{const p=byId(+id),q=state.cart[id];if(!p)return'';
   return '<div class="ci"><div class="ciem'+(p.img?' has-photo':'')+'" style="background:'+grad(p.id)+'">'+photoOrEmoji(p,'')+'</div>'+
-  '<div class="cinfo"><div class="nm">'+nameOf(p)+'</div><div class="pr">'+money(p.price)+' '+(p.old?'<s style="color:#bbb;font-weight:400;font-size:11.5px">'+money(p.old)+'</s>':'')+'</div>'+
+  '<div class="cinfo"><div class="nm">'+nameOf(p)+'</div>'+(p.shop?'<div style="font-size:11px;color:#888">🏪 '+esc(p.shop)+'</div>':'')+'<div class="pr">'+money(p.price)+' '+(p.old?'<s style="color:#bbb;font-weight:400;font-size:11.5px">'+money(p.old)+'</s>':'')+'</div>'+
   '<div class="rm" onclick="rmItem('+id+')">'+t('remove_item')+'</div></div>'+
   '<div class="ci-qty"><button onclick="incQty('+id+')">+</button><span class="q">'+q+'</span><button onclick="decQty('+id+')">−</button></div></div>';
  }).join('');

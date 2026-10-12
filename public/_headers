@@ -13,6 +13,12 @@
   Referrer-Policy: no-referrer
   Cache-Control: no-store
 
+# Seller ড্যাশবোর্ড (Multi-Vendor): সার্চ ইঞ্জিনে আসবে না, ক্যাশ হবে না
+/seller/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+
 # অর্ডার/অ্যাকাউন্ট পেজ: রিসেট লিংকের টোকেন যেন বাইরে না যায়
 /orders/*
   Referrer-Policy: no-referrer

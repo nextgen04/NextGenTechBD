@@ -1,0 +1,23 @@
+// মাইগ্রেশন চালানোর আগেই নতুন কোড ডিপ্লয় হয়ে গেলে পুরোনো সাইট (পণ্য তালিকা, চেকআউট, অ্যাডমিন) আগের মতো চলে কি না
+import fs from 'node:fs';
+import { makeDB } from './d1shim.mjs';
+import * as P from './build/functions/api/products.js';
+import * as ORD from './build/functions/api/orders.js';
+import * as AProd from './build/functions/api/admin/products.js';
+import * as AOrd from './build/functions/api/admin/orders.js';
+import { sha256Hex } from './build/functions/_lib/utils.js';
+let pass = 0, fail = 0; const t = (c, m) => { if (c) pass++; else { fail++; console.log('  ✖ FAIL:', m); } };
+const db = makeDB(); db.exec(fs.readFileSync('fixtures/old_schema.sql', 'utf8')); db.exec(fs.readFileSync('fixtures/seed.sql', 'utf8'));
+const env = { DB: db };
+const call = async (mod, m, path, body, headers = {}) => { const req = new Request('https://x.test' + path, { method: m, headers: { 'CF-Connecting-IP': '3.3.3.3', 'Content-Type': 'application/json', ...headers }, body: body ? JSON.stringify(body) : undefined }); const res = await mod['onRequest' + m[0] + m.slice(1).toLowerCase()]({ request: req, env }); return { s: res.status, j: await res.json().catch(() => ({})) }; };
+let r = await call(P, 'GET', '/api/products');
+t(r.s === 200 && r.j.products.length > 0, 'মাইগ্রেশনের আগে পাবলিক পণ্য তালিকা চলে');
+const pid = r.j.products[0].id; db.raw.prepare('UPDATE products SET stock=50 WHERE id=?').run(pid);
+r = await call(ORD, 'POST', '/api/orders', { name: 'Rahim Uddin', phone: '01712345678', address: 'House 1, Road 2, Dhaka', district: 'ঢাকা', cart: [{ id: pid, qty: 1 }] });
+t(r.s === 200 && r.j.orderNo, 'মাইগ্রেশনের আগে চেকআউট চলে: ' + (r.j.error || ''));
+t(db.raw.prepare('SELECT COUNT(*) c FROM orders').get().c === 1, 'অর্ডার সংরক্ষিত');
+const tok = 'b'.repeat(64); db.raw.prepare('INSERT INTO admin_sessions (token_hash, expires_at) VALUES (?,?)').run(await sha256Hex(tok), new Date(Date.now() + 36e5).toISOString());
+r = await call(AProd, 'GET', '/api/admin/products', null, { 'X-Admin-Key': tok }); t(r.s === 200 && r.j.products.length > 0, 'অ্যাডমিন পণ্য তালিকা চলে');
+r = await call(AOrd, 'GET', '/api/admin/orders', null, { 'X-Admin-Key': tok }); t(r.s === 200 && r.j.orders.length === 1, 'অ্যাডমিন অর্ডার তালিকা চলে');
+r = await call(AOrd, 'PATCH', '/api/admin/orders', { id: r.j.orders[0].id, status: 'confirmed' }, { 'X-Admin-Key': tok }); t(r.s === 200, 'অ্যাডমিন অর্ডার স্ট্যাটাস আপডেট চলে');
+console.log(`প্রি-মাইগ্রেশন কম্প্যাটিবিলিটি: ${pass} পাস, ${fail} ফেল`); process.exit(fail ? 1 : 0);

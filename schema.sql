@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS products (
   sku          TEXT,
   stock        INTEGER,
   low_stock_at INTEGER DEFAULT 5,
+  seller_id    INTEGER,           -- NULL = প্ল্যাটফর্ম/Super Admin-এর নিজের পণ্য (Multi-Vendor)
   created_at   TEXT DEFAULT (datetime('now'))
 );
 
@@ -245,3 +246,54 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   PRIMARY KEY (k, w)
 );
 CREATE INDEX IF NOT EXISTS idx_rate_limits_exp ON rate_limits(exp);
+
+-- ================= Multi-Vendor Marketplace (migrations/009 এর কপি) =================
+-- নতুন করে সাইট বসালে এই অংশসহ সবকিছু একবারেই তৈরি হয়। (বিদ্যমান সাইটে schema.sql নয়, migrations/009 চালান।)
+CREATE TABLE IF NOT EXISTS sellers (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  shop_name     TEXT NOT NULL,
+  owner_name    TEXT,
+  email         TEXT NOT NULL,
+  phone         TEXT,
+  password_hash TEXT NOT NULL,
+  password_salt TEXT NOT NULL,
+  status        TEXT NOT NULL DEFAULT 'active',
+  can_product_create INTEGER NOT NULL DEFAULT 0,
+  can_product_edit   INTEGER NOT NULL DEFAULT 0,
+  can_product_delete INTEGER NOT NULL DEFAULT 0,
+  can_order_manage   INTEGER NOT NULL DEFAULT 0,
+  can_stock_manage   INTEGER NOT NULL DEFAULT 0,
+  can_sales_report   INTEGER NOT NULL DEFAULT 0,
+  notes         TEXT,
+  created_at    TEXT DEFAULT (datetime('now'))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sellers_email ON sellers(lower(email));
+CREATE TABLE IF NOT EXISTS seller_sessions (
+  token_hash TEXT PRIMARY KEY,
+  seller_id  INTEGER NOT NULL,
+  expires_at TEXT NOT NULL,
+  ip         TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (seller_id) REFERENCES sellers(id)
+);
+CREATE INDEX IF NOT EXISTS idx_seller_sessions_seller ON seller_sessions(seller_id);
+CREATE INDEX IF NOT EXISTS idx_seller_sessions_exp ON seller_sessions(expires_at);
+CREATE TABLE IF NOT EXISTS order_items (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id    INTEGER NOT NULL,
+  product_id  INTEGER,
+  seller_id   INTEGER,
+  name        TEXT NOT NULL,
+  price       INTEGER NOT NULL,
+  qty         INTEGER NOT NULL,
+  line_total  INTEGER NOT NULL,
+  status      TEXT NOT NULL DEFAULT 'pending',
+  courier     TEXT,
+  tracking_id TEXT,
+  restocked   INTEGER NOT NULL DEFAULT 0,   -- বাতিল/রিটার্নে স্টক ফেরত দেওয়া হয়েছে কি না
+  created_at  TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (order_id) REFERENCES orders(id)
+);
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_seller ON order_items(seller_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_products_seller ON products(seller_id);

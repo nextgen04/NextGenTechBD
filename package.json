@@ -15,7 +15,9 @@
     "db:migrate:adminupgrade": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/004_admin_upgrade.sql",
     "db:migrate:orderseen": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/005_add_order_seen.sql",
     "db:migrate:passwordreset": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/007_password_reset.sql",
-    "db:migrate:ratelimits": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/008_rate_limits.sql"
+    "db:migrate:ratelimits": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/008_rate_limits.sql",
+    "db:backup": "wrangler d1 export nextgentechbd-db --remote --output=./backup.sql",
+    "db:migrate:multivendor": "wrangler d1 execute nextgentechbd-db --remote --file=./migrations/009_multi_vendor.sql"
   },
   "devDependencies": {
     "wrangler": "^3.90.0"

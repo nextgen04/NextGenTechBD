@@ -6,6 +6,7 @@
 import { json, err, getCustomerFromRequest } from '../_lib/utils.js';
 import { evaluateCoupon, computeDeliveryFee } from '../_lib/pricing.js';
 import { rateLimit } from '../_lib/ratelimit.js';
+import { claimStock, releaseClaims, logOrderStock } from '../_lib/stock.js';
 
 const PHONE_RE = /^01[3-9]\d{8}$/;
 const ORDER_NO_RE = /^[A-Za-z]{2}\d{6,12}$/;
@@ -21,6 +22,7 @@ const str = (v, max) => (v === undefined || v === null ? '' : String(v)).trim().
 export async function onRequestPost(context) {
   const { request, env } = context;
   let claimedCouponId = null;
+  let claimedStock = [];
   const limited = await rateLimit(env, request, 'order', 10, 10 * 60);
   if (limited) return limited;
   try {
@@ -52,9 +54,19 @@ export async function onRequestPost(context) {
       qtyById.set(id, (qtyById.get(id) || 0) + qty);
     }
     const ids = [...qtyById.keys()];
-    const found = await env.DB.prepare(
-      `SELECT id, name, e, price, stock FROM products WHERE id IN (${ids.map(() => '?').join(',')})`
-    ).bind(...ids).all();
+    // Multi-Vendor: একই কার্টে একাধিক Seller-এর পণ্য থাকতে পারে। প্রতিটি পণ্যের seller_id ও Seller-এর অবস্থা DB থেকে আসে (ব্রাউজারের ওপর ভরসা নয়)।
+    // migrations/009 চালানোর আগে কোড ডিপ্লয় হলেও চেকআউট আগের মতোই চলে (fallback)।
+    let found;
+    try {
+      found = await env.DB.prepare(
+        `SELECT p.id, p.name, p.e, p.price, p.stock, p.seller_id, s.status AS seller_status
+         FROM products p LEFT JOIN sellers s ON s.id = p.seller_id WHERE p.id IN (${ids.map(() => '?').join(',')})`
+      ).bind(...ids).all();
+    } catch (e0) {
+      found = await env.DB.prepare(
+        `SELECT id, name, e, price, stock FROM products WHERE id IN (${ids.map(() => '?').join(',')})`
+      ).bind(...ids).all();
+    }
     const byId = new Map((found.results || []).map((p) => [p.id, p]));
 
     let subtotal = 0;
@@ -62,6 +74,7 @@ export async function onRequestPost(context) {
     for (const [id, qty] of qtyById) {
       const p = byId.get(id);
       if (!p) return err('কার্টের একটি পণ্য আর পাওয়া যাচ্ছে না — পেজ রিফ্রেশ করে আবার চেষ্টা করুন', 409);
+      if (p.seller_id && p.seller_status && p.seller_status !== 'active') return err('কার্টের একটি পণ্য এখন বিক্রি হচ্ছে না — পেজ রিফ্রেশ করে আবার চেষ্টা করুন', 409);
       if (p.stock !== null && p.stock !== undefined && p.stock < qty) {
         return err(`"${p.name}" এর স্টকে মাত্র ${Math.max(0, p.stock)}টি আছে — পরিমাণ কমিয়ে আবার চেষ্টা করুন`, 409);
       }
@@ -99,6 +112,14 @@ export async function onRequestPost(context) {
       claimedCouponId = coupon.id;
     }
 
+    // ---- অটো-স্টক কমানো (অ্যাটমিক; ওভারসেল হয় না) ----
+    const sr = await claimStock(env, lines);
+    if (!sr.ok) {
+      if (claimedCouponId) { try { await env.DB.prepare('UPDATE coupons SET used_count = MAX(0, used_count - 1) WHERE id = ?').bind(claimedCouponId).run(); } catch (e2) { /* ignore */ } }
+      return err(`"${sr.name}" এর স্টক এইমাত্র শেষ হয়ে গেছে — কার্ট থেকে সরিয়ে বা পরিমাণ কমিয়ে আবার চেষ্টা করুন`, 409);
+    }
+    claimedStock = sr.claimed;
+
     const customer = await getCustomerFromRequest(request, env);
     const invoiceNo = (settings.invoice_prefix || 'INV') + '-' + Date.now().toString().slice(-8);
     let orderNo = ORDER_NO_RE.test(str(body.orderNo, 20)) ? str(body.orderNo, 20) : genOrderNo();
@@ -106,13 +127,27 @@ export async function onRequestPost(context) {
     let saved = false;
     for (let attempt = 0; attempt < 4 && !saved; attempt++) {
       try {
-        await env.DB.prepare(
+        const orderStmt = env.DB.prepare(
           `INSERT INTO orders (order_no, customer_id, name, phone, address, district, payment, note, items, subtotal, delivery_fee, total, status, coupon_code, discount, invoice_no)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
         ).bind(
           orderNo, customer ? customer.id : null, name, phone, address, district || null, payment || null, note || null,
           JSON.stringify(itemLines), subtotal, deliveryFee, total, coupon ? coupon.code : null, discount, invoiceNo
-        ).run();
+        );
+        // অর্ডার + প্রতিটি লাইন (কোন Seller-এর) একই ব্যাচে — হয় সব সেভ হয়, নয়তো কিছুই না
+        const stmts = [orderStmt];
+        for (const l of lines) {
+          stmts.push(env.DB.prepare(
+            `INSERT INTO order_items (order_id, product_id, seller_id, name, price, qty, line_total)
+             VALUES ((SELECT id FROM orders WHERE order_no = ?), ?, ?, ?, ?, ?, ?)`
+          ).bind(orderNo, l.p.id, l.p.seller_id || null, l.p.name, l.price, l.qty, l.price * l.qty));
+        }
+        try {
+          await env.DB.batch(stmts);
+        } catch (eb) {
+          if (/no such table:\s*order_items/i.test(String(eb && eb.message))) { await releaseClaims(env, claimedStock); claimedStock = []; await orderStmt.run(); } // (order_items নেই বলে স্টক ফেরত — migrations/009 এখনো চালানো হয়নি — আগের মতো শুধু অর্ডার সেভ
+          else throw eb;
+        }
         saved = true;
       } catch (e) {
         if (/UNIQUE/i.test(String(e && e.message))) { orderNo = genOrderNo(); continue; } // একই নম্বর আগে থাকলে নতুন নম্বর
@@ -120,6 +155,7 @@ export async function onRequestPost(context) {
       }
     }
     if (!saved) throw new Error('order number collision');
+    await logOrderStock(env, claimedStock, orderNo);
 
     return json({
       ok: true, orderNo, invoiceNo, subtotal, deliveryFee, discount, total,
@@ -127,6 +163,7 @@ export async function onRequestPost(context) {
     });
   } catch (e) {
     console.error('order save failed:', e && e.message);
+    await releaseClaims(env, claimedStock);
     if (claimedCouponId) { // অর্ডার সেভ না হলে কুপনের ব্যবহার ফেরত দেওয়া
       try { await env.DB.prepare('UPDATE coupons SET used_count = MAX(0, used_count - 1) WHERE id = ?').bind(claimedCouponId).run(); } catch (e2) { /* ignore */ }
     }
